@@ -1,0 +1,1330 @@
+[
+  {
+    "filebase": "common/clib/soup",
+    "items": [
+      {
+        "file": "./common/clib/soup.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/common",
+    "items": [
+      {
+        "file": "./common/common.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/log",
+    "items": [
+      {
+        "file": "./common/log.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/webview/find_controller",
+    "items": [
+      {
+        "file": "./widgets/webview/find_controller.c",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/webview/history",
+    "items": [
+      {
+        "file": "./widgets/webview/history.c",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/webview/inspector",
+    "items": [
+      {
+        "file": "./widgets/webview/inspector.c",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/clib/msg",
+    "items": [
+      {
+        "file": "./common/clib/msg.h",
+        "include": [
+          "#include \"luah.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "common/luajs",
+    "items": [
+      {
+        "file": "./common/luajs.c",
+        "include": [
+          "#include \"common/luajs.h\""
+        ]
+      },
+      {
+        "file": "./common/luajs.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/signal",
+    "items": [
+      {
+        "file": "./common/signal.h",
+        "include": [
+          "#include \"common/util.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "extension/script_world",
+    "items": [
+      {
+        "file": "./extension/script_world.c",
+        "include": [
+          "#include \"extension/extension.h\""
+        ]
+      },
+      {
+        "file": "./extension/script_world.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/webview/auth",
+    "items": [
+      {
+        "file": "./widgets/webview/auth.c",
+        "include": [
+          "#include \"luah.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/webview/scroll",
+    "items": [
+      {
+        "file": "./widgets/webview/scroll.c",
+        "include": [
+          "#include \"ipc.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/webview/stylesheets",
+    "items": [
+      {
+        "file": "./widgets/webview/stylesheets.c",
+        "include": [
+          "#include \"clib/stylesheet.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "clib/xdg",
+    "items": [
+      {
+        "file": "./clib/xdg.c",
+        "include": [
+          "#include \"clib/xdg.h\"",
+          "#include \"luah.h\""
+        ]
+      },
+      {
+        "file": "./clib/xdg.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/clib/utf8",
+    "items": [
+      {
+        "file": "./common/clib/utf8.c",
+        "include": [
+          "#include \"common/clib/utf8.h\"",
+          "#include \"luah.h\""
+        ]
+      },
+      {
+        "file": "./common/clib/utf8.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/luaserialize",
+    "items": [
+      {
+        "file": "./common/luaserialize.c",
+        "include": [
+          "#include \"common/luaserialize.h\"",
+          "#include \"common/lualib.h\""
+        ]
+      },
+      {
+        "file": "./common/luaserialize.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/luauniq",
+    "items": [
+      {
+        "file": "./common/luauniq.c",
+        "include": [
+          "#include \"common/luauniq.h\"",
+          "#include \"common/lualib.h\""
+        ]
+      },
+      {
+        "file": "./common/luauniq.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/util",
+    "items": [
+      {
+        "file": "./common/util.c",
+        "include": [
+          "#include \"common/util.h\""
+        ]
+      },
+      {
+        "file": "./common/util.h",
+        "include": [
+          "#include \"common/log.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "extension/clib/msg",
+    "items": [
+      {
+        "file": "./extension/clib/msg.c",
+        "include": [
+          "#include \"extension/clib/msg.h\"",
+          "#include \"common/clib/msg.h\""
+        ]
+      },
+      {
+        "file": "./extension/clib/msg.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "globalconf",
+    "items": [
+      {
+        "file": "./globalconf.h",
+        "include": [
+          "#include \"buildopts.h\"",
+          "#include \"common/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "tests/util",
+    "items": [
+      {
+        "file": "./tests/util.c",
+        "include": [
+          "#include \"common/util.h\"",
+          "#include \"common/lualib.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/box",
+    "items": [
+      {
+        "file": "./widgets/box.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"widgets/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/drawing_area",
+    "items": [
+      {
+        "file": "./widgets/drawing_area.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"widgets/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/entry",
+    "items": [
+      {
+        "file": "./widgets/entry.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"widgets/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/eventbox",
+    "items": [
+      {
+        "file": "./widgets/eventbox.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"widgets/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/label",
+    "items": [
+      {
+        "file": "./widgets/label.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"widgets/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/notebook",
+    "items": [
+      {
+        "file": "./widgets/notebook.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"widgets/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/overlay",
+    "items": [
+      {
+        "file": "./widgets/overlay.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"widgets/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/paned",
+    "items": [
+      {
+        "file": "./widgets/paned.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"widgets/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/scrolled",
+    "items": [
+      {
+        "file": "./widgets/scrolled.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"widgets/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/spinner",
+    "items": [
+      {
+        "file": "./widgets/spinner.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"widgets/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/stack",
+    "items": [
+      {
+        "file": "./widgets/stack.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"widgets/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/webview/downloads",
+    "items": [
+      {
+        "file": "./widgets/webview/downloads.c",
+        "include": [
+          "#include \"clib/download.h\"",
+          "#include \"clib/luakit.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/window",
+    "items": [
+      {
+        "file": "./widgets/window.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"widgets/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "clib/msg",
+    "items": [
+      {
+        "file": "./clib/msg.c",
+        "include": [
+          "#include \"clib/msg.h\"",
+          "#include \"common/clib/msg.h\""
+        ]
+      },
+      {
+        "file": "./clib/msg.h",
+        "include": [
+          "#include \"common/luaclass.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "clib/unique",
+    "items": [
+      {
+        "file": "./clib/unique.c",
+        "include": [
+          "#include \"clib/unique.h\"",
+          "#include \"globalconf.h\"",
+          "#include \"luah.h\""
+        ]
+      },
+      {
+        "file": "./clib/unique.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "clib/web_module",
+    "items": [
+      {
+        "file": "./clib/web_module.c",
+        "include": [
+          "#include \"clib/web_module.h\"",
+          "#include \"common/clib/ipc.h\""
+        ]
+      },
+      {
+        "file": "./clib/web_module.h",
+        "include": [
+          "#include \"common/ipc.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "common/clib/luakit",
+    "items": [
+      {
+        "file": "./common/clib/luakit.c",
+        "include": [
+          "#include \"common/clib/luakit.h\"",
+          "#include \"common/util.h\"",
+          "#include \"common/luaobject.h\""
+        ]
+      },
+      {
+        "file": "./common/clib/luakit.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/clib/regex",
+    "items": [
+      {
+        "file": "./common/clib/regex.c",
+        "include": [
+          "#include \"common/clib/regex.h\"",
+          "#include \"common/luaobject.h\"",
+          "#include \"luah.h\""
+        ]
+      },
+      {
+        "file": "./common/clib/regex.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/clib/timer",
+    "items": [
+      {
+        "file": "./common/clib/timer.c",
+        "include": [
+          "#include \"common/clib/timer.h\"",
+          "#include \"common/luaobject.h\"",
+          "#include \"luah.h\""
+        ]
+      },
+      {
+        "file": "./common/clib/timer.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/luayield",
+    "items": [
+      {
+        "file": "./common/luayield.c",
+        "include": [
+          "#include \"common/luayield.h\"",
+          "#include \"common/lualib.h\"",
+          "#include \"common/luaobject.h\""
+        ]
+      },
+      {
+        "file": "./common/luayield.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/property",
+    "items": [
+      {
+        "file": "./common/property.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"common/property.h\""
+        ]
+      },
+      {
+        "file": "./common/property.h",
+        "include": [
+          "#include \"common/tokenize.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "common/resource",
+    "items": [
+      {
+        "file": "./common/resource.c",
+        "include": [
+          "#include \"buildopts.h\"",
+          "#include \"common/resource.h\"",
+          "#include \"common/log.h\""
+        ]
+      },
+      {
+        "file": "./common/resource.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "extension/log",
+    "items": [
+      {
+        "file": "./extension/log.c",
+        "include": [
+          "#include \"extension/extension.h\"",
+          "#include \"common/log.h\"",
+          "#include \"common/ipc.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "extension/scroll",
+    "items": [
+      {
+        "file": "./extension/scroll.c",
+        "include": [
+          "#include \"extension/extension.h\"",
+          "#include \"extension/scroll.h\"",
+          "#include \"extension/ipc.h\""
+        ]
+      },
+      {
+        "file": "./extension/scroll.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "web_context",
+    "items": [
+      {
+        "file": "./web_context.c",
+        "include": [
+          "#include \"globalconf.h\"",
+          "#include \"common/log.h\"",
+          "#include \"web_context.h\""
+        ]
+      },
+      {
+        "file": "./web_context.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/webview/javascript",
+    "items": [
+      {
+        "file": "./widgets/webview/javascript.c",
+        "include": [
+          "#include \"common/luajs.h\"",
+          "#include \"common/ipc.h\"",
+          "#include \"common/luaserialize.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "clib/sqlite3",
+    "items": [
+      {
+        "file": "./clib/sqlite3.c",
+        "include": [
+          "#include \"clib/sqlite3.h\"",
+          "#include \"common/luaobject.h\"",
+          "#include \"common/luaclass.h\"",
+          "#include \"globalconf.h\""
+        ]
+      },
+      {
+        "file": "./clib/sqlite3.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/lualib",
+    "items": [
+      {
+        "file": "./common/lualib.c",
+        "include": [
+          "#include \"common/lualib.h\""
+        ]
+      },
+      {
+        "file": "./common/lualib.h",
+        "include": [
+          "#include \"common/util.h\"",
+          "#include \"common/luautil.h\"",
+          "#include \"common/luaclass.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "common/luautil",
+    "items": [
+      {
+        "file": "./common/luautil.c",
+        "include": [
+          "#include \"common/luautil.h\"",
+          "#include \"common/lualib.h\"",
+          "#include \"common/log.h\"",
+          "#include \"buildopts.h\""
+        ]
+      },
+      {
+        "file": "./common/luautil.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/image",
+    "items": [
+      {
+        "file": "./widgets/image.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"widgets/common.h\"",
+          "#include \"web_context.h\"",
+          "#include \"common/resource.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "clib/stylesheet",
+    "items": [
+      {
+        "file": "./clib/stylesheet.c",
+        "include": [
+          "#include \"clib/luakit.h\"",
+          "#include \"clib/widget.h\"",
+          "#include \"clib/stylesheet.h\"",
+          "#include \"globalconf.h\""
+        ]
+      },
+      {
+        "file": "./clib/stylesheet.h",
+        "include": [
+          "#include \"common/luaobject.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "common/ipc",
+    "items": [
+      {
+        "file": "./common/ipc.c",
+        "include": [
+          "#include \"common/lualib.h\"",
+          "#include \"common/luaserialize.h\"",
+          "#include \"common/ipc.h\"",
+          "#include \"log.h\""
+        ]
+      },
+      {
+        "file": "./common/ipc.h",
+        "include": [
+          "#include \"common/util.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "common/luaclass",
+    "items": [
+      {
+        "file": "./common/luaclass.c",
+        "include": [
+          "#include \"common/luaclass.h\"",
+          "#include \"common/luaobject.h\"",
+          "#include \"common/luayield.h\""
+        ]
+      },
+      {
+        "file": "./common/luaclass.h",
+        "include": [
+          "#include \"common/signal.h\"",
+          "#include \"common/tokenize.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "common/luaobject",
+    "items": [
+      {
+        "file": "./common/luaobject.c",
+        "include": [
+          "#include \"common/luaobject.h\""
+        ]
+      },
+      {
+        "file": "./common/luaobject.h",
+        "include": [
+          "#include \"common/luaclass.h\"",
+          "#include \"common/lualib.h\"",
+          "#include \"common/signal.h\"",
+          "#include \"common/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "extension/clib/ipc",
+    "items": [
+      {
+        "file": "./extension/clib/ipc.c",
+        "include": [
+          "#include \"extension/ipc.h\"",
+          "#include \"extension/extension.h\"",
+          "#include \"extension/clib/page.h\"",
+          "#include \"common/clib/ipc.h\"",
+          "#include \"common/luaserialize.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "clib/download",
+    "items": [
+      {
+        "file": "./clib/download.c",
+        "include": [
+          "#include \"common/luaobject.h\"",
+          "#include \"common/luauniq.h\"",
+          "#include \"clib/download.h\"",
+          "#include \"luah.h\"",
+          "#include \"globalconf.h\"",
+          "#include \"web_context.h\""
+        ]
+      },
+      {
+        "file": "./clib/download.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "clib/ipc",
+    "items": [
+      {
+        "file": "./clib/ipc.c",
+        "include": [
+          "#include \"clib/widget.h\"",
+          "#include \"common/ipc.h\"",
+          "#include \"widgets/webview.h\"",
+          "#include \"common/luauniq.h\"",
+          "#include \"common/clib/ipc.h\"",
+          "#include \"common/luaserialize.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "clib/request",
+    "items": [
+      {
+        "file": "./clib/request.c",
+        "include": [
+          "#include \"common/luaobject.h\"",
+          "#include \"common/luauniq.h\"",
+          "#include \"clib/request.h\"",
+          "#include \"luah.h\"",
+          "#include \"globalconf.h\"",
+          "#include \"web_context.h\""
+        ]
+      },
+      {
+        "file": "./clib/request.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "clib/soup",
+    "items": [
+      {
+        "file": "./clib/soup.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"clib/soup.h\"",
+          "#include \"common/property.h\"",
+          "#include \"common/signal.h\"",
+          "#include \"web_context.h\"",
+          "#include \"common/clib/soup.h\""
+        ]
+      },
+      {
+        "file": "./clib/soup.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/luah",
+    "items": [
+      {
+        "file": "./common/luah.c",
+        "include": [
+          "#include \"common/luah.h\"",
+          "#include \"common/luautil.h\"",
+          "#include \"common/luaclass.h\""
+        ]
+      },
+      {
+        "file": "./common/luah.h",
+        "include": [
+          "#include \"common/luaobject.h\"",
+          "#include \"common/lualib.h\"",
+          "#include \"common/log.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "extension/clib/soup",
+    "items": [
+      {
+        "file": "./extension/clib/soup.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"clib/soup.h\"",
+          "#include \"common/property.h\"",
+          "#include \"common/signal.h\"",
+          "#include \"web_context.h\"",
+          "#include \"common/clib/soup.h\""
+        ]
+      },
+      {
+        "file": "./extension/clib/soup.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "luakit",
+    "items": [
+      {
+        "file": "./luakit.c",
+        "include": [
+          "#include \"common/util.h\"",
+          "#include \"globalconf.h\"",
+          "#include \"luah.h\"",
+          "#include \"ipc.h\"",
+          "#include \"log.h\"",
+          "#include \"web_context.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/common",
+    "items": [
+      {
+        "file": "./widgets/common.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"globalconf.h\"",
+          "#include \"common/luaobject.h\"",
+          "#include \"common/lualib.h\"",
+          "#include \"widgets/common.h\""
+        ]
+      },
+      {
+        "file": "./widgets/common.h",
+        "include": [
+          "#include \"clib/widget.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "clib/widget",
+    "items": [
+      {
+        "file": "./clib/widget.c",
+        "include": [
+          "#include \"clib/widget.h\"",
+          "#include \"common/property.h\""
+        ]
+      },
+      {
+        "file": "./clib/widget.h",
+        "include": [
+          "#include \"common/util.h\"",
+          "#include \"common/luaclass.h\"",
+          "#include \"common/luaobject.h\"",
+          "#include \"luah.h\"",
+          "#include \"globalconf.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "log",
+    "items": [
+      {
+        "file": "./log.c",
+        "include": [
+          "#include \"globalconf.h\"",
+          "#include \"common/log.h\"",
+          "#include \"common/luaserialize.h\"",
+          "#include \"common/luaclass.h\"",
+          "#include \"common/ipc.h\"",
+          "#include \"clib/msg.h\""
+        ]
+      },
+      {
+        "file": "./log.h",
+        "include": [
+          "#include \"common/log.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "extension/clib/dom_document",
+    "items": [
+      {
+        "file": "./extension/clib/dom_document.c",
+        "include": [
+          "#include \"extension/extension.h\"",
+          "#include \"extension/clib/dom_document.h\"",
+          "#include \"extension/clib/dom_element.h\"",
+          "#include \"common/tokenize.h\"",
+          "#include \"common/luauniq.h\""
+        ]
+      },
+      {
+        "file": "./extension/clib/dom_document.h",
+        "include": [
+          "#include \"common/util.h\"",
+          "#include \"common/luaclass.h\"",
+          "#include \"common/luaobject.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "extension/luajs",
+    "items": [
+      {
+        "file": "./extension/luajs.c",
+        "include": [
+          "#include \"luah.h\"",
+          "#include \"extension/extension.h\"",
+          "#include \"extension/luajs.h\"",
+          "#include \"extension/clib/page.h\"",
+          "#include \"common/ipc.h\"",
+          "#include \"common/lualib.h\"",
+          "#include \"common/luaserialize.h\"",
+          "#include \"common/luajs.h\""
+        ]
+      },
+      {
+        "file": "./extension/luajs.h",
+        "include": []
+      }
+    ]
+  },
+  {
+    "filebase": "common/clib/ipc",
+    "items": [
+      {
+        "file": "./common/clib/ipc.c",
+        "include": [
+          "#include \"common/clib/ipc.h\"",
+          "#include \"common/ipc.h\"",
+          "#include \"luah.h\"",
+          "#include \"common/tokenize.h\"",
+          "#include \"common/luaserialize.h\"",
+          "#include \"common/luauniq.h\""
+        ]
+      },
+      {
+        "file": "./common/clib/ipc.h",
+        "include": [
+          "#include \"common/util.h\"",
+          "#include \"common/luaclass.h\"",
+          "#include \"common/luaobject.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "extension/clib/dom_element",
+    "items": [
+      {
+        "file": "./extension/clib/dom_element.c",
+        "include": [
+          "#include \"extension/clib/dom_element.h\"",
+          "#include \"extension/clib/dom_document.h\"",
+          "#include \"common/luauniq.h\"",
+          "#include \"extension/extension.h\""
+        ]
+      },
+      {
+        "file": "./extension/clib/dom_element.h",
+        "include": [
+          "#include \"extension/extension.h\"",
+          "#include \"common/util.h\"",
+          "#include \"common/luaclass.h\"",
+          "#include \"common/luaobject.h\"",
+          "#include \"extension/clib/page.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "extension/clib/luakit",
+    "items": [
+      {
+        "file": "./extension/clib/luakit.c",
+        "include": [
+          "#include \"extension/extension.h\"",
+          "#include \"extension/luajs.h\"",
+          "#include \"extension/clib/luakit.h\"",
+          "#include \"extension/clib/page.h\"",
+          "#include \"common/clib/luakit.h\"",
+          "#include \"common/resource.h\"",
+          "#include \"common/signal.h\""
+        ]
+      },
+      {
+        "file": "./extension/clib/luakit.h",
+        "include": [
+          "#include \"common/luaclass.h\"",
+          "#include \"common/ipc.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "extension/ipc",
+    "items": [
+      {
+        "file": "./extension/ipc.c",
+        "include": [
+          "#include \"extension/extension.h\"",
+          "#include \"extension/clib/luakit.h\"",
+          "#include \"extension/ipc.h\"",
+          "#include \"extension/scroll.h\"",
+          "#include \"common/util.h\"",
+          "#include \"common/luajs.h\"",
+          "#include \"common/luaserialize.h\"",
+          "#include \"common/clib/ipc.h\""
+        ]
+      },
+      {
+        "file": "./extension/ipc.h",
+        "include": [
+          "#include \"common/ipc.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "ipc",
+    "items": [
+      {
+        "file": "./ipc.c",
+        "include": [
+          "#include \"globalconf.h\"",
+          "#include \"ipc.h\"",
+          "#include \"clib/web_module.h\"",
+          "#include \"clib/luakit.h\"",
+          "#include \"clib/widget.h\"",
+          "#include \"common/luaserialize.h\"",
+          "#include \"common/clib/ipc.h\"",
+          "#include \"web_context.h\"",
+          "#include \"widgets/webview.h\""
+        ]
+      },
+      {
+        "file": "./ipc.h",
+        "include": [
+          "#include \"common/ipc.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "extension/clib/page",
+    "items": [
+      {
+        "file": "./extension/clib/page.c",
+        "include": [
+          "#include \"extension/extension.h\"",
+          "#include \"extension/clib/page.h\"",
+          "#include \"extension/clib/dom_document.h\"",
+          "#include \"extension/clib/dom_element.h\"",
+          "#include \"common/tokenize.h\"",
+          "#include \"common/luautil.h\"",
+          "#include \"common/luauniq.h\"",
+          "#include \"common/luajs.h\"",
+          "#include \"luah.h\""
+        ]
+      },
+      {
+        "file": "./extension/clib/page.h",
+        "include": [
+          "#include \"common/util.h\"",
+          "#include \"common/luaclass.h\"",
+          "#include \"common/luaobject.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "clib/luakit",
+    "items": [
+      {
+        "file": "./clib/luakit.c",
+        "include": [
+          "#include \"clib/luakit.h\"",
+          "#include \"common/clib/luakit.h\"",
+          "#include \"clib/widget.h\"",
+          "#include \"common/luaserialize.h\"",
+          "#include \"common/luayield.h\"",
+          "#include \"common/ipc.h\"",
+          "#include \"common/resource.h\"",
+          "#include \"common/signal.h\"",
+          "#include \"ipc.h\"",
+          "#include \"luah.h\"",
+          "#include \"log.h\"",
+          "#include \"web_context.h\"",
+          "#include \"globalconf.h\""
+        ]
+      },
+      {
+        "file": "./clib/luakit.h",
+        "include": [
+          "#include \"common/luaclass.h\"",
+          "#include \"common/ipc.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "widgets/webview",
+    "items": [
+      {
+        "file": "./widgets/webview.c",
+        "include": [
+          "#include \"globalconf.h\"",
+          "#include \"widgets/common.h\"",
+          "#include \"widgets/webview.h\"",
+          "#include \"common/property.h\"",
+          "#include \"luah.h\"",
+          "#include \"clib/widget.h\"",
+          "#include \"clib/request.h\"",
+          "#include \"common/signal.h\"",
+          "#include \"web_context.h\"",
+          "#include \"common/ipc.h\"",
+          "#include \"common/luayield.h\"",
+          "#include \"widgets/webview/javascript.c\"",
+          "#include \"widgets/webview/downloads.c\"",
+          "#include \"widgets/webview/history.c\"",
+          "#include \"widgets/webview/scroll.c\"",
+          "#include \"widgets/webview/inspector.c\"",
+          "#include \"widgets/webview/find_controller.c\"",
+          "#include \"widgets/webview/stylesheets.c\"",
+          "#include \"widgets/webview/auth.c\""
+        ]
+      },
+      {
+        "file": "./widgets/webview.h",
+        "include": [
+          "#include \"clib/widget.h\"",
+          "#include \"common/ipc.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "extension/extension",
+    "items": [
+      {
+        "file": "./extension/extension.c",
+        "include": [
+          "#include \"common/util.h\"",
+          "#include \"common/luah.h\"",
+          "#include \"common/luautil.h\"",
+          "#include \"common/luauniq.h\"",
+          "#include \"extension/ipc.h\"",
+          "#include \"common/luaobject.h\"",
+          "#include \"extension/extension.h\"",
+          "#include \"extension/clib/luakit.h\"",
+          "#include \"extension/clib/dom_document.h\"",
+          "#include \"extension/clib/dom_element.h\"",
+          "#include \"extension/clib/page.h\"",
+          "#include \"extension/clib/soup.h\"",
+          "#include \"extension/clib/msg.h\"",
+          "#include \"common/clib/ipc.h\"",
+          "#include \"common/clib/timer.h\"",
+          "#include \"common/clib/regex.h\"",
+          "#include \"common/clib/utf8.h\"",
+          "#include \"extension/scroll.h\"",
+          "#include \"extension/luajs.h\"",
+          "#include \"extension/script_world.h\""
+        ]
+      },
+      {
+        "file": "./extension/extension.h",
+        "include": [
+          "#include \"extension/ipc.h\"",
+          "#include \"common/common.h\""
+        ]
+      }
+    ]
+  },
+  {
+    "filebase": "luah",
+    "items": [
+      {
+        "file": "./luah.c",
+        "include": [
+          "#include \"ipc.h\"",
+          "#include \"luah.h\"",
+          "#include \"log.h\"",
+          "#include \"common/luah.h\"",
+          "#include \"common/luautil.h\"",
+          "#include \"common/luayield.h\"",
+          "#include \"clib/download.h\"",
+          "#include \"clib/luakit.h\"",
+          "#include \"clib/request.h\"",
+          "#include \"clib/sqlite3.h\"",
+          "#include \"clib/soup.h\"",
+          "#include \"clib/unique.h\"",
+          "#include \"clib/widget.h\"",
+          "#include \"clib/xdg.h\"",
+          "#include \"clib/stylesheet.h\"",
+          "#include \"clib/web_module.h\"",
+          "#include \"clib/msg.h\"",
+          "#include \"common/clib/ipc.h\"",
+          "#include \"common/clib/timer.h\"",
+          "#include \"common/clib/regex.h\"",
+          "#include \"common/clib/utf8.h\"",
+          "#include \"globalconf.h\""
+        ]
+      },
+      {
+        "file": "./luah.h",
+        "include": [
+          "#include \"common/luah.h\""
+        ]
+      }
+    ]
+  }
+]

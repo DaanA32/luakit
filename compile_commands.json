@@ -1,0 +1,322 @@
+[
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o ipc.o ipc.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/ipc.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o log.o log.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/log.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o luah.o luah.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/luah.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o luakit.o luakit.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/luakit.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o web_context.o web_context.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/web_context.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/ipc.o common/ipc.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/ipc.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/luaclass.o common/luaclass.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/luaclass.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/luah.o common/luah.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/luah.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/luajs.o common/luajs.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/luajs.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/lualib.o common/lualib.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/lualib.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/luaobject.o common/luaobject.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/luaobject.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/luaserialize.o common/luaserialize.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/luaserialize.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/luauniq.o common/luauniq.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/luauniq.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/luautil.o common/luautil.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/luautil.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/luayield.o common/luayield.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/luayield.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/property.o common/property.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/property.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/resource.o common/resource.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/resource.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/util.o common/util.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/util.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/clib/ipc.o common/clib/ipc.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/clib/ipc.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/clib/luakit.o common/clib/luakit.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/clib/luakit.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/clib/regex.o common/clib/regex.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/clib/regex.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/clib/timer.o common/clib/timer.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/clib/timer.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/clib/utf8.o common/clib/utf8.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/clib/utf8.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o clib/download.o clib/download.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/clib/download.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o clib/ipc.o clib/ipc.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/clib/ipc.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o clib/luakit.o clib/luakit.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/clib/luakit.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o clib/msg.o clib/msg.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/clib/msg.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o clib/request.o clib/request.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/clib/request.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o clib/soup.o clib/soup.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/clib/soup.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o clib/sqlite3.o clib/sqlite3.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/clib/sqlite3.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o clib/stylesheet.o clib/stylesheet.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/clib/stylesheet.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o clib/unique.o clib/unique.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/clib/unique.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o clib/web_module.o clib/web_module.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/clib/web_module.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o clib/widget.o clib/widget.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/clib/widget.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o clib/xdg.o clib/xdg.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/clib/xdg.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/box.o widgets/box.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/box.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/common.o widgets/common.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/common.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/drawing_area.o widgets/drawing_area.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/drawing_area.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/entry.o widgets/entry.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/entry.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/eventbox.o widgets/eventbox.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/eventbox.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/image.o widgets/image.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/image.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/label.o widgets/label.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/label.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/notebook.o widgets/notebook.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/notebook.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/overlay.o widgets/overlay.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/overlay.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/paned.o widgets/paned.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/paned.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/scrolled.o widgets/scrolled.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/scrolled.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/spinner.o widgets/spinner.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/spinner.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/stack.o widgets/stack.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/stack.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/webview.o widgets/webview.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/webview.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DVERSION=\\\"64175ca2\\\" -o widgets/window.o widgets/window.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/widgets/window.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o common/tokenize.o common/tokenize.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/common/tokenize.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o extension/extension.o extension/extension.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/extension/extension.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o extension/ipc.o extension/ipc.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/extension/ipc.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o extension/log.o extension/log.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/extension/log.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o extension/luajs.o extension/luajs.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/extension/luajs.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o extension/script_world.o extension/script_world.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/extension/script_world.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o extension/scroll.o extension/scroll.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/extension/scroll.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o extension/clib/dom_document.o extension/clib/dom_document.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/extension/clib/dom_document.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o extension/clib/dom_element.o extension/clib/dom_element.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/extension/clib/dom_element.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o extension/clib/ipc.o extension/clib/ipc.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/extension/clib/ipc.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o extension/clib/luakit.o extension/clib/luakit.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/extension/clib/luakit.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o extension/clib/msg.o extension/clib/msg.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/extension/clib/msg.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o extension/clib/page.o extension/clib/page.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/extension/clib/page.c"
+    },
+    {
+        "command": "cc -c -std=c11 -D_XOPEN_SOURCE=600 -W -Wall -Wextra -Werror=unused-result -I/usr/include/webkitgtk-4.1 -I/usr/include/gtk-3.0 -I/usr/include/pango-1.0 -I/usr/include/cloudproviders -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/atk-1.0 -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/fribidi -I/usr/include/pixman-1 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gio-unix-2.0 -I/usr/include/libsoup-3.0 -I/usr/include/libmount -I/usr/include/blkid -I/usr/include/luajit-2.1 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/sysprof-6 -pthread -I./ -DLUAKIT_WEB_EXTENSION -fPIC -DVERSION=\\\"64175ca2\\\" -o extension/clib/soup.o extension/clib/soup.c",
+        "directory": "/home/daana/git/luakit",
+        "file": "/home/daana/git/luakit/extension/clib/soup.c"
+    }
+]
