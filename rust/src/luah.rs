@@ -468,6 +468,7 @@ use lua::ffi::{
 
 use crate::clib::soup::soup_lib_setup;
 use crate::clib::sqlite3::sqlite3_class_setup;
+use crate::clib::stylesheet::stylesheet_class_setup;
 use crate::common::util::{file_exists, luaH_panic};
 use crate::luah::stylesheet_h::web_module_lib_setup;
 
@@ -527,7 +528,6 @@ use self::regex_h::regex_class_setup;
 use self::request_h::request_class_setup;
 use self::stdlib_h::{atoi, getenv, setenv, unsetenv};
 use self::string_h::{memcpy, strlen};
-use self::stylesheet_h::stylesheet_class_setup;
 use self::timer_h::timer_class_setup;
 use self::unique_h::unique_lib_setup;
 use self::unistd_h::execvp;
