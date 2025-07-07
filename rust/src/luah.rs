@@ -46,13 +46,6 @@ pub mod gunicode_h {
         pub fn g_unichar_to_utf8(c: gunichar, outbuf: *mut gchar) -> gint;
     }
 }
-pub mod lua_h {
-    pub type lua_CFunction = Option<unsafe extern "C" fn(*mut lua_State) -> std::ffi::c_int>;
-    use lua::ffi::lua_State;
-
-    use super::__stddef_size_t_h::size_t;
-    unsafe extern "C" {}
-}
 pub mod log_h {
     pub type log_level_t = std::ffi::c_uint;
     pub const LOG_LEVEL_debug: log_level_t = 5;
@@ -474,10 +467,14 @@ pub mod utf8_h {
     }
 }
 use glib_sys::g_free;
+use lua::Function;
 use lua::ffi::{
     lua_Integer, lua_State, lua_atpanic, lua_createtable, lua_pushstring, lua_rawseti,
     lua_setfield, lua_settop, lua_tolstring,
 };
+
+use crate::common::util::{file_exists, luaH_panic};
+use crate::luah::stylesheet_h::web_module_lib_setup;
 
 pub use self::__stddef_size_t_h::size_t;
 use self::clib_ipc_h::ipc_channel_class_setup;
@@ -523,7 +520,6 @@ pub use self::log_h::{
     _log, LOG_LEVEL_debug, LOG_LEVEL_error, LOG_LEVEL_fatal, LOG_LEVEL_info, LOG_LEVEL_verbose,
     LOG_LEVEL_warn, log_level_t,
 };
-pub use self::lua_h::lua_CFunction;
 use self::luah_h::luaH_fixups;
 use self::luakit_h::luakit_lib_setup;
 use self::luakit_log_h::log_dump_queued_emissions;
@@ -543,8 +539,6 @@ use self::timer_h::timer_class_setup;
 use self::unique_h::unique_lib_setup;
 use self::unistd_h::execvp;
 use self::utf8_h::utf8_lib_setup;
-use self::util_h::{file_exists, luaH_panic};
-use self::web_module_h::web_module_lib_setup;
 use self::widget_h::widget_class_setup;
 use self::xdg_h::xdg_lib_setup;
 
@@ -620,10 +614,7 @@ pub unsafe extern "C" fn luaH_keystr_push(mut L: *mut lua_State, mut keyval: gui
 pub unsafe extern "C" fn luaH_init(mut uris: *mut *mut gchar) {
     common.L = luaL_newstate();
     let mut L: *mut lua_State = common.L;
-    lua_atpanic(
-        L,
-        Some(luaH_panic as unsafe extern "C" fn(*mut lua_State) -> gint),
-    );
+    lua_atpanic(L, Some(luaH_panic));
     luaL_openlibs(L);
     luaH_fixups(L);
     luaH_object_setup(L);

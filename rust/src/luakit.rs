@@ -508,8 +508,10 @@ pub mod gprintf_h {
         pub fn g_fprintf(file: *mut FILE, format: *const gchar, _: ...) -> gint;
     }
 }
+pub mod clib;
 pub mod common;
 pub mod luah;
+
 pub mod ipc_h {
     unsafe extern "C" {
         pub fn ipc_init();
