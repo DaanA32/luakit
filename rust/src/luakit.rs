@@ -9,6 +9,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(path_statements)]
 #![allow(static_mut_refs)]
+#![allow(mutable_transmutes)]
 
 use ::c2rust_bitfields;
 use ::libc;
@@ -510,6 +511,7 @@ pub mod gprintf_h {
         pub fn g_fprintf(file: *mut FILE, format: *const gchar, _: ...) -> gint;
     }
 }
+pub mod common;
 pub mod luah;
 pub mod ipc_h {
     unsafe extern "C" {

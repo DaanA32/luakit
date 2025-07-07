@@ -47,33 +47,10 @@ pub mod gunicode_h {
     }
 }
 pub mod lua_h {
+    use crate::common::luautil::lua_State;
     pub type lua_CFunction = Option<unsafe extern "C" fn(*mut lua_State) -> std::ffi::c_int>;
     use super::__stddef_size_t_h::size_t;
-    #[link(name = "lua")]
-    unsafe extern "C" {
-        pub type lua_State;
-        pub fn lua_atpanic(L: *mut lua_State, panicf: lua_CFunction) -> lua_CFunction;
-        pub fn lua_gettop(L: *mut lua_State) -> std::ffi::c_int;
-        pub fn lua_settop(L: *mut lua_State, idx: std::ffi::c_int);
-        pub fn lua_remove(L: *mut lua_State, idx: std::ffi::c_int);
-        pub fn lua_insert(L: *mut lua_State, idx: std::ffi::c_int);
-        pub fn lua_tolstring(
-            L: *mut lua_State,
-            idx: std::ffi::c_int,
-            len: *mut size_t,
-        ) -> *const std::ffi::c_char;
-        pub fn lua_pushstring(L: *mut lua_State, s: *const std::ffi::c_char);
-        pub fn lua_pushcclosure(L: *mut lua_State, fn_0: lua_CFunction, n: std::ffi::c_int);
-        pub fn lua_createtable(L: *mut lua_State, narr: std::ffi::c_int, nrec: std::ffi::c_int);
-        pub fn lua_setfield(L: *mut lua_State, idx: std::ffi::c_int, k: *const std::ffi::c_char);
-        pub fn lua_rawseti(L: *mut lua_State, idx: std::ffi::c_int, n: std::ffi::c_int);
-        pub fn lua_pcall(
-            L: *mut lua_State,
-            nargs: std::ffi::c_int,
-            nresults: std::ffi::c_int,
-            errfunc: std::ffi::c_int,
-        ) -> std::ffi::c_int;
-    }
+    unsafe extern "C" {}
 }
 pub mod log_h {
     pub type log_level_t = std::ffi::c_uint;
@@ -118,13 +95,14 @@ pub mod gobject_h {
     use super::gtypes_h::guint;
 }
 pub mod common_h {
+    use crate::common::luautil::lua_State;
+
     #[derive(Copy, Clone)]
     #[repr(C)]
     pub struct _common_t {
         pub L: *mut lua_State,
     }
     pub type common_t = _common_t;
-    use super::lua_h::lua_State;
     unsafe extern "C" {
         pub static mut common: common_t;
     }
@@ -300,7 +278,7 @@ pub mod unistd_h {
 }
 pub mod util_h {
     use super::gtypes_h::{gboolean, gchar, gint};
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn file_exists(_: *const gchar) -> gboolean;
         pub fn luaH_panic(L: *mut lua_State) -> gint;
@@ -312,7 +290,7 @@ pub mod ipc_h {
     }
 }
 pub mod lauxlib_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn luaL_loadfile(
             L: *mut lua_State,
@@ -322,20 +300,21 @@ pub mod lauxlib_h {
     }
 }
 pub mod lualib_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn luaL_openlibs(L: *mut lua_State);
     }
 }
 pub mod luautil_h {
     use super::gtypes_h::{gchar, gint};
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn luaH_dofunction_on_error(L: *mut lua_State) -> gint;
         pub fn luaH_add_paths(L: *mut lua_State, config_dir: *const gchar);
     }
 }
 pub mod common_lualib_h {
+    use crate::common::luautil::lua_h::*;
     #[inline]
     pub unsafe extern "C" fn luaH_dofunction(
         mut L: *mut lua_State,
@@ -363,23 +342,20 @@ pub mod common_lualib_h {
         lua_remove(L, error_func_pos);
         return (0 as std::ffi::c_int == 0) as std::ffi::c_int;
     }
+
     use super::__stddef_size_t_h::size_t;
     use super::gtypes_h::{gboolean, gint};
     use super::log_h::{_log, LOG_LEVEL_error, log_level_t};
-    use super::lua_h::{
-        lua_State, lua_gettop, lua_insert, lua_pcall, lua_pushcclosure, lua_remove, lua_settop,
-        lua_tolstring,
-    };
     use super::luautil_h::luaH_dofunction_on_error;
 }
 pub mod luaobject_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn luaH_object_setup(L: *mut lua_State);
     }
 }
 pub mod luah_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn luaH_fixups(L: *mut lua_State);
     }
@@ -390,7 +366,7 @@ pub mod luakit_log_h {
     }
 }
 pub mod luayield_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn luaH_yield_setup(L: *mut lua_State);
     }
@@ -404,96 +380,98 @@ pub mod gdkkeys_h {
     }
 }
 pub mod download_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn download_class_setup(_: *mut lua_State);
     }
 }
 pub mod luakit_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn luakit_lib_setup(L: *mut lua_State);
     }
 }
 pub mod request_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn request_class_setup(_: *mut lua_State);
     }
 }
 pub mod sqlite3_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn sqlite3_class_setup(_: *mut lua_State);
     }
 }
 pub mod soup_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn soup_lib_setup(L: *mut lua_State);
     }
 }
 pub mod unique_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn unique_lib_setup(_: *mut lua_State);
     }
 }
 pub mod widget_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn widget_class_setup(_: *mut lua_State);
     }
 }
 pub mod xdg_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn xdg_lib_setup(_: *mut lua_State);
     }
 }
 pub mod stylesheet_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn stylesheet_class_setup(_: *mut lua_State);
     }
 }
 pub mod web_module_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn web_module_lib_setup(_: *mut lua_State);
     }
 }
 pub mod msg_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn msg_lib_setup(L: *mut lua_State);
     }
 }
 pub mod clib_ipc_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn ipc_channel_class_setup(_: *mut lua_State);
     }
 }
 pub mod timer_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn timer_class_setup(_: *mut lua_State);
     }
 }
 pub mod regex_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn regex_class_setup(_: *mut lua_State);
     }
 }
 pub mod utf8_h {
-    use super::lua_h::lua_State;
+    use crate::common::luautil::lua_State;
     unsafe extern "C" {
         pub fn utf8_lib_setup(_: *mut lua_State);
     }
 }
 use glib_sys::g_free;
+
+use crate::common::luautil::lua_rawseti;
 
 pub use self::__stddef_size_t_h::size_t;
 use self::clib_ipc_h::ipc_channel_class_setup;
@@ -539,11 +517,7 @@ pub use self::log_h::{
     _log, LOG_LEVEL_debug, LOG_LEVEL_error, LOG_LEVEL_fatal, LOG_LEVEL_info, LOG_LEVEL_verbose,
     LOG_LEVEL_warn, log_level_t,
 };
-pub use self::lua_h::{
-    lua_CFunction, lua_State, lua_atpanic, lua_createtable, lua_gettop, lua_insert, lua_pcall,
-    lua_pushcclosure, lua_pushstring, lua_rawseti, lua_remove, lua_setfield, lua_settop,
-    lua_tolstring,
-};
+pub use self::lua_h::lua_CFunction;
 use self::luah_h::luaH_fixups;
 use self::luakit_h::luakit_lib_setup;
 use self::luakit_log_h::log_dump_queued_emissions;
@@ -567,6 +541,8 @@ use self::util_h::{file_exists, luaH_panic};
 use self::web_module_h::web_module_lib_setup;
 use self::widget_h::widget_class_setup;
 use self::xdg_h::xdg_lib_setup;
+
+use crate::common::luautil::lua_h::*;
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn luaH_modifier_table_push(mut L: *mut lua_State, mut state: guint) {
