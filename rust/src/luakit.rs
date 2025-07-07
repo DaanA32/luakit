@@ -174,11 +174,6 @@ pub mod gtree_h {
         pub type _GTree;
     }
 }
-pub mod lua_h {
-    unsafe extern "C" {
-        pub type lua_State;
-    }
-}
 pub mod struct_timeval_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
@@ -202,13 +197,14 @@ pub mod log_h {
     }
 }
 pub mod common_h {
+    use lua::ffi::lua_State;
+
     #[derive(Copy, Clone)]
     #[repr(C)]
     pub struct _common_t {
         pub L: *mut lua_State,
     }
     pub type common_t = _common_t;
-    use super::lua_h::lua_State;
 }
 pub mod gtype_h {
     pub type GType = gsize;
@@ -366,9 +362,10 @@ pub mod luaclass_h {
         pub index_miss_property: lua_class_propfunc_t,
         pub newindex_miss_property: lua_class_propfunc_t,
     }
+    use lua::ffi::lua_State;
+
     use super::ghash_h::GHashTable;
     use super::gtypes_h::{gchar, gint};
-    use super::lua_h::lua_State;
     use super::signal_h::signal_t;
 }
 pub mod string_h {
@@ -552,6 +549,7 @@ pub mod locale_h {
     }
 }
 use glib_sys::g_free;
+use lua::ffi::lua_State;
 
 pub use self::__stddef_size_t_h::size_t;
 pub use self::FILE_h::FILE;
@@ -607,7 +605,6 @@ pub use self::log_h::{
     _log, LOG_LEVEL_debug, LOG_LEVEL_error, LOG_LEVEL_fatal, LOG_LEVEL_info, LOG_LEVEL_verbose,
     LOG_LEVEL_warn, log_level_t,
 };
-use self::lua_h::lua_State;
 pub use self::luaclass_h::{
     lua_class_allocator_t, lua_class_property_array_t, lua_class_propfunc_t, lua_class_t,
     lua_object_t,

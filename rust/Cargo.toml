@@ -18,3 +18,4 @@ c2rust-bitfields = "0.20.0"
 # c2rust = { path = "../../c2rust/c2rust/" }
 libc = "0.2.174"
 glib-sys = "0.20.10"
+lua = "0.0.10"
