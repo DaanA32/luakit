@@ -1,163 +1,118 @@
+#![feature(extern_types)]
+#![allow(non_camel_case_types)]
+#![allow(unused_imports)]
+#![allow(unsafe_op_in_unsafe_fn)]
+#![allow(unused_assignments)]
+#![allow(unused_mut)]
+#![allow(unused_variables)]
+#![allow(non_snake_case)]
+#![allow(non_upper_case_globals)]
+#![allow(path_statements)]
+#![allow(static_mut_refs)]
+
 use ::libc;
 use ::c2rust_bitfields;
-#[c2rust::header_src = "/usr/lib/clang/20/include/__stddef_size_t.h:21"]
+
 pub mod __stddef_size_t_h {
-    #[c2rust::src_loc = "18:1"]
     pub type size_t = std::ffi::c_ulong;
 }
-#[c2rust::header_src = "/usr/lib/glib-2.0/include/glibconfig.h:21"]
 pub mod glibconfig_h {
-    #[c2rust::src_loc = "57:1"]
     pub type guint32 = std::ffi::c_uint;
-    #[c2rust::src_loc = "82:1"]
     pub type gssize = std::ffi::c_long;
-    #[c2rust::src_loc = "83:1"]
     pub type gsize = std::ffi::c_ulong;
 }
-#[c2rust::header_src = "/usr/include/bits/types.h:21"]
 pub mod types_h {
-    #[c2rust::src_loc = "152:1"]
     pub type __off_t = std::ffi::c_long;
-    #[c2rust::src_loc = "153:1"]
     pub type __off64_t = std::ffi::c_long;
-    #[c2rust::src_loc = "154:1"]
     pub type __pid_t = std::ffi::c_int;
-    #[c2rust::src_loc = "160:1"]
     pub type __time_t = std::ffi::c_long;
-    #[c2rust::src_loc = "162:1"]
     pub type __suseconds_t = std::ffi::c_long;
 }
-#[c2rust::header_src = "/usr/include/time.h:21"]
 pub mod include_time_h {
-    #[c2rust::src_loc = "54:1"]
     pub type pid_t = __pid_t;
     use super::types_h::__pid_t;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gtypes.h:21"]
 pub mod gtypes_h {
-    #[c2rust::src_loc = "52:1"]
     pub type gchar = std::ffi::c_char;
-    #[c2rust::src_loc = "55:1"]
     pub type gint = std::ffi::c_int;
-    #[c2rust::src_loc = "56:1"]
     pub type gboolean = gint;
-    #[c2rust::src_loc = "61:1"]
     pub type guint = std::ffi::c_uint;
-    #[c2rust::src_loc = "64:1"]
     pub type gdouble = std::ffi::c_double;
-    #[c2rust::src_loc = "109:1"]
     pub type gpointer = *mut std::ffi::c_void;
-    #[c2rust::src_loc = "110:1"]
     pub type gconstpointer = *const std::ffi::c_void;
-    #[c2rust::src_loc = "140:1"]
     pub type GDestroyNotify = Option::<unsafe extern "C" fn(gpointer) -> ()>;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/garray.h:21"]
 pub mod garray_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "55:8"]
     pub struct _GPtrArray {
         pub pdata: *mut gpointer,
         pub len: guint,
     }
-    #[c2rust::src_loc = "41:1"]
     pub type GPtrArray = _GPtrArray;
     use super::gtypes_h::{gpointer, guint, GDestroyNotify};
-    extern "C" {
-        #[c2rust::src_loc = "150:1"]
+    unsafe extern "C" {
         pub fn g_ptr_array_new() -> *mut GPtrArray;
-        #[c2rust::src_loc = "152:1"]
         pub fn g_ptr_array_new_with_free_func(
             element_free_func: GDestroyNotify,
         ) -> *mut GPtrArray;
-        #[c2rust::src_loc = "201:1"]
         pub fn g_ptr_array_remove_index(
             array: *mut GPtrArray,
             index_: guint,
         ) -> gpointer;
-        #[c2rust::src_loc = "223:1"]
         pub fn g_ptr_array_add(array: *mut GPtrArray, data: gpointer);
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gquark.h:21"]
 pub mod gquark_h {
-    #[c2rust::src_loc = "38:1"]
     pub type GQuark = guint32;
     use super::glibconfig_h::guint32;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gerror.h:21"]
 pub mod gerror_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "45:8"]
     pub struct _GError {
         pub domain: GQuark,
         pub code: gint,
         pub message: *mut gchar,
     }
-    #[c2rust::src_loc = "43:1"]
     pub type GError = _GError;
     use super::gquark_h::GQuark;
     use super::gtypes_h::{gint, gchar};
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gdataset.h:21"]
 pub mod gdataset_h {
-    #[c2rust::src_loc = "38:1"]
     pub type GData = _GData;
-    extern "C" {
-        #[c2rust::src_loc = "38:16"]
+    unsafe extern "C" {
         pub type _GData;
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/ghash.h:21"]
 pub mod ghash_h {
-    #[c2rust::src_loc = "40:1"]
     pub type GHashTable = _GHashTable;
-    extern "C" {
-        #[c2rust::src_loc = "40:16"]
+    unsafe extern "C" {
         pub type _GHashTable;
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gmessages.h:21"]
 pub mod gmessages_h {
-    #[c2rust::src_loc = "55:9"]
     pub type GLogLevelFlags = std::ffi::c_int;
-    #[c2rust::src_loc = "69:3"]
     pub const G_LOG_LEVEL_MASK: GLogLevelFlags = -4;
-    #[c2rust::src_loc = "67:3"]
     pub const G_LOG_LEVEL_DEBUG: GLogLevelFlags = 128;
-    #[c2rust::src_loc = "66:3"]
     pub const G_LOG_LEVEL_INFO: GLogLevelFlags = 64;
-    #[c2rust::src_loc = "65:3"]
     pub const G_LOG_LEVEL_MESSAGE: GLogLevelFlags = 32;
-    #[c2rust::src_loc = "64:3"]
     pub const G_LOG_LEVEL_WARNING: GLogLevelFlags = 16;
-    #[c2rust::src_loc = "63:3"]
     pub const G_LOG_LEVEL_CRITICAL: GLogLevelFlags = 8;
-    #[c2rust::src_loc = "62:3"]
     pub const G_LOG_LEVEL_ERROR: GLogLevelFlags = 4;
-    #[c2rust::src_loc = "59:3"]
     pub const G_LOG_FLAG_FATAL: GLogLevelFlags = 2;
-    #[c2rust::src_loc = "58:3"]
     pub const G_LOG_FLAG_RECURSION: GLogLevelFlags = 1;
-    #[c2rust::src_loc = "136:9"]
     pub type GLogWriterOutput = std::ffi::c_uint;
-    #[c2rust::src_loc = "139:3"]
     pub const G_LOG_WRITER_UNHANDLED: GLogWriterOutput = 0;
-    #[c2rust::src_loc = "138:3"]
     pub const G_LOG_WRITER_HANDLED: GLogWriterOutput = 1;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "159:8"]
     pub struct _GLogField {
         pub key: *const gchar,
         pub value: gconstpointer,
         pub length: gssize,
     }
-    #[c2rust::src_loc = "158:1"]
     pub type GLogField = _GLogField;
-    #[c2rust::src_loc = "197:1"]
     pub type GLogWriterFunc = Option::<
         unsafe extern "C" fn(
             GLogLevelFlags,
@@ -168,8 +123,7 @@ pub mod gmessages_h {
     >;
     use super::gtypes_h::{gchar, gconstpointer, gpointer, GDestroyNotify};
     use super::glibconfig_h::{gssize, gsize};
-    extern "C" {
-        #[c2rust::src_loc = "216:1"]
+    unsafe extern "C" {
         pub fn g_log_set_writer_func(
             func: GLogWriterFunc,
             user_data: gpointer,
@@ -177,15 +131,11 @@ pub mod gmessages_h {
         );
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/goption.h:21"]
 pub mod goption_h {
-    #[c2rust::src_loc = "40:1"]
     pub type GOptionContext = _GOptionContext;
-    #[c2rust::src_loc = "53:1"]
     pub type GOptionGroup = _GOptionGroup;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "283:8"]
     pub struct _GOptionEntry {
         pub long_name: *const gchar,
         pub short_name: gchar,
@@ -195,188 +145,135 @@ pub mod goption_h {
         pub description: *const gchar,
         pub arg_description: *const gchar,
     }
-    #[c2rust::src_loc = "142:9"]
     pub type GOptionArg = std::ffi::c_uint;
-    #[c2rust::src_loc = "152:3"]
     pub const G_OPTION_ARG_INT64: GOptionArg = 8;
-    #[c2rust::src_loc = "151:3"]
     pub const G_OPTION_ARG_DOUBLE: GOptionArg = 7;
-    #[c2rust::src_loc = "150:3"]
     pub const G_OPTION_ARG_FILENAME_ARRAY: GOptionArg = 6;
-    #[c2rust::src_loc = "149:3"]
     pub const G_OPTION_ARG_STRING_ARRAY: GOptionArg = 5;
-    #[c2rust::src_loc = "148:3"]
     pub const G_OPTION_ARG_FILENAME: GOptionArg = 4;
-    #[c2rust::src_loc = "147:3"]
     pub const G_OPTION_ARG_CALLBACK: GOptionArg = 3;
-    #[c2rust::src_loc = "146:3"]
     pub const G_OPTION_ARG_INT: GOptionArg = 2;
-    #[c2rust::src_loc = "145:3"]
     pub const G_OPTION_ARG_STRING: GOptionArg = 1;
-    #[c2rust::src_loc = "144:3"]
     pub const G_OPTION_ARG_NONE: GOptionArg = 0;
-    #[c2rust::src_loc = "54:1"]
     pub type GOptionEntry = _GOptionEntry;
     use super::gtypes_h::{gchar, gint, gpointer, gboolean};
     use super::gerror_h::GError;
-    extern "C" {
-        #[c2rust::src_loc = "40:16"]
+    unsafe extern "C" {
         pub type _GOptionContext;
-        #[c2rust::src_loc = "53:16"]
         pub type _GOptionGroup;
-        #[c2rust::src_loc = "332:1"]
         pub fn g_option_context_new(
             parameter_string: *const gchar,
         ) -> *mut GOptionContext;
-        #[c2rust::src_loc = "344:1"]
         pub fn g_option_context_free(context: *mut GOptionContext);
-        #[c2rust::src_loc = "363:1"]
         pub fn g_option_context_add_main_entries(
             context: *mut GOptionContext,
             entries: *const GOptionEntry,
             translation_domain: *const gchar,
         );
-        #[c2rust::src_loc = "367:1"]
         pub fn g_option_context_parse(
             context: *mut GOptionContext,
             argc: *mut gint,
             argv: *mut *mut *mut gchar,
             error: *mut *mut GError,
         ) -> gboolean;
-        #[c2rust::src_loc = "385:1"]
         pub fn g_option_context_add_group(
             context: *mut GOptionContext,
             group: *mut GOptionGroup,
         );
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gtree.h:21"]
 pub mod gtree_h {
-    #[c2rust::src_loc = "40:1"]
     pub type GTree = _GTree;
-    extern "C" {
-        #[c2rust::src_loc = "40:16"]
+    unsafe extern "C" {
         pub type _GTree;
     }
 }
-#[c2rust::header_src = "/usr/include/luajit-2.1/lua.h:21"]
 pub mod lua_h {
-    extern "C" {
-        #[c2rust::src_loc = "51:16"]
+    unsafe extern "C" {
         pub type lua_State;
     }
 }
-#[c2rust::header_src = "/usr/include/bits/types/struct_timeval.h:21"]
 pub mod struct_timeval_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "8:8"]
     pub struct timeval {
         pub tv_sec: __time_t,
         pub tv_usec: __suseconds_t,
     }
     use super::types_h::{__time_t, __suseconds_t};
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/log.h:21"]
 pub mod log_h {
-    #[c2rust::src_loc = "36:9"]
     pub type log_level_t = std::ffi::c_uint;
-    #[c2rust::src_loc = "36:16"]
     pub const LOG_LEVEL_debug: log_level_t = 5;
-    #[c2rust::src_loc = "36:16"]
     pub const LOG_LEVEL_verbose: log_level_t = 4;
-    #[c2rust::src_loc = "36:16"]
     pub const LOG_LEVEL_info: log_level_t = 3;
-    #[c2rust::src_loc = "36:16"]
     pub const LOG_LEVEL_warn: log_level_t = 2;
-    #[c2rust::src_loc = "36:16"]
     pub const LOG_LEVEL_error: log_level_t = 1;
-    #[c2rust::src_loc = "36:16"]
     pub const LOG_LEVEL_fatal: log_level_t = 0;
     use super::gtypes_h::gchar;
-    extern "C" {
-        #[c2rust::src_loc = "54:1"]
+    unsafe extern "C" {
         pub fn _log(lvl: log_level_t, _: *const gchar, _: *const gchar, _: ...);
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/common.h:22"]
 pub mod common_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "24:16"]
     pub struct _common_t {
         pub L: *mut lua_State,
     }
-    #[c2rust::src_loc = "24:1"]
     pub type common_t = _common_t;
     use super::lua_h::lua_State;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/gobject/gtype.h:22"]
 pub mod gtype_h {
-    #[c2rust::src_loc = "427:1"]
     pub type GType = gsize;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "451:8"]
     pub struct _GTypeClass {
         pub g_type: GType,
     }
-    #[c2rust::src_loc = "434:1"]
     pub type GTypeClass = _GTypeClass;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "461:8"]
     pub struct _GTypeInstance {
         pub g_class: *mut GTypeClass,
     }
-    #[c2rust::src_loc = "436:1"]
     pub type GTypeInstance = _GTypeInstance;
     use super::glibconfig_h::gsize;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/gobject/gobject.h:22"]
 pub mod gobject_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "252:9"]
     pub struct _GObject {
         pub g_type_instance: GTypeInstance,
         pub ref_count: guint,
         pub qdata: *mut GData,
     }
-    #[c2rust::src_loc = "192:1"]
     pub type GObject = _GObject;
     use super::gtype_h::GTypeInstance;
     use super::gtypes_h::guint;
     use super::gdataset_h::GData;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/gio/gapplication.h:22"]
 pub mod gapplication_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "46:8"]
     pub struct _GApplication {
         pub parent_instance: GObject,
         pub priv_0: *mut GApplicationPrivate,
     }
-    #[c2rust::src_loc = "43:1"]
     pub type GApplicationPrivate = _GApplicationPrivate;
     use super::gobject_h::GObject;
-    extern "C" {
-        #[c2rust::src_loc = "43:16"]
+    unsafe extern "C" {
         pub type _GApplicationPrivate;
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/gio/giotypes.h:22"]
 pub mod giotypes_h {
-    #[c2rust::src_loc = "59:1"]
     pub type GApplication = _GApplication;
     use super::gapplication_h::_GApplication;
 }
-#[c2rust::header_src = "/usr/include/bits/types/struct_FILE.h:22"]
 pub mod struct_FILE_h {
+    use c2rust_bitfields::BitfieldStruct;
     #[derive(Copy, Clone, BitfieldStruct)]
     #[repr(C)]
-    #[c2rust::src_loc = "50:8"]
     pub struct _IO_FILE {
         pub _flags: std::ffi::c_int,
         pub _IO_read_ptr: *mut std::ffi::c_char,
@@ -410,48 +307,35 @@ pub mod struct_FILE_h {
         pub _mode: std::ffi::c_int,
         pub _unused2: [std::ffi::c_char; 20],
     }
-    #[c2rust::src_loc = "44:1"]
     pub type _IO_lock_t = ();
     use super::types_h::{__off_t, __off64_t};
-    extern "C" {
-        #[c2rust::src_loc = "39:8"]
+    unsafe extern "C" {
         pub type _IO_wide_data;
-        #[c2rust::src_loc = "38:8"]
         pub type _IO_codecvt;
-        #[c2rust::src_loc = "37:8"]
         pub type _IO_marker;
     }
 }
-#[c2rust::header_src = "/usr/include/bits/types/FILE.h:22"]
 pub mod FILE_h {
-    #[c2rust::src_loc = "7:1"]
     pub type FILE = _IO_FILE;
     use super::struct_FILE_h::_IO_FILE;
 }
-#[c2rust::header_src = "/usr/include/gtk-3.0/gtk/gtkapplication.h:22"]
 pub mod gtkapplication_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "43:8"]
     pub struct _GtkApplication {
         pub parent: GApplication,
         pub priv_0: *mut GtkApplicationPrivate,
     }
-    #[c2rust::src_loc = "41:1"]
     pub type GtkApplicationPrivate = _GtkApplicationPrivate;
-    #[c2rust::src_loc = "39:1"]
     pub type GtkApplication = _GtkApplication;
     use super::giotypes_h::GApplication;
-    extern "C" {
-        #[c2rust::src_loc = "41:16"]
+    unsafe extern "C" {
         pub type _GtkApplicationPrivate;
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/globalconf.h:22"]
 pub mod globalconf_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "32:9"]
     pub struct globalconf_t {
         pub application: *mut GtkApplication,
         pub config_dir: *mut gchar,
@@ -471,33 +355,25 @@ pub mod globalconf_h {
     use super::gtypes_h::{gchar, gboolean, gdouble};
     use super::garray_h::GPtrArray;
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/signal.h:23"]
 pub mod signal_h {
-    #[c2rust::src_loc = "29:1"]
     pub type signal_t = GTree;
     use super::gtree_h::GTree;
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/luaclass.h:23"]
 pub mod luaclass_h {
-    #[c2rust::src_loc = "32:1"]
     pub type lua_class_property_array_t = GHashTable;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "39:9"]
     pub struct lua_object_t {
         pub signals: *mut signal_t,
     }
-    #[c2rust::src_loc = "43:1"]
     pub type lua_class_allocator_t = Option::<
         unsafe extern "C" fn(*mut lua_State) -> *mut lua_object_t,
     >;
-    #[c2rust::src_loc = "45:1"]
     pub type lua_class_propfunc_t = Option::<
         unsafe extern "C" fn(*mut lua_State, *mut lua_object_t) -> gint,
     >;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "47:9"]
     pub struct lua_class_t {
         pub name: *const gchar,
         pub signals: *mut signal_t,
@@ -511,79 +387,59 @@ pub mod luaclass_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::{gint, gchar};
 }
-#[c2rust::header_src = "/usr/include/string.h:21"]
 pub mod string_h {
-    extern "C" {
-        #[c2rust::src_loc = "43:14"]
+    unsafe extern "C" {
         pub fn memcpy(
             _: *mut std::ffi::c_void,
             _: *const std::ffi::c_void,
             _: std::ffi::c_ulong,
         ) -> *mut std::ffi::c_void;
-        #[c2rust::src_loc = "61:14"]
         pub fn memset(
             _: *mut std::ffi::c_void,
             _: std::ffi::c_int,
             _: std::ffi::c_ulong,
         ) -> *mut std::ffi::c_void;
-        #[c2rust::src_loc = "156:12"]
         pub fn strcmp(
             _: *const std::ffi::c_char,
             _: *const std::ffi::c_char,
         ) -> std::ffi::c_int;
-        #[c2rust::src_loc = "246:14"]
         pub fn strchr(
             _: *const std::ffi::c_char,
             _: std::ffi::c_int,
         ) -> *mut std::ffi::c_char;
-        #[c2rust::src_loc = "407:15"]
         pub fn strlen(_: *const std::ffi::c_char) -> std::ffi::c_ulong;
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gutils.h:21"]
 pub mod gutils_h {
     use super::gtypes_h::gchar;
-    extern "C" {
-        #[c2rust::src_loc = "183:1"]
+    unsafe extern "C" {
         pub fn g_get_user_data_dir() -> *const gchar;
-        #[c2rust::src_loc = "185:1"]
         pub fn g_get_user_config_dir() -> *const gchar;
-        #[c2rust::src_loc = "187:1"]
         pub fn g_get_user_cache_dir() -> *const gchar;
     }
 }
-#[c2rust::header_src = "/usr/include/stdlib.h:21"]
 pub mod stdlib_h {
-    extern "C" {
-        #[c2rust::src_loc = "756:13"]
+    unsafe extern "C" {
         pub fn exit(_: std::ffi::c_int) -> !;
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gfileutils.h:21"]
 pub mod gfileutils_h {
     use super::gtypes_h::{gchar, gint};
-    extern "C" {
-        #[c2rust::src_loc = "174:1"]
+    unsafe extern "C" {
         pub fn g_build_filename(first_element: *const gchar, _: ...) -> *mut gchar;
-        #[c2rust::src_loc = "183:1"]
         pub fn g_mkdir_with_parents(pathname: *const gchar, mode: gint) -> gint;
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gmem.h:21"]
 pub mod gmem_h {
     use super::gtypes_h::gpointer;
     use super::glibconfig_h::gsize;
-    extern "C" {
-        #[c2rust::src_loc = "73:1"]
+    unsafe extern "C" {
         pub fn g_free(mem: gpointer);
-        #[c2rust::src_loc = "83:1"]
         pub fn g_malloc(n_bytes: gsize) -> gpointer;
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gstrfuncs.h:21"]
 pub mod gstrfuncs_h {
     #[inline(always)]
-    #[c2rust::src_loc = "308:1"]
     pub unsafe extern "C" fn g_strdup_inline(
         mut str: *const std::ffi::c_char,
     ) -> *mut std::ffi::c_char {
@@ -607,53 +463,40 @@ pub mod gstrfuncs_h {
     use super::string_h::{strlen, memcpy};
     use super::__stddef_size_t_h::size_t;
     use super::gmem_h::g_malloc;
-    extern "C" {
-        #[c2rust::src_loc = "283:1"]
+    unsafe extern "C" {
         pub fn g_strdup(str: *const gchar) -> *mut gchar;
-        #[c2rust::src_loc = "355:1"]
         pub fn g_strsplit(
             string: *const gchar,
             delimiter: *const gchar,
             max_tokens: gint,
         ) -> *mut *mut gchar;
-        #[c2rust::src_loc = "366:1"]
         pub fn g_strfreev(str_array: *mut *mut gchar);
-        #[c2rust::src_loc = "368:1"]
         pub fn g_strdupv(str_array: *mut *mut gchar) -> *mut *mut gchar;
     }
 }
-#[c2rust::header_src = "/usr/include/errno.h:21"]
 pub mod errno_h {
-    extern "C" {
-        #[c2rust::src_loc = "37:1"]
+    unsafe extern "C" {
         pub fn __errno_location() -> *mut std::ffi::c_int;
     }
 }
-#[c2rust::header_src = "/usr/include/unistd.h:21"]
 pub mod unistd_h {
     use super::types_h::__pid_t;
-    extern "C" {
-        #[c2rust::src_loc = "689:1"]
+    unsafe extern "C" {
         pub fn setsid() -> __pid_t;
-        #[c2rust::src_loc = "778:1"]
         pub fn fork() -> __pid_t;
     }
 }
-#[c2rust::header_src = "/usr/include/sys/time.h:21"]
 pub mod time_h {
     use super::struct_timeval_h::timeval;
-    extern "C" {
-        #[c2rust::src_loc = "67:1"]
+    unsafe extern "C" {
         pub fn gettimeofday(
             __tv: *mut timeval,
             __tz: *mut std::ffi::c_void,
         ) -> std::ffi::c_int;
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/util.h:21"]
 pub mod util_h {
     #[inline]
-    #[c2rust::src_loc = "63:1"]
     pub unsafe extern "C" fn l_time() -> gdouble {
         let mut tv: timeval = timeval { tv_sec: 0, tv_usec: 0 };
         gettimeofday(&mut tv, 0 as *mut std::ffi::c_void);
@@ -665,98 +508,71 @@ pub mod util_h {
     use super::types_h::{__time_t, __suseconds_t};
     use super::time_h::gettimeofday;
 }
-#[c2rust::header_src = "/usr/include/stdio.h:22"]
 pub mod stdio_h {
     use super::FILE_h::FILE;
-    extern "C" {
-        #[c2rust::src_loc = "151:14"]
+    unsafe extern "C" {
         pub static mut stderr: *mut FILE;
     }
 }
-#[c2rust::header_src = "/usr/include/gtk-3.0/gtk/gtkmain.h:22"]
 pub mod gtkmain_h {
     use super::gtypes_h::gboolean;
     use super::goption_h::GOptionGroup;
-    extern "C" {
-        #[c2rust::src_loc = "100:1"]
+    unsafe extern "C" {
         pub fn gtk_init(
             argc: *mut std::ffi::c_int,
             argv: *mut *mut *mut std::ffi::c_char,
         );
-        #[c2rust::src_loc = "116:1"]
         pub fn gtk_get_option_group(open_default_display: gboolean) -> *mut GOptionGroup;
-        #[c2rust::src_loc = "142:1"]
         pub fn gtk_disable_setlocale();
-        #[c2rust::src_loc = "153:1"]
         pub fn gtk_main();
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gprintf.h:23"]
 pub mod gprintf_h {
     use super::gtypes_h::{gchar, gint};
     use super::FILE_h::FILE;
-    extern "C" {
-        #[c2rust::src_loc = "29:1"]
+    unsafe extern "C" {
         pub fn g_printf(format: *const gchar, _: ...) -> gint;
-        #[c2rust::src_loc = "32:1"]
         pub fn g_fprintf(file: *mut FILE, format: *const gchar, _: ...) -> gint;
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/luah.h:23"]
 pub mod luah_h {
     use super::gtypes_h::{gchar, gboolean};
-    extern "C" {
-        #[c2rust::src_loc = "27:1"]
+    unsafe extern "C" {
         pub fn luaH_init(_: *mut *mut gchar);
-        #[c2rust::src_loc = "28:1"]
         pub fn luaH_parserc(_: *const gchar, _: gboolean) -> gboolean;
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/ipc.h:24"]
 pub mod ipc_h {
-    extern "C" {
-        #[c2rust::src_loc = "24:1"]
+    unsafe extern "C" {
         pub fn ipc_init();
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/log.h:25"]
 pub mod luakit_log_h {
     use super::log_h::log_level_t;
-    extern "C" {
-        #[c2rust::src_loc = "26:1"]
+    unsafe extern "C" {
         pub fn log_init();
-        #[c2rust::src_loc = "27:1"]
         pub fn log_level_from_string(
             out: *mut log_level_t,
             str: *const std::ffi::c_char,
         ) -> std::ffi::c_int;
-        #[c2rust::src_loc = "28:1"]
         pub fn log_set_verbosity(group: *const std::ffi::c_char, lvl: log_level_t);
     }
 }
-#[c2rust::header_src = "/usr/include/webkitgtk-4.1/webkit/WebKitVersion.h:26"]
 pub mod WebKitVersion_h {
     use super::gtypes_h::guint;
-    extern "C" {
-        #[c2rust::src_loc = "41:1"]
+    unsafe extern "C" {
         pub fn webkit_get_major_version() -> guint;
-        #[c2rust::src_loc = "44:1"]
         pub fn webkit_get_minor_version() -> guint;
-        #[c2rust::src_loc = "47:1"]
         pub fn webkit_get_micro_version() -> guint;
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/web_context.h:26"]
 pub mod web_context_h {
-    extern "C" {
-        #[c2rust::src_loc = "26:1"]
+    unsafe extern "C" {
         pub fn web_context_init();
     }
 }
-#[c2rust::header_src = "/usr/include/locale.h:30"]
 pub mod locale_h {
-    extern "C" {
-        #[c2rust::src_loc = "122:1"]
+    unsafe extern "C" {
         pub fn setlocale(
             __category: std::ffi::c_int,
             __locale: *const std::ffi::c_char,
@@ -840,13 +656,11 @@ use self::WebKitVersion_h::{
 };
 use self::web_context_h::web_context_init;
 use self::locale_h::setlocale;
-#[no_mangle]
-#[c2rust::src_loc = "45:10"]
+#[unsafe(no_mangle)]
 pub static mut common: common_t = _common_t {
     L: 0 as *const lua_State as *mut lua_State,
 };
-#[no_mangle]
-#[c2rust::src_loc = "46:14"]
+#[unsafe(no_mangle)]
 pub static mut globalconf: globalconf_t = globalconf_t {
     application: 0 as *const GtkApplication as *mut GtkApplication,
     config_dir: 0 as *const gchar as *mut gchar,
@@ -862,8 +676,7 @@ pub static mut globalconf: globalconf_t = globalconf_t {
     stylesheets: 0 as *const GPtrArray as *mut GPtrArray,
     starttime: 0.,
 };
-#[no_mangle]
-#[c2rust::src_loc = "47:13"]
+#[unsafe(no_mangle)]
 pub static mut widget_class: lua_class_t = lua_class_t {
     name: 0 as *const gchar,
     signals: 0 as *const signal_t as *mut signal_t,
@@ -873,7 +686,6 @@ pub static mut widget_class: lua_class_t = lua_class_t {
     index_miss_property: None,
     newindex_miss_property: None,
 };
-#[c2rust::src_loc = "49:1"]
 unsafe extern "C" fn init_directories() {
     globalconf
         .cache_dir = g_build_filename(
@@ -900,7 +712,6 @@ unsafe extern "C" fn init_directories() {
     g_mkdir_with_parents(globalconf.config_dir, 0o700 as std::ffi::c_int);
     g_mkdir_with_parents(globalconf.data_dir, 0o700 as std::ffi::c_int);
 }
-#[c2rust::src_loc = "61:1"]
 unsafe extern "C" fn parse_log_level_option(mut log_lvl: *mut gchar) {
     let mut parts: *mut *mut gchar = g_strsplit(
         log_lvl,
@@ -937,7 +748,6 @@ unsafe extern "C" fn parse_log_level_option(mut log_lvl: *mut gchar) {
     }
     g_strfreev(parts);
 }
-#[c2rust::src_loc = "83:1"]
 unsafe extern "C" fn parseopts(
     mut argc: *mut std::ffi::c_int,
     mut argv: *mut *mut gchar,
@@ -1214,7 +1024,6 @@ unsafe extern "C" fn parseopts(
         return g_strdupv(argv.offset(1 as std::ffi::c_int as isize))
     };
 }
-#[c2rust::src_loc = "174:1"]
 unsafe extern "C" fn glib_log_writer(
     mut log_level_flags: GLogLevelFlags,
     mut fields: *const GLogField,
@@ -1386,7 +1195,6 @@ unsafe extern "C" fn glib_log_writer(
     );
     return G_LOG_WRITER_HANDLED;
 }
-#[c2rust::src_loc = "203:1"]
 unsafe fn main_0(mut argc: gint, mut argv: *mut *mut gchar) -> gint {
     let mut nonblock: *mut gboolean = 0 as *mut gboolean;
     globalconf.starttime = l_time();

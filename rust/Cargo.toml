@@ -4,10 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [lib]
-name = "webview"
-path = "src/widgets/webview.rs"
-# crate-type = ["dylib"]
+name = "luakit"
+path = "src/luakit.rs"
+crate-type = ["dylib"]
 
 [dependencies]
 c2rust-bitfields = "0.20.0"
+# c2rust-bitfields = { path = "../../c2rust/c2rust-bitfields/" }
+# c2rust = { path = "../../c2rust/c2rust/" }
 libc = "0.2.174"
