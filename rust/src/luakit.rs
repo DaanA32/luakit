@@ -389,6 +389,7 @@ pub mod string_h {
 }
 pub mod gutils_h {
     use super::gtypes_h::gchar;
+    #[link(name = "gtk-4")]
     unsafe extern "C" {
         pub fn g_get_user_data_dir() -> *const gchar;
         pub fn g_get_user_config_dir() -> *const gchar;
@@ -412,7 +413,7 @@ pub mod gmem_h {
     use super::gtypes_h::gpointer;
     #[link(name = "gtk-4")]
     unsafe extern "C" {
-        pub fn g_free(mem: gpointer);
+        // pub fn g_free(mem: gpointer);
         pub fn g_malloc(n_bytes: gsize) -> gpointer;
     }
 }
@@ -548,6 +549,8 @@ pub mod locale_h {
         ) -> *mut std::ffi::c_char;
     }
 }
+use glib_sys::g_free;
+
 pub use self::__stddef_size_t_h::size_t;
 pub use self::FILE_h::FILE;
 use self::WebKitVersion_h::{
@@ -567,7 +570,7 @@ pub use self::ghash_h::{_GHashTable, GHashTable};
 pub use self::giotypes_h::GApplication;
 pub use self::glibconfig_h::{gsize, gssize, guint32};
 pub use self::globalconf_h::globalconf_t;
-use self::gmem_h::{g_free, g_malloc};
+use self::gmem_h::g_malloc;
 pub use self::gmessages_h::{
     _GLogField, G_LOG_FLAG_FATAL, G_LOG_FLAG_RECURSION, G_LOG_LEVEL_CRITICAL, G_LOG_LEVEL_DEBUG,
     G_LOG_LEVEL_ERROR, G_LOG_LEVEL_INFO, G_LOG_LEVEL_MASK, G_LOG_LEVEL_MESSAGE,

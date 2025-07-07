@@ -49,6 +49,7 @@ pub mod gunicode_h {
 pub mod lua_h {
     pub type lua_CFunction = Option<unsafe extern "C" fn(*mut lua_State) -> std::ffi::c_int>;
     use super::__stddef_size_t_h::size_t;
+    #[link(name = "lua")]
     unsafe extern "C" {
         pub type lua_State;
         pub fn lua_atpanic(L: *mut lua_State, panicf: lua_CFunction) -> lua_CFunction;
@@ -253,15 +254,6 @@ pub mod gfileutils_h {
         pub fn g_build_filename(first_element: *const gchar, _: ...) -> *mut gchar;
     }
 }
-pub mod gmem_h {
-    use super::glibconfig_h::gsize;
-    use super::gtypes_h::gpointer;
-    #[link(name = "gtk-4")]
-    unsafe extern "C" {
-        pub fn g_free(mem: gpointer);
-        pub fn g_malloc(n_bytes: gsize) -> gpointer;
-    }
-}
 pub mod gstrfuncs_h {
     #[inline(always)]
     pub unsafe extern "C" fn g_strdup_inline(
@@ -272,7 +264,8 @@ pub mod gstrfuncs_h {
         }
         if 0 != 0 && !str.is_null() && 0 != 0 {
             let len: size_t = (strlen(str)).wrapping_add(1 as std::ffi::c_int as std::ffi::c_ulong);
-            let mut dup_str: *mut std::ffi::c_char = g_malloc(len) as *mut std::ffi::c_char;
+            let mut dup_str: *mut std::ffi::c_char =
+                g_malloc(len as usize) as *mut std::ffi::c_char;
             return memcpy(
                 dup_str as *mut std::ffi::c_void,
                 str as *const std::ffi::c_void,
@@ -282,9 +275,9 @@ pub mod gstrfuncs_h {
         return g_strdup(str);
     }
     use super::__stddef_size_t_h::size_t;
-    use super::gmem_h::g_malloc;
     use super::gtypes_h::{gchar, gint};
     use super::string_h::{memcpy, strlen};
+    use glib_sys::g_malloc;
     unsafe extern "C" {
         pub fn g_strdup(str: *const gchar) -> *mut gchar;
         pub fn g_strdup_printf(format: *const gchar, _: ...) -> *mut gchar;
@@ -500,6 +493,8 @@ pub mod utf8_h {
         pub fn utf8_lib_setup(_: *mut lua_State);
     }
 }
+use glib_sys::g_free;
+
 pub use self::__stddef_size_t_h::size_t;
 use self::clib_ipc_h::ipc_channel_class_setup;
 pub use self::common_h::{_common_t, common, common_t};
@@ -527,7 +522,6 @@ use self::gfileutils_h::g_build_filename;
 pub use self::giotypes_h::GApplication;
 pub use self::glibconfig_h::{gsize, guint32};
 pub use self::globalconf_h::{globalconf, globalconf_t};
-use self::gmem_h::{g_free, g_malloc};
 pub use self::gobject_h::{_GObject, GObject};
 pub use self::gstrfuncs_h::{
     g_strdup, g_strdup_inline, g_strdup_printf, g_strfreev, g_strjoinv, g_strsplit,
@@ -573,6 +567,7 @@ use self::util_h::{file_exists, luaH_panic};
 use self::web_module_h::web_module_lib_setup;
 use self::widget_h::widget_class_setup;
 use self::xdg_h::xdg_lib_setup;
+
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn luaH_modifier_table_push(mut L: *mut lua_State, mut state: guint) {
     let mut i: gint = 1 as std::ffi::c_int;
