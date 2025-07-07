@@ -511,6 +511,7 @@ pub mod gprintf_h {
 }
 pub mod clib;
 pub mod common;
+pub mod luaclass;
 pub mod luah;
 
 pub mod ipc_h {

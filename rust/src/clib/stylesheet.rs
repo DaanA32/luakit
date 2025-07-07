@@ -1,5 +1,5 @@
 use ::libc;
-use lua::ffi::{lua_State, lua_createtable, lua_gettop, lua_newuserdata, lua_pushstring, lua_pushvalue, lua_setmetatable, LUA_MULTRET};
+use lua::ffi::{luaL_Reg, luaL_checklstring, lua_State, lua_createtable, lua_gettop, lua_newuserdata, lua_pushstring, lua_pushvalue, lua_setmetatable, LUA_MULTRET};
 use lua::Function;
 pub mod __stddef_size_t_h {
     pub type size_t = std::ffi::c_ulong;
@@ -60,56 +60,6 @@ pub mod gtree_h {
             value_destroy_func: GDestroyNotify,
         ) -> *mut GTree;
     }
-}
-pub mod signal_h {
-    pub type signal_t = GTree;
-    #[inline]
-    pub unsafe extern "C" fn signal_cmp(
-        mut a: gconstpointer,
-        mut b: gconstpointer,
-        mut UNUSED_p: gpointer,
-    ) -> gint {
-        return g_strcmp0(a as *const std::ffi::c_char, b as *const std::ffi::c_char);
-    }
-    #[inline]
-    pub unsafe extern "C" fn signal_array_destroy(mut sigfuncs: *mut gpointer) {
-        g_ptr_array_free(sigfuncs as *mut GPtrArray, TRUE);
-    }
-    #[inline]
-    pub unsafe extern "C" fn signal_new() -> *mut signal_t {
-        return g_tree_new_full(
-            ::core::mem::transmute::<
-                Option::<
-                    unsafe extern "C" fn(gconstpointer, gconstpointer, gpointer) -> gint,
-                >,
-                GCompareDataFunc,
-            >(
-                Some(
-                    signal_cmp
-                        as unsafe extern "C" fn(
-                            gconstpointer,
-                            gconstpointer,
-                            gpointer,
-                        ) -> gint,
-                ),
-            ),
-            NULL_0 as *mut std::ffi::c_void,
-            Some(g_free as unsafe extern "C" fn(gpointer) -> ()),
-            ::core::mem::transmute::<
-                Option::<unsafe extern "C" fn(*mut gpointer) -> ()>,
-                GDestroyNotify,
-            >(Some(signal_array_destroy as unsafe extern "C" fn(*mut gpointer) -> ())),
-        ) as *mut signal_t;
-    }
-    use super::gtree_h::{GTree, g_tree_new_full};
-    use super::gtypes_h::{
-        gconstpointer, gpointer, gint, GCompareDataFunc, GDestroyNotify,
-    };
-    use super::gtestutils_h::g_strcmp0;
-    use super::garray_h::{g_ptr_array_free, GPtrArray};
-    use super::gmacros_h::{FALSE, TRUE};
-    use super::__stddef_null_h::NULL_0;
-    use super::gmem_h::g_free;
 }
 pub mod tokenize_h {
     pub type luakit_token_t = std::ffi::c_uint;
@@ -389,101 +339,6 @@ pub mod tokenize_h {
     pub const L_TK_ACCEPT_POLICY: luakit_token_t = 1;
     pub const L_TK_UNKNOWN: luakit_token_t = 0;
 }
-pub mod lauxlib_h {
-    #[derive(Copy, Clone)]
-    #[repr(C)]
-    pub struct luaL_Reg {
-        pub name: *const std::ffi::c_char,
-        pub func: Function,
-    }
-    use lua::{ffi::lua_State, Function};
-
-    use super::__stddef_size_t_h::size_t;
-    unsafe extern "C" {
-        pub fn luaL_checklstring(
-            L: *mut lua_State,
-            numArg: std::ffi::c_int,
-            l: *mut size_t,
-        ) -> *const std::ffi::c_char;
-    }
-}
-pub mod luaclass_h {
-    pub type lua_class_property_array_t = GHashTable;
-    #[derive(Copy, Clone)]
-    #[repr(C)]
-    pub struct lua_object_t {
-        pub signals: *mut signal_t,
-    }
-    pub type lua_class_allocator_t = Option::<
-        unsafe extern "C" fn(*mut lua_State) -> *mut lua_object_t,
-    >;
-    pub type lua_class_propfunc_t = Option::<
-        unsafe extern "C" fn(*mut lua_State, *mut lua_object_t) -> gint,
-    >;
-    #[derive(Copy, Clone)]
-    #[repr(C)]
-    pub struct lua_class_t {
-        pub name: *const gchar,
-        pub signals: *mut signal_t,
-        pub allocator: lua_class_allocator_t,
-        pub properties: *mut lua_class_property_array_t,
-        pub index_miss_property: lua_class_propfunc_t,
-        pub newindex_miss_property: lua_class_propfunc_t,
-    }
-    use lua::ffi::lua_State;
-
-    use super::ghash_h::GHashTable;
-    use super::signal_h::signal_t;
-    use super::gtypes_h::{gint, gchar, gpointer};
-    use super::lauxlib_h::luaL_Reg;
-    use super::tokenize_h::{luakit_token_t, L_TK_UNKNOWN};
-    unsafe extern "C" {
-        pub fn luaH_class_add_signal(
-            _: *mut lua_State,
-            _: *mut lua_class_t,
-            name: *const gchar,
-            ud: gint,
-        );
-        pub fn luaH_class_remove_signal(
-            _: *mut lua_State,
-            _: *mut lua_class_t,
-            name: *const gchar,
-            ud: gint,
-        );
-        pub fn luaH_class_emit_signal(
-            _: *mut lua_State,
-            _: *mut lua_class_t,
-            name: *const gchar,
-            nargs: gint,
-            nret: gint,
-        ) -> gint;
-        pub fn luaH_class_setup(
-            _: *mut lua_State,
-            _: *mut lua_class_t,
-            _: *const gchar,
-            _: lua_class_allocator_t,
-            _: lua_class_propfunc_t,
-            _: lua_class_propfunc_t,
-            _: *const luaL_Reg,
-            _: *const luaL_Reg,
-        );
-        pub fn luaH_class_add_property(
-            _: *mut lua_class_t,
-            token: luakit_token_t,
-            _: lua_class_propfunc_t,
-            _: lua_class_propfunc_t,
-            _: lua_class_propfunc_t,
-        );
-        pub fn luaH_class_index(_: *mut lua_State) -> gint;
-        pub fn luaH_class_newindex(_: *mut lua_State) -> gint;
-        pub fn luaH_class_new(_: *mut lua_State, _: *mut lua_class_t) -> gint;
-        pub fn luaH_checkudata(
-            _: *mut lua_State,
-            _: gint,
-            _: *mut lua_class_t,
-        ) -> gpointer;
-    }
-}
 pub mod widget_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
@@ -519,7 +374,8 @@ pub mod widget_h {
     ) -> *mut widget_t;
     use lua::ffi::lua_State;
 
-    use super::signal_h::signal_t;
+    use crate::common::luaclass::signal_t;
+
     use super::gtypes_h::{gint, gpointer, gchar};
     use super::tokenize_h::luakit_token_t;
     use super::gtktypes_h::GtkWidget;
@@ -673,7 +529,8 @@ pub mod stylesheet_h {
         pub stylesheet: *mut WebKitUserStyleSheet,
         pub source: *mut gchar,
     }
-    use super::signal_h::signal_t;
+    use crate::common::luaclass::signal_t;
+
     use super::WebKitUserContent_h::WebKitUserStyleSheet;
     use super::gtypes_h::gchar;
     use super::widget_h::widget_t;
@@ -744,37 +601,6 @@ pub mod gtestutils_h {
         ) -> std::ffi::c_int;
     }
 }
-pub mod luakit_h {
-    use lua::ffi::lua_State;
-
-    use super::luaclass_h::lua_object_t;
-    use super::gtypes_h::gint;
-    unsafe extern "C" {
-        pub fn luaH_class_index_miss_property(
-            _: *mut lua_State,
-            _: *mut lua_object_t,
-        ) -> gint;
-        pub fn luaH_class_newindex_miss_property(
-            _: *mut lua_State,
-            _: *mut lua_object_t,
-        ) -> gint;
-    }
-}
-pub mod luaobject_h {
-    use lua::ffi::lua_State;
-
-    use super::luaclass_h::lua_class_t;
-    use super::gtypes_h::gint;
-    unsafe extern "C" {
-        pub fn luaH_settype(L: *mut lua_State, lua_class: *mut lua_class_t) -> gint;
-        pub fn luaH_object_add_signal_simple(L: *mut lua_State) -> gint;
-        pub fn luaH_object_remove_signal_simple(L: *mut lua_State) -> gint;
-        pub fn luaH_object_remove_signals_simple(L: *mut lua_State) -> gint;
-        pub fn luaH_object_emit_signal_simple(L: *mut lua_State) -> gint;
-        pub fn luaH_object_tostring(_: *mut lua_State) -> gint;
-        pub fn luaH_object_gc(_: *mut lua_State) -> gint;
-    }
-}
 pub mod gmacros_h {
     pub const FALSE: std::ffi::c_int = 0 as std::ffi::c_int;
     pub const TRUE: std::ffi::c_int = (FALSE == 0) as std::ffi::c_int;
@@ -784,6 +610,8 @@ pub mod __stddef_null_h {
     pub const NULL_0: std::ffi::c_int = 0 as std::ffi::c_int;
     pub const NULL_1: std::ffi::c_int = 0 as std::ffi::c_int;
 }
+use crate::common::luaclass::{luaH_class_add_property, luaH_class_add_signal, luaH_class_emit_signal, luaH_class_index, luaH_class_newindex, luaH_class_remove_signal, luaH_class_setup, lua_class_allocator_t, lua_class_property_array_t, lua_class_propfunc_t, lua_class_t};
+
 pub use self::__stddef_size_t_h::size_t;
 pub use self::glibconfig_h::gsize;
 pub use self::gtypes_h::{
@@ -794,7 +622,6 @@ pub use self::garray_h::{_GPtrArray, GPtrArray, g_ptr_array_free};
 pub use self::gdataset_h::{GData, _GData};
 pub use self::ghash_h::{GHashTable, _GHashTable};
 pub use self::gtree_h::{GTree, _GTree, g_tree_new_full};
-pub use self::signal_h::{signal_t, signal_cmp, signal_array_destroy, signal_new};
 pub use self::tokenize_h::{
     luakit_token_t, L_TK_ZOOM_TEXT_ONLY, L_TK_ZOOM_LEVEL, L_TK_YPAGE_SIZE, L_TK_YMAX,
     L_TK_Y, L_TK_XPAGE_SIZE, L_TK_XMAX, L_TK_X, L_TK_WRAP_JS, L_TK_WIN_XID, L_TK_WINDOWS,
@@ -864,13 +691,6 @@ pub use self::tokenize_h::{
     L_TK_ALLOW_CERTIFICATE, L_TK_ALIGN, L_TK_ADD_EVENT_LISTENER, L_TK_ACCEPT_POLICY,
     L_TK_UNKNOWN,
 };
-pub use self::lauxlib_h::{luaL_Reg, luaL_checklstring};
-pub use self::luaclass_h::{
-    lua_class_property_array_t, lua_object_t, lua_class_allocator_t,
-    lua_class_propfunc_t, lua_class_t, luaH_class_add_signal, luaH_class_remove_signal,
-    luaH_class_emit_signal, luaH_class_setup, luaH_class_add_property, luaH_class_index,
-    luaH_class_newindex, luaH_class_new, luaH_checkudata,
-};
 pub use self::widget_h::{
     widget_t, widget_destructor_t, widget_info_t, widget_constructor_t,
 };
@@ -898,12 +718,6 @@ use self::string_h::{memcpy, memset, strlen};
 use self::gmem_h::{g_free, g_malloc};
 pub use self::gstrfuncs_h::{g_strdup_inline, g_strdup};
 use self::gtestutils_h::g_strcmp0;
-use self::luakit_h::{luaH_class_index_miss_property, luaH_class_newindex_miss_property};
-use self::luaobject_h::{
-    luaH_settype, luaH_object_add_signal_simple, luaH_object_remove_signal_simple,
-    luaH_object_remove_signals_simple, luaH_object_emit_signal_simple,
-    luaH_object_tostring, luaH_object_gc,
-};
 pub use self::gmacros_h::{FALSE, TRUE};
 pub use self::__stddef_null_h::{NULL, NULL_0, NULL_1};
 unsafe extern "C" {
@@ -927,7 +741,7 @@ unsafe extern "C" fn luaH_stylesheet_class_emit_signal(mut L: *mut lua_State) ->
     return luaH_class_emit_signal(
         L,
         &mut stylesheet_class,
-        luaL_checklstring(L, 1 as std::ffi::c_int, NULL_1 as *mut size_t),
+        luaL_checklstring(L, 1 as std::ffi::c_int, NULL_1 as *mut usize),
         lua_gettop(L) - 1 as std::ffi::c_int,
         LUA_MULTRET,
     );
@@ -937,7 +751,7 @@ unsafe extern "C" fn luaH_stylesheet_class_remove_signal(mut L: *mut lua_State) 
     luaH_class_remove_signal(
         L,
         &mut stylesheet_class,
-        luaL_checklstring(L, 1 as std::ffi::c_int, NULL_1 as *mut size_t),
+        luaL_checklstring(L, 1 as std::ffi::c_int, NULL_1 as *mut usize),
         2 as std::ffi::c_int,
     );
     return 0 as std::ffi::c_int;
@@ -947,7 +761,7 @@ unsafe extern "C" fn luaH_stylesheet_class_add_signal(mut L: *mut lua_State) -> 
     luaH_class_add_signal(
         L,
         &mut stylesheet_class,
-        luaL_checklstring(L, 1 as std::ffi::c_int, NULL_1 as *mut size_t),
+        luaL_checklstring(L, 1 as std::ffi::c_int, NULL_1 as *mut usize),
         2 as std::ffi::c_int,
     );
     return 0 as std::ffi::c_int;
@@ -1039,7 +853,7 @@ unsafe extern "C" fn luaH_stylesheet_set_source(
     let mut new_source = luaL_checklstring(
         L,
         -(1 as std::ffi::c_int),
-        NULL_1 as *mut size_t,
+        NULL_1 as *mut usize,
     );
     g_free((*stylesheet).source as gpointer);
     (*stylesheet).source = g_strdup_inline(new_source);
@@ -1156,7 +970,6 @@ pub unsafe extern "C" fn stylesheet_class_setup(mut L: *mut lua_State) {
                     name: b"emit_signal\0" as *const u8 as *const std::ffi::c_char,
                     func: Some(
                         luaH_object_emit_signal_simple
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
                     ),
                 };
                 init
@@ -1165,7 +978,7 @@ pub unsafe extern "C" fn stylesheet_class_setup(mut L: *mut lua_State) {
                 let mut init = luaL_Reg {
                     name: b"__index\0" as *const u8 as *const std::ffi::c_char,
                     func: Some(
-                        luaH_class_index as unsafe extern "C" fn(*mut lua_State) -> gint,
+                        luaH_class_index,
                     ),
                 };
                 init
@@ -1175,7 +988,6 @@ pub unsafe extern "C" fn stylesheet_class_setup(mut L: *mut lua_State) {
                     name: b"__newindex\0" as *const u8 as *const std::ffi::c_char,
                     func: Some(
                         luaH_class_newindex
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
                     ),
                 };
                 init
