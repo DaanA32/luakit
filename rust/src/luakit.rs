@@ -10,6 +10,7 @@
 #![allow(path_statements)]
 #![allow(static_mut_refs)]
 #![allow(mutable_transmutes)]
+#![allow(unreachable_patterns)]
 
 use ::c2rust_bitfields;
 use ::libc;

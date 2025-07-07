@@ -396,13 +396,6 @@ pub mod request_h {
         pub fn request_class_setup(_: *mut lua_State);
     }
 }
-pub mod sqlite3_h {
-    use lua::ffi::lua_State;
-
-    unsafe extern "C" {
-        pub fn soup_lib_setup(L: *mut lua_State);
-    }
-}
 pub mod unique_h {
     use lua::ffi::lua_State;
 
@@ -474,6 +467,7 @@ use lua::ffi::{
 };
 
 use crate::clib::soup::soup_lib_setup;
+use crate::clib::sqlite3::sqlite3_class_setup;
 use crate::common::util::{file_exists, luaH_panic};
 use crate::luah::stylesheet_h::web_module_lib_setup;
 
@@ -531,7 +525,6 @@ use self::luayield_h::luaH_yield_setup;
 use self::msg_h::msg_lib_setup;
 use self::regex_h::regex_class_setup;
 use self::request_h::request_class_setup;
-use self::sqlite3_h::sqlite3_class_setup;
 use self::stdlib_h::{atoi, getenv, setenv, unsetenv};
 use self::string_h::{memcpy, strlen};
 use self::stylesheet_h::stylesheet_class_setup;
