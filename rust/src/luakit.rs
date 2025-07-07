@@ -10,8 +10,8 @@
 #![allow(path_statements)]
 #![allow(static_mut_refs)]
 
-use ::libc;
 use ::c2rust_bitfields;
+use ::libc;
 
 pub mod __stddef_size_t_h {
     pub type size_t = std::ffi::c_ulong;
@@ -40,7 +40,7 @@ pub mod gtypes_h {
     pub type gdouble = std::ffi::c_double;
     pub type gpointer = *mut std::ffi::c_void;
     pub type gconstpointer = *const std::ffi::c_void;
-    pub type GDestroyNotify = Option::<unsafe extern "C" fn(gpointer) -> ()>;
+    pub type GDestroyNotify = Option<unsafe extern "C" fn(gpointer) -> ()>;
 }
 pub mod garray_h {
     #[derive(Copy, Clone)]
@@ -50,16 +50,11 @@ pub mod garray_h {
         pub len: guint,
     }
     pub type GPtrArray = _GPtrArray;
-    use super::gtypes_h::{gpointer, guint, GDestroyNotify};
+    use super::gtypes_h::{GDestroyNotify, gpointer, guint};
     unsafe extern "C" {
         pub fn g_ptr_array_new() -> *mut GPtrArray;
-        pub fn g_ptr_array_new_with_free_func(
-            element_free_func: GDestroyNotify,
-        ) -> *mut GPtrArray;
-        pub fn g_ptr_array_remove_index(
-            array: *mut GPtrArray,
-            index_: guint,
-        ) -> gpointer;
+        pub fn g_ptr_array_new_with_free_func(element_free_func: GDestroyNotify) -> *mut GPtrArray;
+        pub fn g_ptr_array_remove_index(array: *mut GPtrArray, index_: guint) -> gpointer;
         pub fn g_ptr_array_add(array: *mut GPtrArray, data: gpointer);
     }
 }
@@ -77,7 +72,7 @@ pub mod gerror_h {
     }
     pub type GError = _GError;
     use super::gquark_h::GQuark;
-    use super::gtypes_h::{gint, gchar};
+    use super::gtypes_h::{gchar, gint};
 }
 pub mod gdataset_h {
     pub type GData = _GData;
@@ -113,16 +108,11 @@ pub mod gmessages_h {
         pub length: gssize,
     }
     pub type GLogField = _GLogField;
-    pub type GLogWriterFunc = Option::<
-        unsafe extern "C" fn(
-            GLogLevelFlags,
-            *const GLogField,
-            gsize,
-            gpointer,
-        ) -> GLogWriterOutput,
+    pub type GLogWriterFunc = Option<
+        unsafe extern "C" fn(GLogLevelFlags, *const GLogField, gsize, gpointer) -> GLogWriterOutput,
     >;
-    use super::gtypes_h::{gchar, gconstpointer, gpointer, GDestroyNotify};
-    use super::glibconfig_h::{gssize, gsize};
+    use super::glibconfig_h::{gsize, gssize};
+    use super::gtypes_h::{GDestroyNotify, gchar, gconstpointer, gpointer};
     unsafe extern "C" {
         pub fn g_log_set_writer_func(
             func: GLogWriterFunc,
@@ -156,14 +146,12 @@ pub mod goption_h {
     pub const G_OPTION_ARG_STRING: GOptionArg = 1;
     pub const G_OPTION_ARG_NONE: GOptionArg = 0;
     pub type GOptionEntry = _GOptionEntry;
-    use super::gtypes_h::{gchar, gint, gpointer, gboolean};
     use super::gerror_h::GError;
+    use super::gtypes_h::{gboolean, gchar, gint, gpointer};
     unsafe extern "C" {
         pub type _GOptionContext;
         pub type _GOptionGroup;
-        pub fn g_option_context_new(
-            parameter_string: *const gchar,
-        ) -> *mut GOptionContext;
+        pub fn g_option_context_new(parameter_string: *const gchar) -> *mut GOptionContext;
         pub fn g_option_context_free(context: *mut GOptionContext);
         pub fn g_option_context_add_main_entries(
             context: *mut GOptionContext,
@@ -176,10 +164,7 @@ pub mod goption_h {
             argv: *mut *mut *mut gchar,
             error: *mut *mut GError,
         ) -> gboolean;
-        pub fn g_option_context_add_group(
-            context: *mut GOptionContext,
-            group: *mut GOptionGroup,
-        );
+        pub fn g_option_context_add_group(context: *mut GOptionContext, group: *mut GOptionGroup);
     }
 }
 pub mod gtree_h {
@@ -200,7 +185,7 @@ pub mod struct_timeval_h {
         pub tv_sec: __time_t,
         pub tv_usec: __suseconds_t,
     }
-    use super::types_h::{__time_t, __suseconds_t};
+    use super::types_h::{__suseconds_t, __time_t};
 }
 pub mod log_h {
     pub type log_level_t = std::ffi::c_uint;
@@ -249,9 +234,9 @@ pub mod gobject_h {
         pub qdata: *mut GData,
     }
     pub type GObject = _GObject;
+    use super::gdataset_h::GData;
     use super::gtype_h::GTypeInstance;
     use super::gtypes_h::guint;
-    use super::gdataset_h::GData;
 }
 pub mod gapplication_h {
     #[derive(Copy, Clone)]
@@ -351,9 +336,9 @@ pub mod globalconf_h {
         pub stylesheets: *mut GPtrArray,
         pub starttime: gdouble,
     }
-    use super::gtkapplication_h::GtkApplication;
-    use super::gtypes_h::{gchar, gboolean, gdouble};
     use super::garray_h::GPtrArray;
+    use super::gtkapplication_h::GtkApplication;
+    use super::gtypes_h::{gboolean, gchar, gdouble};
 }
 pub mod signal_h {
     pub type signal_t = GTree;
@@ -366,12 +351,10 @@ pub mod luaclass_h {
     pub struct lua_object_t {
         pub signals: *mut signal_t,
     }
-    pub type lua_class_allocator_t = Option::<
-        unsafe extern "C" fn(*mut lua_State) -> *mut lua_object_t,
-    >;
-    pub type lua_class_propfunc_t = Option::<
-        unsafe extern "C" fn(*mut lua_State, *mut lua_object_t) -> gint,
-    >;
+    pub type lua_class_allocator_t =
+        Option<unsafe extern "C" fn(*mut lua_State) -> *mut lua_object_t>;
+    pub type lua_class_propfunc_t =
+        Option<unsafe extern "C" fn(*mut lua_State, *mut lua_object_t) -> gint>;
     #[derive(Copy, Clone)]
     #[repr(C)]
     pub struct lua_class_t {
@@ -383,9 +366,9 @@ pub mod luaclass_h {
         pub newindex_miss_property: lua_class_propfunc_t,
     }
     use super::ghash_h::GHashTable;
-    use super::signal_h::signal_t;
+    use super::gtypes_h::{gchar, gint};
     use super::lua_h::lua_State;
-    use super::gtypes_h::{gint, gchar};
+    use super::signal_h::signal_t;
 }
 pub mod string_h {
     unsafe extern "C" {
@@ -399,14 +382,8 @@ pub mod string_h {
             _: std::ffi::c_int,
             _: std::ffi::c_ulong,
         ) -> *mut std::ffi::c_void;
-        pub fn strcmp(
-            _: *const std::ffi::c_char,
-            _: *const std::ffi::c_char,
-        ) -> std::ffi::c_int;
-        pub fn strchr(
-            _: *const std::ffi::c_char,
-            _: std::ffi::c_int,
-        ) -> *mut std::ffi::c_char;
+        pub fn strcmp(_: *const std::ffi::c_char, _: *const std::ffi::c_char) -> std::ffi::c_int;
+        pub fn strchr(_: *const std::ffi::c_char, _: std::ffi::c_int) -> *mut std::ffi::c_char;
         pub fn strlen(_: *const std::ffi::c_char) -> std::ffi::c_ulong;
     }
 }
@@ -431,8 +408,9 @@ pub mod gfileutils_h {
     }
 }
 pub mod gmem_h {
-    use super::gtypes_h::gpointer;
     use super::glibconfig_h::gsize;
+    use super::gtypes_h::gpointer;
+    #[link(name = "gtk-4")]
     unsafe extern "C" {
         pub fn g_free(mem: gpointer);
         pub fn g_malloc(n_bytes: gsize) -> gpointer;
@@ -447,10 +425,8 @@ pub mod gstrfuncs_h {
             return 0 as *mut std::ffi::c_char;
         }
         if 0 != 0 && !str.is_null() && 0 != 0 {
-            let len: size_t = (strlen(str))
-                .wrapping_add(1 as std::ffi::c_int as std::ffi::c_ulong);
-            let mut dup_str: *mut std::ffi::c_char = g_malloc(len)
-                as *mut std::ffi::c_char;
+            let len: size_t = (strlen(str)).wrapping_add(1 as std::ffi::c_int as std::ffi::c_ulong);
+            let mut dup_str: *mut std::ffi::c_char = g_malloc(len) as *mut std::ffi::c_char;
             return memcpy(
                 dup_str as *mut std::ffi::c_void,
                 str as *const std::ffi::c_void,
@@ -459,10 +435,11 @@ pub mod gstrfuncs_h {
         }
         return g_strdup(str);
     }
-    use super::gtypes_h::{gchar, gint};
-    use super::string_h::{strlen, memcpy};
     use super::__stddef_size_t_h::size_t;
     use super::gmem_h::g_malloc;
+    use super::gtypes_h::{gchar, gint};
+    use super::string_h::{memcpy, strlen};
+    #[link(name = "gtk-4")]
     unsafe extern "C" {
         pub fn g_strdup(str: *const gchar) -> *mut gchar;
         pub fn g_strsplit(
@@ -489,24 +466,23 @@ pub mod unistd_h {
 pub mod time_h {
     use super::struct_timeval_h::timeval;
     unsafe extern "C" {
-        pub fn gettimeofday(
-            __tv: *mut timeval,
-            __tz: *mut std::ffi::c_void,
-        ) -> std::ffi::c_int;
+        pub fn gettimeofday(__tv: *mut timeval, __tz: *mut std::ffi::c_void) -> std::ffi::c_int;
     }
 }
 pub mod util_h {
     #[inline]
     pub unsafe extern "C" fn l_time() -> gdouble {
-        let mut tv: timeval = timeval { tv_sec: 0, tv_usec: 0 };
+        let mut tv: timeval = timeval {
+            tv_sec: 0,
+            tv_usec: 0,
+        };
         gettimeofday(&mut tv, 0 as *mut std::ffi::c_void);
-        return tv.tv_sec as std::ffi::c_double
-            + tv.tv_usec as std::ffi::c_double / 1e6f64;
+        return tv.tv_sec as std::ffi::c_double + tv.tv_usec as std::ffi::c_double / 1e6f64;
     }
     use super::gtypes_h::gdouble;
     use super::struct_timeval_h::timeval;
-    use super::types_h::{__time_t, __suseconds_t};
     use super::time_h::gettimeofday;
+    use super::types_h::{__suseconds_t, __time_t};
 }
 pub mod stdio_h {
     use super::FILE_h::FILE;
@@ -515,33 +491,25 @@ pub mod stdio_h {
     }
 }
 pub mod gtkmain_h {
-    use super::gtypes_h::gboolean;
     use super::goption_h::GOptionGroup;
+    use super::gtypes_h::gboolean;
     unsafe extern "C" {
-        pub fn gtk_init(
-            argc: *mut std::ffi::c_int,
-            argv: *mut *mut *mut std::ffi::c_char,
-        );
+        pub fn gtk_init(argc: *mut std::ffi::c_int, argv: *mut *mut *mut std::ffi::c_char);
         pub fn gtk_get_option_group(open_default_display: gboolean) -> *mut GOptionGroup;
         pub fn gtk_disable_setlocale();
         pub fn gtk_main();
     }
 }
 pub mod gprintf_h {
-    use super::gtypes_h::{gchar, gint};
     use super::FILE_h::FILE;
+    use super::gtypes_h::{gchar, gint};
+    #[link(name = "gtk-4")]
     unsafe extern "C" {
         pub fn g_printf(format: *const gchar, _: ...) -> gint;
         pub fn g_fprintf(file: *mut FILE, format: *const gchar, _: ...) -> gint;
     }
 }
-pub mod luah_h {
-    use super::gtypes_h::{gchar, gboolean};
-    unsafe extern "C" {
-        pub fn luaH_init(_: *mut *mut gchar);
-        pub fn luaH_parserc(_: *const gchar, _: gboolean) -> gboolean;
-    }
-}
+pub mod luah;
 pub mod ipc_h {
     unsafe extern "C" {
         pub fn ipc_init();
@@ -560,6 +528,7 @@ pub mod luakit_log_h {
 }
 pub mod WebKitVersion_h {
     use super::gtypes_h::guint;
+    #[link(name = "webkit2gtk-4.1")]
     unsafe extern "C" {
         pub fn webkit_get_major_version() -> guint;
         pub fn webkit_get_minor_version() -> guint;
@@ -580,82 +549,77 @@ pub mod locale_h {
     }
 }
 pub use self::__stddef_size_t_h::size_t;
-pub use self::glibconfig_h::{guint32, gssize, gsize};
-pub use self::types_h::{__off_t, __off64_t, __pid_t, __time_t, __suseconds_t};
-pub use self::include_time_h::pid_t;
-pub use self::gtypes_h::{
-    gchar, gint, gboolean, guint, gdouble, gpointer, gconstpointer, GDestroyNotify,
-};
-pub use self::garray_h::{
-    _GPtrArray, GPtrArray, g_ptr_array_new, g_ptr_array_new_with_free_func,
-    g_ptr_array_remove_index, g_ptr_array_add,
-};
-pub use self::gquark_h::GQuark;
-pub use self::gerror_h::{_GError, GError};
-pub use self::gdataset_h::{GData, _GData};
-pub use self::ghash_h::{GHashTable, _GHashTable};
-pub use self::gmessages_h::{
-    GLogLevelFlags, G_LOG_LEVEL_MASK, G_LOG_LEVEL_DEBUG, G_LOG_LEVEL_INFO,
-    G_LOG_LEVEL_MESSAGE, G_LOG_LEVEL_WARNING, G_LOG_LEVEL_CRITICAL, G_LOG_LEVEL_ERROR,
-    G_LOG_FLAG_FATAL, G_LOG_FLAG_RECURSION, GLogWriterOutput, G_LOG_WRITER_UNHANDLED,
-    G_LOG_WRITER_HANDLED, _GLogField, GLogField, GLogWriterFunc, g_log_set_writer_func,
-};
-pub use self::goption_h::{
-    GOptionContext, GOptionGroup, _GOptionEntry, GOptionArg, G_OPTION_ARG_INT64,
-    G_OPTION_ARG_DOUBLE, G_OPTION_ARG_FILENAME_ARRAY, G_OPTION_ARG_STRING_ARRAY,
-    G_OPTION_ARG_FILENAME, G_OPTION_ARG_CALLBACK, G_OPTION_ARG_INT, G_OPTION_ARG_STRING,
-    G_OPTION_ARG_NONE, GOptionEntry, _GOptionContext, _GOptionGroup,
-    g_option_context_new, g_option_context_free, g_option_context_add_main_entries,
-    g_option_context_parse, g_option_context_add_group,
-};
-pub use self::gtree_h::{GTree, _GTree};
-use self::lua_h::lua_State;
-pub use self::struct_timeval_h::timeval;
-pub use self::log_h::{
-    log_level_t, LOG_LEVEL_debug, LOG_LEVEL_verbose, LOG_LEVEL_info, LOG_LEVEL_warn,
-    LOG_LEVEL_error, LOG_LEVEL_fatal, _log,
+pub use self::FILE_h::FILE;
+use self::WebKitVersion_h::{
+    webkit_get_major_version, webkit_get_micro_version, webkit_get_minor_version,
 };
 pub use self::common_h::{_common_t, common_t};
-pub use self::gtype_h::{GType, _GTypeClass, GTypeClass, _GTypeInstance, GTypeInstance};
-pub use self::gobject_h::{_GObject, GObject};
-pub use self::gapplication_h::{_GApplication, GApplicationPrivate, _GApplicationPrivate};
-pub use self::giotypes_h::GApplication;
-pub use self::struct_FILE_h::{
-    _IO_FILE, _IO_lock_t, _IO_wide_data, _IO_codecvt, _IO_marker,
-};
-pub use self::FILE_h::FILE;
-pub use self::gtkapplication_h::{
-    _GtkApplication, GtkApplicationPrivate, GtkApplication, _GtkApplicationPrivate,
-};
-pub use self::globalconf_h::globalconf_t;
-pub use self::signal_h::signal_t;
-pub use self::luaclass_h::{
-    lua_class_property_array_t, lua_object_t, lua_class_allocator_t,
-    lua_class_propfunc_t, lua_class_t,
-};
-use self::string_h::{memcpy, memset, strcmp, strchr, strlen};
-use self::gutils_h::{g_get_user_data_dir, g_get_user_config_dir, g_get_user_cache_dir};
-use self::stdlib_h::exit;
-use self::gfileutils_h::{g_build_filename, g_mkdir_with_parents};
-use self::gmem_h::{g_free, g_malloc};
-pub use self::gstrfuncs_h::{
-    g_strdup_inline, g_strdup, g_strsplit, g_strfreev, g_strdupv,
-};
 use self::errno_h::__errno_location;
-use self::unistd_h::{setsid, fork};
-use self::time_h::gettimeofday;
-pub use self::util_h::l_time;
-use self::stdio_h::stderr;
-use self::gtkmain_h::{gtk_init, gtk_get_option_group, gtk_disable_setlocale, gtk_main};
-use self::gprintf_h::{g_printf, g_fprintf};
-use self::luah_h::{luaH_init, luaH_parserc};
-use self::ipc_h::ipc_init;
-use self::luakit_log_h::{log_init, log_level_from_string, log_set_verbosity};
-use self::WebKitVersion_h::{
-    webkit_get_major_version, webkit_get_minor_version, webkit_get_micro_version,
+pub use self::gapplication_h::{_GApplication, _GApplicationPrivate, GApplicationPrivate};
+pub use self::garray_h::{
+    _GPtrArray, GPtrArray, g_ptr_array_add, g_ptr_array_new, g_ptr_array_new_with_free_func,
+    g_ptr_array_remove_index,
 };
-use self::web_context_h::web_context_init;
+pub use self::gdataset_h::{_GData, GData};
+pub use self::gerror_h::{_GError, GError};
+use self::gfileutils_h::{g_build_filename, g_mkdir_with_parents};
+pub use self::ghash_h::{_GHashTable, GHashTable};
+pub use self::giotypes_h::GApplication;
+pub use self::glibconfig_h::{gsize, gssize, guint32};
+pub use self::globalconf_h::globalconf_t;
+use self::gmem_h::{g_free, g_malloc};
+pub use self::gmessages_h::{
+    _GLogField, G_LOG_FLAG_FATAL, G_LOG_FLAG_RECURSION, G_LOG_LEVEL_CRITICAL, G_LOG_LEVEL_DEBUG,
+    G_LOG_LEVEL_ERROR, G_LOG_LEVEL_INFO, G_LOG_LEVEL_MASK, G_LOG_LEVEL_MESSAGE,
+    G_LOG_LEVEL_WARNING, G_LOG_WRITER_HANDLED, G_LOG_WRITER_UNHANDLED, GLogField, GLogLevelFlags,
+    GLogWriterFunc, GLogWriterOutput, g_log_set_writer_func,
+};
+pub use self::gobject_h::{_GObject, GObject};
+pub use self::goption_h::{
+    _GOptionContext, _GOptionEntry, _GOptionGroup, G_OPTION_ARG_CALLBACK, G_OPTION_ARG_DOUBLE,
+    G_OPTION_ARG_FILENAME, G_OPTION_ARG_FILENAME_ARRAY, G_OPTION_ARG_INT, G_OPTION_ARG_INT64,
+    G_OPTION_ARG_NONE, G_OPTION_ARG_STRING, G_OPTION_ARG_STRING_ARRAY, GOptionArg, GOptionContext,
+    GOptionEntry, GOptionGroup, g_option_context_add_group, g_option_context_add_main_entries,
+    g_option_context_free, g_option_context_new, g_option_context_parse,
+};
+use self::gprintf_h::{g_fprintf, g_printf};
+pub use self::gquark_h::GQuark;
+pub use self::gstrfuncs_h::{g_strdup, g_strdup_inline, g_strdupv, g_strfreev, g_strsplit};
+pub use self::gtkapplication_h::{
+    _GtkApplication, _GtkApplicationPrivate, GtkApplication, GtkApplicationPrivate,
+};
+use self::gtkmain_h::{gtk_disable_setlocale, gtk_get_option_group, gtk_init, gtk_main};
+pub use self::gtree_h::{_GTree, GTree};
+pub use self::gtype_h::{_GTypeClass, _GTypeInstance, GType, GTypeClass, GTypeInstance};
+pub use self::gtypes_h::{
+    GDestroyNotify, gboolean, gchar, gconstpointer, gdouble, gint, gpointer, guint,
+};
+use self::gutils_h::{g_get_user_cache_dir, g_get_user_config_dir, g_get_user_data_dir};
+pub use self::include_time_h::pid_t;
+use self::ipc_h::ipc_init;
 use self::locale_h::setlocale;
+pub use self::log_h::{
+    _log, LOG_LEVEL_debug, LOG_LEVEL_error, LOG_LEVEL_fatal, LOG_LEVEL_info, LOG_LEVEL_verbose,
+    LOG_LEVEL_warn, log_level_t,
+};
+use self::lua_h::lua_State;
+pub use self::luaclass_h::{
+    lua_class_allocator_t, lua_class_property_array_t, lua_class_propfunc_t, lua_class_t,
+    lua_object_t,
+};
+use self::luah::{luaH_init, luaH_parserc};
+use self::luakit_log_h::{log_init, log_level_from_string, log_set_verbosity};
+pub use self::signal_h::signal_t;
+use self::stdio_h::stderr;
+use self::stdlib_h::exit;
+use self::string_h::{memcpy, memset, strchr, strcmp, strlen};
+pub use self::struct_FILE_h::{_IO_FILE, _IO_codecvt, _IO_lock_t, _IO_marker, _IO_wide_data};
+pub use self::struct_timeval_h::timeval;
+use self::time_h::gettimeofday;
+pub use self::types_h::{__off_t, __off64_t, __pid_t, __suseconds_t, __time_t};
+use self::unistd_h::{fork, setsid};
+pub use self::util_h::l_time;
+use self::web_context_h::web_context_init;
 #[unsafe(no_mangle)]
 pub static mut common: common_t = _common_t {
     L: 0 as *const lua_State as *mut lua_State,
@@ -681,28 +645,24 @@ pub static mut widget_class: lua_class_t = lua_class_t {
     name: 0 as *const gchar,
     signals: 0 as *const signal_t as *mut signal_t,
     allocator: None,
-    properties: 0 as *const lua_class_property_array_t
-        as *mut lua_class_property_array_t,
+    properties: 0 as *const lua_class_property_array_t as *mut lua_class_property_array_t,
     index_miss_property: None,
     newindex_miss_property: None,
 };
 unsafe extern "C" fn init_directories() {
-    globalconf
-        .cache_dir = g_build_filename(
+    globalconf.cache_dir = g_build_filename(
         g_get_user_cache_dir(),
         b"luakit\0" as *const u8 as *const std::ffi::c_char,
         globalconf.profile,
         0 as *mut std::ffi::c_void,
     );
-    globalconf
-        .config_dir = g_build_filename(
+    globalconf.config_dir = g_build_filename(
         g_get_user_config_dir(),
         b"luakit\0" as *const u8 as *const std::ffi::c_char,
         globalconf.profile,
         0 as *mut std::ffi::c_void,
     );
-    globalconf
-        .data_dir = g_build_filename(
+    globalconf.data_dir = g_build_filename(
         g_get_user_data_dir(),
         b"luakit\0" as *const u8 as *const std::ffi::c_char,
         globalconf.profile,
@@ -726,10 +686,7 @@ unsafe extern "C" fn parse_log_level_option(mut log_lvl: *mut gchar) {
         } else {
             let mut sep: *mut gchar = strchr(*part, '=' as i32);
             if !sep.is_null()
-                && log_level_from_string(
-                    &mut lvl,
-                    sep.offset(1 as std::ffi::c_int as isize),
-                ) == 0
+                && log_level_from_string(&mut lvl, sep.offset(1 as std::ffi::c_int as isize)) == 0
             {
                 *sep = '\0' as i32 as gchar;
                 log_set_verbosity(*part, lvl);
@@ -770,8 +727,7 @@ unsafe extern "C" fn parseopts(
                 flags: 0 as std::ffi::c_int,
                 arg: G_OPTION_ARG_NONE,
                 arg_data: &mut check_only as *mut *mut gboolean as gpointer,
-                description: b"check config and exit\0" as *const u8
-                    as *const std::ffi::c_char,
+                description: b"check config and exit\0" as *const u8 as *const std::ffi::c_char,
                 arg_description: 0 as *const gchar,
             };
             init
@@ -783,8 +739,7 @@ unsafe extern "C" fn parseopts(
                 flags: 0 as std::ffi::c_int,
                 arg: G_OPTION_ARG_STRING,
                 arg_data: &mut globalconf.confpath as *mut *mut gchar as gpointer,
-                description: b"configuration file to use\0" as *const u8
-                    as *const std::ffi::c_char,
+                description: b"configuration file to use\0" as *const u8 as *const std::ffi::c_char,
                 arg_description: b"FILE\0" as *const u8 as *const std::ffi::c_char,
             };
             init
@@ -796,8 +751,7 @@ unsafe extern "C" fn parseopts(
                 flags: 0 as std::ffi::c_int,
                 arg: G_OPTION_ARG_STRING,
                 arg_data: &mut globalconf.profile as *mut *mut gchar as gpointer,
-                description: b"profile name to use\0" as *const u8
-                    as *const std::ffi::c_char,
+                description: b"profile name to use\0" as *const u8 as *const std::ffi::c_char,
                 arg_description: b"NAME\0" as *const u8 as *const std::ffi::c_char,
             };
             init
@@ -809,8 +763,7 @@ unsafe extern "C" fn parseopts(
                 flags: 0 as std::ffi::c_int,
                 arg: G_OPTION_ARG_NONE,
                 arg_data: nonblock as gpointer,
-                description: b"run in background\0" as *const u8
-                    as *const std::ffi::c_char,
+                description: b"run in background\0" as *const u8 as *const std::ffi::c_char,
                 arg_description: 0 as *const gchar,
             };
             init
@@ -822,8 +775,7 @@ unsafe extern "C" fn parseopts(
                 flags: 0 as std::ffi::c_int,
                 arg: G_OPTION_ARG_NONE,
                 arg_data: &mut globalconf.nounique as *mut gboolean as gpointer,
-                description: b"ignore libunique bindings\0" as *const u8
-                    as *const std::ffi::c_char,
+                description: b"ignore libunique bindings\0" as *const u8 as *const std::ffi::c_char,
                 arg_description: 0 as *const gchar,
             };
             init
@@ -835,8 +787,7 @@ unsafe extern "C" fn parseopts(
                 flags: 0 as std::ffi::c_int,
                 arg: G_OPTION_ARG_STRING_ARRAY,
                 arg_data: &mut uris as *mut *mut *mut gchar as gpointer,
-                description: b"uri(s) to load at startup\0" as *const u8
-                    as *const std::ffi::c_char,
+                description: b"uri(s) to load at startup\0" as *const u8 as *const std::ffi::c_char,
                 arg_description: b"URI\0" as *const u8 as *const std::ffi::c_char,
             };
             init
@@ -848,8 +799,7 @@ unsafe extern "C" fn parseopts(
                 flags: 0 as std::ffi::c_int,
                 arg: G_OPTION_ARG_NONE,
                 arg_data: &mut verbose as *mut gboolean as gpointer,
-                description: b"print verbose output\0" as *const u8
-                    as *const std::ffi::c_char,
+                description: b"print verbose output\0" as *const u8 as *const std::ffi::c_char,
                 arg_description: 0 as *const gchar,
             };
             init
@@ -861,8 +811,7 @@ unsafe extern "C" fn parseopts(
                 flags: 0 as std::ffi::c_int,
                 arg: G_OPTION_ARG_STRING,
                 arg_data: &mut log_lvl as *mut *mut gchar as gpointer,
-                description: b"specify precise log level\0" as *const u8
-                    as *const std::ffi::c_char,
+                description: b"specify precise log level\0" as *const u8 as *const std::ffi::c_char,
                 arg_description: b"NAME\0" as *const u8 as *const std::ffi::c_char,
             };
             init
@@ -874,8 +823,7 @@ unsafe extern "C" fn parseopts(
                 flags: 0 as std::ffi::c_int,
                 arg: G_OPTION_ARG_NONE,
                 arg_data: &mut version_only as *mut *mut gboolean as gpointer,
-                description: b"print version and exit\0" as *const u8
-                    as *const std::ffi::c_char,
+                description: b"print version and exit\0" as *const u8 as *const std::ffi::c_char,
                 arg_description: 0 as *const gchar,
             };
             init
@@ -893,10 +841,8 @@ unsafe extern "C" fn parseopts(
             init
         },
     ];
-    globalconf
-        .argv = g_ptr_array_new_with_free_func(
-        Some(g_free as unsafe extern "C" fn(gpointer) -> ()),
-    );
+    globalconf.argv =
+        g_ptr_array_new_with_free_func(Some(g_free as unsafe extern "C" fn(gpointer) -> ()));
     let mut i: gint = 0 as std::ffi::c_int;
     while i < *argc {
         g_ptr_array_add(
@@ -906,9 +852,7 @@ unsafe extern "C" fn parseopts(
         i += 1;
         i;
     }
-    context = g_option_context_new(
-        b"[URI...]\0" as *const u8 as *const std::ffi::c_char,
-    );
+    context = g_option_context_new(b"[URI...]\0" as *const u8 as *const std::ffi::c_char);
     g_option_context_add_main_entries(context, entries.as_ptr(), 0 as *const gchar);
     g_option_context_add_group(context, gtk_get_option_group(0 as std::ffi::c_int));
     g_option_context_parse(context, argc, &mut argv, 0 as *mut *mut GError);
@@ -917,8 +861,7 @@ unsafe extern "C" fn parseopts(
     while i_0 < *argc {
         while (i_0 as std::ffi::c_uint) < (*globalconf.argv).len
             && strcmp(
-                *((*globalconf.argv).pdata).offset(i_0 as isize)
-                    as *const std::ffi::c_char,
+                *((*globalconf.argv).pdata).offset(i_0 as isize) as *const std::ffi::c_char,
                 *argv.offset(i_0 as isize),
             ) == 0
         {
@@ -928,43 +871,17 @@ unsafe extern "C" fn parseopts(
         i_0;
     }
     if !version_only.is_null() {
-        g_printf(
-            b"luakit %s\n\0" as *const u8 as *const std::ffi::c_char,
-            b"64175ca2\0" as *const u8 as *const std::ffi::c_char,
-        );
-        g_printf(
-            b"  built with: webkit %i.%i.%i \0" as *const u8 as *const std::ffi::c_char,
-            2 as std::ffi::c_int,
-            48 as std::ffi::c_int,
-            3 as std::ffi::c_int,
-        );
-        g_printf(
-            b"(installed version: %u.%u.%u)\n\0" as *const u8 as *const std::ffi::c_char,
+        println!("luakit {}\n\0", "64175ca2",);
+        println!("  built with: webkit {}.{}.{}", 2, 48, 3,);
+        println!(
+            "(installed version: {}.{}.{})",
             webkit_get_major_version(),
             webkit_get_minor_version(),
             webkit_get_micro_version(),
         );
-        g_printf(
-            b"                 GTK %i.%i.%i \n\0" as *const u8
-                as *const std::ffi::c_char,
-            3 as std::ffi::c_int,
-            24 as std::ffi::c_int,
-            49 as std::ffi::c_int,
-        );
-        g_printf(
-            b"                GLIB %i.%i.%i \n\0" as *const u8
-                as *const std::ffi::c_char,
-            2 as std::ffi::c_int,
-            84 as std::ffi::c_int,
-            3 as std::ffi::c_int,
-        );
-        g_printf(
-            b"                SOUP %i.%i.%i \n\0" as *const u8
-                as *const std::ffi::c_char,
-            3 as std::ffi::c_int,
-            6 as std::ffi::c_int,
-            5 as std::ffi::c_int,
-        );
+        println!("                 GTK {}.{}.{}", 3, 24, 49,);
+        println!("                GLIB {}.{}.{}", 2, 84, 3,);
+        println!("                SOUP {}.{}.{}", 3, 6, 5,);
         exit(0 as std::ffi::c_int);
     }
     if log_lvl.is_null() {
@@ -997,15 +914,13 @@ unsafe extern "C" fn parseopts(
         if luaH_parserc(globalconf.confpath, 0 as std::ffi::c_int) == 0 {
             g_fprintf(
                 stderr,
-                b"Confiuration file syntax error.\n\0" as *const u8
-                    as *const std::ffi::c_char,
+                b"Confiuration file syntax error.\n\0" as *const u8 as *const std::ffi::c_char,
             );
             exit(1 as std::ffi::c_int);
         } else {
             g_fprintf(
                 stderr,
-                b"Configuration file syntax OK.\n\0" as *const u8
-                    as *const std::ffi::c_char,
+                b"Configuration file syntax OK.\n\0" as *const u8 as *const std::ffi::c_char,
             );
             exit(0 as std::ffi::c_int);
         }
@@ -1019,9 +934,9 @@ unsafe extern "C" fn parseopts(
         );
     }
     if !uris.is_null() {
-        return uris
+        return uris;
     } else {
-        return g_strdupv(argv.offset(1 as std::ffi::c_int as isize))
+        return g_strdupv(argv.offset(1 as std::ffi::c_int as isize));
     };
 }
 unsafe extern "C" fn glib_log_writer(
@@ -1030,8 +945,7 @@ unsafe extern "C" fn glib_log_writer(
     mut n_fields: gsize,
     mut UNUSED_user_data: gpointer,
 ) -> GLogWriterOutput {
-    let mut log_domain: *const gchar = b"(unknown)\0" as *const u8
-        as *const std::ffi::c_char;
+    let mut log_domain: *const gchar = b"(unknown)\0" as *const u8 as *const std::ffi::c_char;
     let mut message: *const gchar = b"(empty)\0" as *const u8 as *const std::ffi::c_char;
     let mut i: gsize = 0 as std::ffi::c_int as gsize;
     while i < n_fields {
@@ -1200,8 +1114,14 @@ unsafe fn main_0(mut argc: gint, mut argv: *mut *mut gchar) -> gint {
     globalconf.starttime = l_time();
     log_init();
     gtk_disable_setlocale();
-    setlocale(6 as std::ffi::c_int, b"\0" as *const u8 as *const std::ffi::c_char);
-    setlocale(1 as std::ffi::c_int, b"C\0" as *const u8 as *const std::ffi::c_char);
+    setlocale(
+        6 as std::ffi::c_int,
+        b"\0" as *const u8 as *const std::ffi::c_char,
+    );
+    setlocale(
+        1 as std::ffi::c_int,
+        b"C\0" as *const u8 as *const std::ffi::c_char,
+    );
     let mut uris: *mut *mut gchar = parseopts(&mut argc, argv, &mut nonblock);
     let mut i: gint = 1 as std::ffi::c_int;
     while i < argc {
@@ -1231,8 +1151,7 @@ unsafe fn main_0(mut argc: gint, mut argv: *mut *mut gchar) -> gint {
             _log(
                 LOG_LEVEL_fatal,
                 b"luakit.c\0" as *const u8 as *const std::ffi::c_char,
-                b"New SID creation failure: %d\0" as *const u8
-                    as *const std::ffi::c_char,
+                b"New SID creation failure: %d\0" as *const u8 as *const std::ffi::c_char,
                 *__errno_location(),
             );
         }
@@ -1255,8 +1174,10 @@ unsafe fn main_0(mut argc: gint, mut argv: *mut *mut gchar) -> gint {
     web_context_init();
     ipc_init();
     luaH_init(uris);
-    if luaH_parserc(globalconf.confpath, (0 as std::ffi::c_int == 0) as std::ffi::c_int)
-        == 0
+    if luaH_parserc(
+        globalconf.confpath,
+        (0 as std::ffi::c_int == 0) as std::ffi::c_int,
+    ) == 0
     {
         _log(
             LOG_LEVEL_fatal,
@@ -1268,15 +1189,14 @@ unsafe fn main_0(mut argc: gint, mut argv: *mut *mut gchar) -> gint {
         _log(
             LOG_LEVEL_fatal,
             b"luakit.c\0" as *const u8 as *const std::ffi::c_char,
-            b"no windows spawned by rc file, exiting\0" as *const u8
-                as *const std::ffi::c_char,
+            b"no windows spawned by rc file, exiting\0" as *const u8 as *const std::ffi::c_char,
         );
     }
     gtk_main();
     return 0 as std::ffi::c_int;
 }
 pub fn main() {
-    let mut args: Vec::<*mut std::ffi::c_char> = Vec::new();
+    let mut args: Vec<*mut std::ffi::c_char> = Vec::new();
     for arg in ::std::env::args() {
         args.push(
             (::std::ffi::CString::new(arg))
@@ -1286,8 +1206,9 @@ pub fn main() {
     }
     args.push(::core::ptr::null_mut());
     unsafe {
-        ::std::process::exit(
-            main_0((args.len() - 1) as gint, args.as_mut_ptr() as *mut *mut gchar) as i32,
-        )
+        ::std::process::exit(main_0(
+            (args.len() - 1) as gint,
+            args.as_mut_ptr() as *mut *mut gchar,
+        ) as i32)
     }
 }

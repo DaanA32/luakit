@@ -3,6 +3,10 @@ name = "luakit-rs"
 version = "0.1.0"
 edition = "2024"
 
+[[bin]]
+name = "luakit"
+path = "src/luakit.rs"
+
 [lib]
 name = "luakit"
 path = "src/luakit.rs"
