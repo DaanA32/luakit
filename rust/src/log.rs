@@ -27,9 +27,10 @@ use lua::ffi::{
 use crate::{
     clib::msg::msg_lib_get_msg_class,
     common::{
+        clib::luakit::l_time,
         common,
         luaclass::{lua_class_t, luaH_class_emit_signal},
-        util::strip_ansi_escapes,
+        util::{file_exists, strip_ansi_escapes},
     },
     globalconf::globalconf,
     gtypes::{gchar, gint, gint64, glong, guint, guint8, gulong},

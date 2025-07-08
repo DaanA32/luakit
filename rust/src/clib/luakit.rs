@@ -11,7 +11,7 @@ pub mod luakit_h {
     use crate::gtypes::gint;
 }
 use gdk4_sys::GdkClipboard;
-use gio_sys::{GAsyncReadyCallback, GAsyncResult, GCancellable};
+use gio_sys::{GAsyncReadyCallback, GAsyncResult, GCancellable, GFile};
 use glib_sys::*;
 use gtk4_sys::*;
 use libc::*;
@@ -229,7 +229,7 @@ unsafe extern "C" fn luaH_luakit_save_file(mut L: *mut lua_State) -> gint {
     gtk_file_chooser_set_current_folder(
         g_type_check_instance_cast(dialog as *mut GTypeInstance, gtk_file_chooser_get_type())
             as *mut std::ffi::c_void as *mut GtkFileChooser,
-        default_folder as *mut gio_sys::GFile,
+        default_folder as *mut GFile,
         std::ptr::null_mut(),
     );
     gtk_file_chooser_set_current_name(

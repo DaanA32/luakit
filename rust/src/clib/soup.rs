@@ -95,7 +95,7 @@ pub mod soup_h {
         lua_rawget(L, 1 as std::ffi::c_int);
         if !(lua_type(L, -(1 as std::ffi::c_int)) == LUA_TNIL)
             && {
-                p = lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null());
+                p = lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null_mut());
                 !p.is_null()
             }
             && *p.offset(0 as std::ffi::c_int as isize) as std::ffi::c_int != 0
@@ -113,7 +113,7 @@ pub mod soup_h {
         lua_rawget(L, 1 as std::ffi::c_int);
         if !(lua_type(L, -(1 as std::ffi::c_int)) == LUA_TNIL)
             && {
-                p = lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null());
+                p = lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null_mut());
                 !p.is_null()
             }
             && *p.offset(0 as std::ffi::c_int as isize) as std::ffi::c_int != 0
@@ -131,7 +131,7 @@ pub mod soup_h {
         lua_rawget(L, 1 as std::ffi::c_int);
         if !(lua_type(L, -(1 as std::ffi::c_int)) == LUA_TNIL)
             && {
-                p = lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null());
+                p = lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null_mut());
                 !p.is_null()
             }
             && *p.offset(0 as std::ffi::c_int as isize) as std::ffi::c_int != 0
@@ -149,7 +149,7 @@ pub mod soup_h {
         lua_rawget(L, 1 as std::ffi::c_int);
         if !(lua_type(L, -(1 as std::ffi::c_int)) == LUA_TNIL)
             && {
-                p = lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null());
+                p = lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null_mut());
                 !p.is_null()
             }
             && *p.offset(0 as std::ffi::c_int as isize) as std::ffi::c_int != 0
@@ -394,7 +394,7 @@ unsafe extern "C" fn luaH_soup_class_add_signal(mut L: *mut lua_State) -> gint {
     luaH_class_add_signal(
         L,
         &mut soup_class,
-        luaL_checklstring(L, 1 as std::ffi::c_int, std::ptr::null()),
+        luaL_checklstring(L, 1 as std::ffi::c_int, std::ptr::null_mut()),
         2 as std::ffi::c_int,
     );
     return 0 as std::ffi::c_int;

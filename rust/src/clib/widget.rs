@@ -174,15 +174,21 @@ pub mod widget_h {
 use crate::{
     common::{
         luaclass::{
-            luaH_checkudata, luaH_class_add_property, luaH_class_add_signal, luaH_class_emit_signal, luaH_class_new, luaH_class_remove_signal, luaH_class_setup, lua_class_allocator_t, lua_class_propfunc_t, signal_h::signal_new
+            lua_class_allocator_t, lua_class_propfunc_t, luaH_checkudata, luaH_class_add_property,
+            luaH_class_add_signal, luaH_class_emit_signal, luaH_class_index, luaH_class_new,
+            luaH_class_newindex, luaH_class_remove_signal, luaH_class_setup, signal_h::signal_new,
         },
-        luaobject::{luaH_object_gc, luaH_settype},
+        luaobject::{
+            luaH_object_add_signal_simple, luaH_object_emit_signal_simple, luaH_object_gc,
+            luaH_object_property_signal, luaH_object_remove_signal_simple,
+            luaH_object_remove_signals_simple, luaH_object_tostring, luaH_settype,
+        },
         messages::G_LOG_DOMAIN,
-        property::{luaH_gobject_index, property_t, BOOL, INT},
+        property::{BOOL, INT, luaH_gobject_index, luaH_gobject_newindex, property_t},
         tokenize::*,
     },
     gtypes::{gchar, gint, guint},
-    log::{LOG_LEVEL_debug, _log},
+    log::{_log, LOG_LEVEL_debug, LOG_LEVEL_verbose},
 };
 
 pub use self::widget_h::{
@@ -721,7 +727,7 @@ pub unsafe extern "C" fn widget_class_setup(mut L: *mut lua_State) {
             {
                 let mut init = luaL_Reg {
                     name: std::ptr::null(),
-                    func: ::core::mem::transmute::<libc::intptr_t, lua_CFunction>(std::ptr::null()),
+                    func: None,
                 };
                 init
             },
@@ -820,8 +826,8 @@ pub unsafe extern "C" fn widget_class_setup(mut L: *mut lua_State) {
         >(Some(
             widget_new as unsafe extern "C" fn(*mut lua_State) -> *mut widget_t,
         )),
-        ::core::mem::transmute::<libc::intptr_t, lua_class_propfunc_t>(std::ptr::null()),
-        ::core::mem::transmute::<libc::intptr_t, lua_class_propfunc_t>(std::ptr::null()),
+        None,
+        None,
         widget_methods.as_ptr(),
         widget_meta.as_ptr(),
     );
@@ -840,6 +846,6 @@ pub unsafe extern "C" fn widget_class_setup(mut L: *mut lua_State) {
         >(Some(
             luaH_widget_get_type as unsafe extern "C" fn(*mut lua_State, *mut widget_t) -> gint,
         )),
-        ::core::mem::transmute::<libc::intptr_t, lua_class_propfunc_t>(std::ptr::null()),
+        None,
     );
 }

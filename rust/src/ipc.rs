@@ -85,12 +85,31 @@ pub mod ipc_h {
 
 use crate::{
     clib::{web_module::web_module_load_modules_on_endpoint, widget::widget_t},
+    common::common,
     globalconf::globalconf,
     gtypes::*,
-    log::{_log, LOG_LEVEL_debug, LOG_LEVEL_fatal},
+    log::{_log, LOG_LEVEL_debug, LOG_LEVEL_fatal, LOG_LEVEL_verbose},
+    web_context::web_context_get,
 };
-use glib_sys::*;
-use libc::{accept, getpid, listen, sockaddr, sockaddr_un, socklen_t, strerror};
+use glib_sys::{
+    G_FILE_TEST_EXISTS, GCond, GFunc, GIOChannel, GMutex, GPtrArray, GQueue, GVariant,
+    g_build_filename, g_cond_signal, g_cond_wait, g_file_test, g_free, g_get_current_dir,
+    g_get_tmp_dir, g_mutex_lock, g_mutex_unlock, g_ptr_array_foreach, g_random_int_range,
+    g_strdup_printf, g_thread_new, g_unlink, g_variant_new, gboolean, gpointer,
+};
+use libc::{
+    __errno_location, SOCK_STREAM, accept, access, atexit, bind, c_int, getpid, listen, memset,
+    sa_family_t, size_t, sockaddr, sockaddr_un, socket, socklen_t, strcpy, strerror, strlen,
+    unlink,
+};
+use lua::ffi::{lua_getfield, lua_settop, lua_tolstring};
+use webkit2gtk::{
+    ffi::{
+        WebKitWebContext, webkit_web_context_set_web_extensions_directory,
+        webkit_web_context_set_web_extensions_initialization_user_data,
+    },
+    glib::gobject_ffi::{G_CONNECT_DEFAULT, GCallback, GObject, g_signal_connect_data},
+};
 
 pub use self::ipc_h::{
     _ipc_endpoint_t, _ipc_header_t, _ipc_lua_ipc_t, _ipc_page_created_t, _ipc_recv_state_t,
@@ -276,11 +295,7 @@ unsafe extern "C" fn build_socket_path() -> *mut gchar {
 unsafe extern "C" fn web_extension_connect_thread(mut UNUSED_data: gpointer) -> gpointer {
     let mut path: *mut gchar = build_socket_path();
     let mut sock: std::ffi::c_int = 0;
-    sock = socket(
-        1 as std::ffi::c_int,
-        SOCK_STREAM as std::ffi::c_int,
-        0 as std::ffi::c_int,
-    );
+    sock = socket(1 as std::ffi::c_int, SOCK_STREAM, 0 as std::ffi::c_int);
     if sock == -(1 as std::ffi::c_int) {
         _log(
             LOG_LEVEL_fatal,
@@ -296,12 +311,12 @@ unsafe extern "C" fn web_extension_connect_thread(mut UNUSED_data: gpointer) -> 
     memset(
         &mut local as *mut sockaddr_un as *mut std::ffi::c_void,
         0 as std::ffi::c_int,
-        ::core::mem::size_of::<sockaddr_un>() as std::ffi::c_ulong,
+        ::core::mem::size_of::<sockaddr_un>(),
     );
     local.sun_family = 1 as std::ffi::c_int as sa_family_t;
     strcpy((local.sun_path).as_mut_ptr(), path);
     let mut len: std::ffi::c_int = (2 as std::ffi::c_ulong)
-        .wrapping_add(strlen((local.sun_path).as_mut_ptr()))
+        .wrapping_add(strlen((local.sun_path).as_mut_ptr()) as u64)
         as std::ffi::c_int;
     unlink((local.sun_path).as_mut_ptr());
     if bind(
@@ -411,12 +426,12 @@ unsafe extern "C" fn initialize_web_extensions_cb(
         );
     }
     let mut path: *const std::ffi::c_char = 0 as *const std::ffi::c_char;
-    g_mutex_lock(&mut socket_path_lock);
+    g_mutex_lock(socket_path_lock);
     while socket_path.is_null() {
-        g_cond_wait(&mut socket_path_cond, &mut socket_path_lock);
+        g_cond_wait(socket_path_cond, socket_path_lock);
     }
     path = socket_path;
-    g_mutex_unlock(&mut socket_path_lock);
+    g_mutex_unlock(socket_path_lock);
     lua_getfield(
         common.L,
         -(10002 as std::ffi::c_int),
@@ -448,12 +463,14 @@ unsafe extern "C" fn initialize_web_extensions_cb(
     g_free(dirs[0 as std::ffi::c_int as usize] as gpointer);
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ipc_remove_socket_file() {
-    g_mutex_lock(&mut socket_path_lock);
-    g_unlink(socket_path);
-    g_free(socket_path as gpointer);
-    socket_path = 0 as *mut std::ffi::c_char;
-    g_mutex_unlock(&mut socket_path_lock);
+pub extern "C" fn ipc_remove_socket_file() -> () {
+    unsafe {
+        g_mutex_lock(socket_path_lock);
+        g_unlink(socket_path);
+        g_free(socket_path as gpointer);
+        socket_path = 0 as *mut std::ffi::c_char;
+        g_mutex_unlock(socket_path_lock);
+    }
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ipc_init() {
@@ -463,7 +480,7 @@ pub unsafe extern "C" fn ipc_init() {
         0 as *mut std::ffi::c_void,
     );
     g_signal_connect_data(
-        web_context_get() as gpointer,
+        web_context_get() as *mut GObject,
         b"initialize-web-extensions\0" as *const u8 as *const std::ffi::c_char,
         ::core::mem::transmute::<
             Option<unsafe extern "C" fn(*mut WebKitWebContext, gpointer) -> ()>,
@@ -476,5 +493,5 @@ pub unsafe extern "C" fn ipc_init() {
         None,
         G_CONNECT_DEFAULT,
     );
-    atexit(Some(ipc_remove_socket_file as unsafe extern "C" fn() -> ()));
+    atexit(ipc_remove_socket_file);
 }

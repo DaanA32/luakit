@@ -15,9 +15,9 @@ crate-type = ["dylib"]
 [dependencies]
 c2rust-bitfields = "0.20.0"
 libc = "0.2.174"
-glib-sys = "0.20.10"
 lua = "0.0.10"
-gtk4-sys = "^0.9.0"
-gdk4-sys = "^0.9.0"
 webkit2gtk = { version = "2.0.1", features = [ "v2_16"] }
-gio-sys = "0.20.10"
+gio-sys = "0.18.1"
+glib-sys = "0.18.1"
+gtk4-sys = "0.9.6"
+gdk4-sys = "0.9.6"
