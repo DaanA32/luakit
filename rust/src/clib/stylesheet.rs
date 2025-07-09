@@ -1,7 +1,7 @@
 use glib_sys::{g_free, g_strdup, gboolean, gpointer};
 use libc::memset;
-use lua::Function;
-use lua::ffi::{
+use mlua_sys::*;
+use mlua_sys::{
     LUA_MULTRET, lua_State, lua_createtable, lua_gettop, lua_newuserdata, lua_pushstring,
     lua_pushvalue, lua_setmetatable, luaL_Reg, luaL_checklstring,
 };
@@ -21,7 +21,7 @@ pub mod stylesheet_h {
 
     use crate::{clib::widget::widget_t, common::luaclass::signal_h::signal_t, gtypes::gchar};
 
-    unsafe extern "C" {
+    unsafe extern "C-unwind" {
         pub fn webview_stylesheets_regenerate_stylesheet(
             w: *mut widget_t,
             stylesheet: *mut lstylesheet_t,
@@ -49,7 +49,7 @@ use crate::common::tokenize::L_TK_SOURCE;
 use crate::globalconf::globalconf;
 use crate::gtypes::{gchar, gint};
 
-unsafe extern "C" {
+unsafe extern "C-unwind" {
     pub fn webview_stylesheet_set_enabled(
         w: *mut widget_t,
         stylesheet: *mut lstylesheet_t,
@@ -65,7 +65,7 @@ static mut stylesheet_class: lua_class_t = lua_class_t {
     newindex_miss_property: None,
 };
 #[inline]
-unsafe extern "C" fn luaH_stylesheet_class_emit_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_stylesheet_class_emit_signal(mut L: *mut lua_State) -> gint {
     return luaH_class_emit_signal(
         L,
         &mut stylesheet_class,
@@ -75,7 +75,7 @@ unsafe extern "C" fn luaH_stylesheet_class_emit_signal(mut L: *mut lua_State) ->
     );
 }
 #[inline]
-unsafe extern "C" fn luaH_stylesheet_class_remove_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_stylesheet_class_remove_signal(mut L: *mut lua_State) -> gint {
     luaH_class_remove_signal(
         L,
         &mut stylesheet_class,
@@ -85,7 +85,7 @@ unsafe extern "C" fn luaH_stylesheet_class_remove_signal(mut L: *mut lua_State) 
     return 0 as std::ffi::c_int;
 }
 #[inline]
-unsafe extern "C" fn luaH_stylesheet_class_add_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_stylesheet_class_add_signal(mut L: *mut lua_State) -> gint {
     luaH_class_add_signal(
         L,
         &mut stylesheet_class,
@@ -95,7 +95,7 @@ unsafe extern "C" fn luaH_stylesheet_class_add_signal(mut L: *mut lua_State) -> 
     return 0 as std::ffi::c_int;
 }
 #[inline]
-unsafe extern "C" fn stylesheet_new(mut L: *mut lua_State) -> *mut lstylesheet_t {
+unsafe extern "C-unwind" fn stylesheet_new(mut L: *mut lua_State) -> *mut lstylesheet_t {
     let mut p = lua_newuserdata(L, ::core::mem::size_of::<lstylesheet_t>()) as *mut lstylesheet_t;
     memset(
         p as *mut std::ffi::c_void,
@@ -119,10 +119,13 @@ unsafe extern "C" fn stylesheet_new(mut L: *mut lua_State) -> *mut lstylesheet_t
     return p;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_checkstylesheet(mut L: *mut lua_State, mut idx: gint) -> gpointer {
+pub unsafe extern "C-unwind" fn luaH_checkstylesheet(
+    mut L: *mut lua_State,
+    mut idx: gint,
+) -> gpointer {
     return luaH_checkudata(L, idx, &mut stylesheet_class);
 }
-unsafe extern "C" fn luaH_stylesheet_gc(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_stylesheet_gc(mut L: *mut lua_State) -> gint {
     let mut stylesheet = luaH_checkstylesheet(L, 1 as std::ffi::c_int) as *mut lstylesheet_t;
     if !((*stylesheet).stylesheet).is_null() && !(globalconf.webviews).is_null() {
         let mut i = 0 as std::ffi::c_int as std::ffi::c_uint;
@@ -137,11 +140,11 @@ unsafe extern "C" fn luaH_stylesheet_gc(mut L: *mut lua_State) -> gint {
     g_free((*stylesheet).source as gpointer);
     return luaH_object_gc(L);
 }
-unsafe extern "C" fn luaH_stylesheet_new(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_stylesheet_new(mut L: *mut lua_State) -> gint {
     luaH_class_new(L, &mut stylesheet_class);
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn regenerate_stylesheet(mut stylesheet: *mut lstylesheet_t) {
+unsafe extern "C-unwind" fn regenerate_stylesheet(mut stylesheet: *mut lstylesheet_t) {
     let mut old = (*stylesheet).stylesheet;
     if !old.is_null() {
         webkit_user_style_sheet_unref(old);
@@ -163,7 +166,7 @@ unsafe extern "C" fn regenerate_stylesheet(mut stylesheet: *mut lstylesheet_t) {
         }
     }
 }
-unsafe extern "C" fn luaH_stylesheet_set_source(
+unsafe extern "C-unwind" fn luaH_stylesheet_set_source(
     mut L: *mut lua_State,
     mut stylesheet: *mut lstylesheet_t,
 ) -> std::ffi::c_int {
@@ -173,7 +176,7 @@ unsafe extern "C" fn luaH_stylesheet_set_source(
     regenerate_stylesheet(stylesheet);
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_stylesheet_get_source(
+unsafe extern "C-unwind" fn luaH_stylesheet_get_source(
     mut L: *mut lua_State,
     mut stylesheet: *mut lstylesheet_t,
 ) -> std::ffi::c_int {
@@ -181,113 +184,113 @@ unsafe extern "C" fn luaH_stylesheet_get_source(
     return 1 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn stylesheet_class_setup(mut L: *mut lua_State) {
-    static mut stylesheet_methods: [luaL_Reg; 5] = unsafe {
+pub unsafe extern "C-unwind" fn stylesheet_class_setup(mut L: *mut lua_State) {
+    static mut stylesheet_methods: [luaL_Reg; 4] = unsafe {
         [
             {
                 let mut init = luaL_Reg {
                     name: b"add_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_stylesheet_class_add_signal),
+                    func: luaH_stylesheet_class_add_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"remove_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_stylesheet_class_remove_signal),
+                    func: luaH_stylesheet_class_remove_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"emit_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_stylesheet_class_emit_signal),
+                    func: luaH_stylesheet_class_emit_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__call\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_stylesheet_new),
+                    func: luaH_stylesheet_new,
                 };
                 init
             },
-            {
-                let mut init = luaL_Reg {
-                    name: std::ptr::null_mut(),
-                    func: None,
-                };
-                init
-            },
+            // {
+            //     let mut init = luaL_Reg {
+            //         name: std::ptr::null_mut(),
+            //         func: None,
+            //     };
+            //     init
+            // },
         ]
     };
-    static mut stylesheet_meta: [luaL_Reg; 9] = unsafe {
+    static mut stylesheet_meta: [luaL_Reg; 8] = unsafe {
         [
             {
                 let mut init = luaL_Reg {
                     name: b"__tostring\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_object_tostring),
+                    func: luaH_object_tostring,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"add_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_object_add_signal_simple),
+                    func: luaH_object_add_signal_simple,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"remove_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_object_remove_signal_simple),
+                    func: luaH_object_remove_signal_simple,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"remove_signals\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_object_remove_signals_simple),
+                    func: luaH_object_remove_signals_simple,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"emit_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_object_emit_signal_simple),
+                    func: luaH_object_emit_signal_simple,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__index\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_class_index),
+                    func: luaH_class_index,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__newindex\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_class_newindex),
+                    func: luaH_class_newindex,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__gc\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_stylesheet_gc),
+                    func: luaH_stylesheet_gc,
                 };
                 init
             },
-            {
-                let mut init = luaL_Reg {
-                    name: std::ptr::null_mut(),
-                    func: None, // func: ::core::mem::transmute::<libc::intptr_t, Function>(
-                                //     NULL_1 as libc::intptr_t,
-                                // ),
-                };
-                init
-            },
+            // {
+            //     let mut init = luaL_Reg {
+            //         name: std::ptr::null_mut(),
+            //         func: None, // func: ::core::mem::transmute::<libc::intptr_t, Function>(
+            //                     //     NULL_1 as libc::intptr_t,
+            //                     // ),
+            //     };
+            //     init
+            // },
         ]
     };
     luaH_class_setup(
@@ -295,10 +298,10 @@ pub unsafe extern "C" fn stylesheet_class_setup(mut L: *mut lua_State) {
         &mut stylesheet_class,
         b"stylesheet\0" as *const u8 as *const std::ffi::c_char,
         ::core::mem::transmute::<
-            Option<unsafe extern "C" fn(*mut lua_State) -> *mut lstylesheet_t>,
+            Option<unsafe extern "C-unwind" fn(*mut lua_State) -> *mut lstylesheet_t>,
             lua_class_allocator_t,
         >(Some(
-            stylesheet_new as unsafe extern "C" fn(*mut lua_State) -> *mut lstylesheet_t,
+            stylesheet_new as unsafe extern "C-unwind" fn(*mut lua_State) -> *mut lstylesheet_t,
         )),
         Some(luaH_class_index_miss_property),
         Some(luaH_class_newindex_miss_property),
@@ -309,25 +312,40 @@ pub unsafe extern "C" fn stylesheet_class_setup(mut L: *mut lua_State) {
         &mut stylesheet_class,
         L_TK_SOURCE,
         ::core::mem::transmute::<
-            Option<unsafe extern "C" fn(*mut lua_State, *mut lstylesheet_t) -> std::ffi::c_int>,
+            Option<
+                unsafe extern "C-unwind" fn(*mut lua_State, *mut lstylesheet_t) -> std::ffi::c_int,
+            >,
             lua_class_propfunc_t,
         >(Some(
             luaH_stylesheet_set_source
-                as unsafe extern "C" fn(*mut lua_State, *mut lstylesheet_t) -> std::ffi::c_int,
+                as unsafe extern "C-unwind" fn(
+                    *mut lua_State,
+                    *mut lstylesheet_t,
+                ) -> std::ffi::c_int,
         )),
         ::core::mem::transmute::<
-            Option<unsafe extern "C" fn(*mut lua_State, *mut lstylesheet_t) -> std::ffi::c_int>,
+            Option<
+                unsafe extern "C-unwind" fn(*mut lua_State, *mut lstylesheet_t) -> std::ffi::c_int,
+            >,
             lua_class_propfunc_t,
         >(Some(
             luaH_stylesheet_get_source
-                as unsafe extern "C" fn(*mut lua_State, *mut lstylesheet_t) -> std::ffi::c_int,
+                as unsafe extern "C-unwind" fn(
+                    *mut lua_State,
+                    *mut lstylesheet_t,
+                ) -> std::ffi::c_int,
         )),
         ::core::mem::transmute::<
-            Option<unsafe extern "C" fn(*mut lua_State, *mut lstylesheet_t) -> std::ffi::c_int>,
+            Option<
+                unsafe extern "C-unwind" fn(*mut lua_State, *mut lstylesheet_t) -> std::ffi::c_int,
+            >,
             lua_class_propfunc_t,
         >(Some(
             luaH_stylesheet_set_source
-                as unsafe extern "C" fn(*mut lua_State, *mut lstylesheet_t) -> std::ffi::c_int,
+                as unsafe extern "C-unwind" fn(
+                    *mut lua_State,
+                    *mut lstylesheet_t,
+                ) -> std::ffi::c_int,
         )),
     );
 }

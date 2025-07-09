@@ -1,6 +1,6 @@
 use glib_sys::*;
 use libc::size_t;
-use lua::ffi::*;
+use mlua_sys::*;
 use webkit2gtk::glib::gobject_ffi::{GObject, g_object_get, g_object_set};
 
 pub mod property_h {

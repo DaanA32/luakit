@@ -1,7 +1,7 @@
 use gio_sys::{GFile, g_file_get_path, g_file_new_for_path};
 use glib_sys::*;
 use libc::*;
-use lua::ffi::*;
+use mlua_sys::*;
 
 use crate::{
     common::{luaclass::luaH_typename, luautil::luaH_traceback, util::strip_ansi_escapes},
@@ -307,4 +307,47 @@ pub unsafe extern "C" fn luaH_fixups(mut L: *mut lua_State) {
         b"traceback\0" as *const u8 as *const std::ffi::c_char,
     );
     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
+}
+
+pub unsafe extern "C" fn luaH_warn(mut L: *mut lua_State, mut fmt: *const gchar, mut args: ...) {
+    let mut top: gint = lua_gettop(L);
+    let mut ar: lua_Debug = lua_Debug {
+        event: 0,
+        name: 0 as *const std::ffi::c_char,
+        namewhat: 0 as *const std::ffi::c_char,
+        what: 0 as *const std::ffi::c_char,
+        source: 0 as *const std::ffi::c_char,
+        currentline: 0,
+        nups: 0,
+        linedefined: 0,
+        lastlinedefined: 0,
+        short_src: [0; 60],
+        i_ci: 0,
+    };
+    lua_getstack(L, 1 as std::ffi::c_int, &mut ar);
+    lua_getinfo(L, b"Sln\0" as *const u8 as *const std::ffi::c_char, &mut ar);
+    let mut __n1: gint64 = top as gint64;
+    let mut __n2: gint64 = lua_gettop(L) as gint64;
+    if !(__n1 == __n2) {
+        g_assertion_message_cmpint(
+            0 as *mut gchar,
+            b"./common/luah.h\0" as *const u8 as *const std::ffi::c_char,
+            142 as std::ffi::c_int,
+            (*::core::mem::transmute::<&[u8; 10], &[std::ffi::c_char; 10]>(b"luaH_warn\0"))
+                .as_ptr(),
+            b"top == lua_gettop(L)\0" as *const u8 as *const std::ffi::c_char,
+            __n1 as guint64,
+            b"==\0" as *const u8 as *const std::ffi::c_char,
+            __n2 as guint64,
+            'i' as i32 as std::ffi::c_char,
+        );
+    }
+    let mut ap: ::core::ffi::VaListImpl;
+    ap = args.clone();
+    va_log(
+        LOG_LEVEL_warn,
+        (ar.short_src).as_mut_ptr(),
+        fmt,
+        ap.as_va_list(),
+    );
 }

@@ -1,10 +1,25 @@
+use gdk_sys::*;
 use glib_sys::*;
-use gtk4_sys::*;
+use gtk_sys::*;
 use libc::*;
-use lua::ffi::*;
-use webkit2gtk::glib::gobject_ffi::{
-    GObject, GTypeInstance, g_object_set_data, g_type_check_instance_cast,
-};
+use mlua_sys::*;
+
+use crate::clib::luakit::*;
+use crate::common::clib::luakit::*;
+use crate::common::common;
+use crate::common::luaclass::signal_h::*;
+use crate::common::luaclass::*;
+use crate::common::luah::*;
+use crate::common::luaobject::*;
+use crate::common::luauniq::*;
+use crate::common::tokenize::*;
+use crate::globalconf::*;
+use crate::log::*;
+use crate::luah::*;
+use crate::web_context::*;
+
+use crate::gtypes::*;
+use webkit2gtk::{ffi::*, glib::gobject_ffi::*};
 
 pub mod internal {
     pub type __builtin_va_list = [__va_list_tag; 1];
@@ -24,10 +39,12 @@ pub mod widget_h {
         pub signals: *mut signal_t,
         pub info: *const widget_info_t,
         pub destructor: Option<widget_destructor_t>,
-        pub index:
-            Option<unsafe extern "C" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> gint>,
-        pub newindex:
-            Option<unsafe extern "C" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> gint>,
+        pub index: Option<
+            unsafe extern "C-unwind" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> gint,
+        >,
+        pub newindex: Option<
+            unsafe extern "C-unwind" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> gint,
+        >,
         pub ref_0: gpointer,
         pub widget: *mut GtkWidget,
         pub provider: *mut GtkCssProvider,
@@ -35,7 +52,7 @@ pub mod widget_h {
         pub prev_height: gint,
         pub data: gpointer,
     }
-    pub type widget_destructor_t = unsafe extern "C" fn(*mut widget_t) -> ();
+    pub type widget_destructor_t = unsafe extern "C-unwind" fn(*mut widget_t) -> ();
     #[derive(Copy, Clone)]
     #[repr(C)]
     pub struct widget_info_t {
@@ -44,12 +61,12 @@ pub mod widget_h {
         pub wc: Option<widget_constructor_t>,
     }
     pub type widget_constructor_t =
-        unsafe extern "C" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> *mut widget_t;
+        unsafe extern "C-unwind" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> *mut widget_t;
     pub const GOBJECT_LUAKIT_WIDGET_DATA_KEY: [std::ffi::c_char; 19] = unsafe {
         *::core::mem::transmute::<&[u8; 19], &[std::ffi::c_char; 19]>(b"luakit_widget_data\0")
     };
     #[inline]
-    pub unsafe extern "C" fn luaH_checkwidget(
+    pub unsafe extern "C-unwind" fn luaH_checkwidget(
         mut L: *mut lua_State,
         mut udx: gint,
     ) -> *mut widget_t {
@@ -91,8 +108,8 @@ pub mod widget_h {
         return w;
     }
     use glib_sys::*;
-    use gtk4_sys::*;
-    use lua::ffi::*;
+    use gtk_sys::*;
+    use mlua_sys::*;
     use webkit2gtk::glib::gobject_ffi::{GTypeInstance, g_type_check_instance_is_a};
 
     use crate::common::luaclass::signal_h::signal_t;
@@ -101,7 +118,7 @@ pub mod widget_h {
     use crate::common::tokenize::luakit_token_t;
     use crate::gtypes::*;
 
-    unsafe extern "C" {
+    unsafe extern "C-unwind" {
         pub fn widget_box(_: *mut lua_State, _: *mut widget_t, _: luakit_token_t) -> *mut widget_t;
         pub fn widget_entry(
             _: *mut lua_State,
@@ -395,7 +412,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
     ]
 };
 #[inline]
-unsafe extern "C" fn luaH_widget_class_emit_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_widget_class_emit_signal(mut L: *mut lua_State) -> gint {
     return luaH_class_emit_signal(
         L,
         &mut widget_class,
@@ -405,7 +422,7 @@ unsafe extern "C" fn luaH_widget_class_emit_signal(mut L: *mut lua_State) -> gin
     );
 }
 #[inline]
-unsafe extern "C" fn luaH_widget_class_remove_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_widget_class_remove_signal(mut L: *mut lua_State) -> gint {
     luaH_class_remove_signal(
         L,
         &mut widget_class,
@@ -415,7 +432,7 @@ unsafe extern "C" fn luaH_widget_class_remove_signal(mut L: *mut lua_State) -> g
     return 0 as std::ffi::c_int;
 }
 #[inline]
-unsafe extern "C" fn luaH_widget_class_add_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_widget_class_add_signal(mut L: *mut lua_State) -> gint {
     luaH_class_add_signal(
         L,
         &mut widget_class,
@@ -425,7 +442,7 @@ unsafe extern "C" fn luaH_widget_class_add_signal(mut L: *mut lua_State) -> gint
     return 0 as std::ffi::c_int;
 }
 #[inline]
-unsafe extern "C" fn widget_new(mut L: *mut lua_State) -> *mut widget_t {
+unsafe extern "C-unwind" fn widget_new(mut L: *mut lua_State) -> *mut widget_t {
     let mut p = lua_newuserdata(L, ::core::mem::size_of::<widget_t>()) as *mut widget_t;
     memset(
         p as *mut std::ffi::c_void,
@@ -448,7 +465,7 @@ unsafe extern "C" fn widget_new(mut L: *mut lua_State) -> *mut widget_t {
     );
     return p;
 }
-unsafe extern "C" fn luaH_widget_gc(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_widget_gc(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkudata(L, 1 as std::ffi::c_int, &mut widget_class) as *mut widget_t;
     if !((*w).info).is_null() {
         _log(
@@ -473,7 +490,7 @@ unsafe extern "C" fn luaH_widget_gc(mut L: *mut lua_State) -> gint {
     return luaH_object_gc(L);
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_widget_new(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_widget_new(mut L: *mut lua_State) -> gint {
     luaH_class_new(L, &mut widget_class);
     let mut w = lua_touserdata(L, -(1 as std::ffi::c_int)) as *mut widget_t;
     if ((*w).info).is_null() {
@@ -488,19 +505,24 @@ pub unsafe extern "C" fn luaH_widget_new(mut L: *mut lua_State) -> gint {
     return 1 as std::ffi::c_int;
 }
 #[inline]
-unsafe extern "C" fn widget_set_css(mut w: *mut widget_t, mut properties: *const gchar) {
+unsafe extern "C-unwind" fn widget_set_css(mut w: *mut widget_t, mut properties: *const gchar) {
     let mut old_css = gtk_css_provider_to_string((*w).provider);
-    let mut css = g_strdup_printf(
+    let css = g_strdup_printf(
         b"%s\n#widget { %s }\0" as *const u8 as *const std::ffi::c_char,
         old_css,
         properties,
     );
-    gtk_css_provider_load_from_data((*w).provider, css, strlen(css) as ssize_t);
+    gtk_css_provider_load_from_data(
+        (*w).provider,
+        css as *const u8,
+        strlen(css).try_into().unwrap(),
+        std::ptr::null_mut(),
+    );
     g_free(css as gpointer);
     g_free(old_css as gpointer);
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn widget_set_css_properties(mut w: *mut widget_t, mut args: ...) {
+pub unsafe extern "C-unwind" fn widget_set_css_properties(mut w: *mut widget_t, mut args: ...) {
     let mut argp: ::core::ffi::VaListImpl;
     argp = args.clone();
     let mut css = g_strdup(b"\0" as *const u8 as *const std::ffi::c_char);
@@ -539,7 +561,7 @@ pub unsafe extern "C" fn widget_set_css_properties(mut w: *mut widget_t, mut arg
     widget_set_css(w, css);
     g_free(css as gpointer);
 }
-unsafe extern "C" fn luaH_widget_index(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_widget_index(mut L: *mut lua_State) -> gint {
     let mut prop = luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut());
     let mut token = l_tokenize(prop);
     if luaH_class_index(L) != 0 {
@@ -570,7 +592,7 @@ unsafe extern "C" fn luaH_widget_index(mut L: *mut lua_State) -> gint {
         0 as std::ffi::c_int
     };
 }
-unsafe extern "C" fn luaH_widget_newindex(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_widget_newindex(mut L: *mut lua_State) -> gint {
     let mut prop = luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut());
     let mut token = l_tokenize(prop);
     luaH_class_newindex(L);
@@ -601,7 +623,10 @@ unsafe extern "C" fn luaH_widget_newindex(mut L: *mut lua_State) -> gint {
         0 as std::ffi::c_int
     };
 }
-unsafe extern "C" fn luaH_widget_set_type(mut L: *mut lua_State, mut w: *mut widget_t) -> gint {
+unsafe extern "C-unwind" fn luaH_widget_set_type(
+    mut L: *mut lua_State,
+    mut w: *mut widget_t,
+) -> gint {
     if !((*w).info).is_null() {
         luaL_error(
             L,
@@ -675,7 +700,10 @@ unsafe extern "C" fn luaH_widget_set_type(mut L: *mut lua_State, mut w: *mut wid
     );
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_widget_get_type(mut L: *mut lua_State, mut w: *mut widget_t) -> gint {
+unsafe extern "C-unwind" fn luaH_widget_get_type(
+    mut L: *mut lua_State,
+    mut w: *mut widget_t,
+) -> gint {
     if ((*w).info).is_null() {
         return 0 as std::ffi::c_int;
     }
@@ -684,136 +712,111 @@ unsafe extern "C" fn luaH_widget_get_type(mut L: *mut lua_State, mut w: *mut wid
     return 1 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn widget_class_setup(mut L: *mut lua_State) {
-    static mut widget_methods: [luaL_Reg; 5] = unsafe {
+pub unsafe extern "C-unwind" fn widget_class_setup(mut L: *mut lua_State) {
+    static mut widget_methods: [luaL_Reg; 4] = unsafe {
         [
             {
                 let mut init = luaL_Reg {
                     name: b"add_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_widget_class_add_signal
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_widget_class_add_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"remove_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_widget_class_remove_signal
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_widget_class_remove_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"emit_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_widget_class_emit_signal
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_widget_class_emit_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__call\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_widget_new as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_widget_new,
                 };
                 init
             },
-            {
-                let mut init = luaL_Reg {
-                    name: std::ptr::null(),
-                    func: None,
-                };
-                init
-            },
+            // {
+            //     let mut init = luaL_Reg {
+            //         name: std::ptr::null(),
+            //         func: None,
+            //     };
+            //     init
+            // },
         ]
     };
-    static mut widget_meta: [luaL_Reg; 9] = unsafe {
+    static mut widget_meta: [luaL_Reg; 8] = unsafe {
         [
             {
                 let mut init = luaL_Reg {
                     name: b"__tostring\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_object_tostring as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_object_tostring,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"add_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_object_add_signal_simple
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_object_add_signal_simple,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"remove_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_object_remove_signal_simple
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_object_remove_signal_simple,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"remove_signals\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_object_remove_signals_simple
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_object_remove_signals_simple,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"emit_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_object_emit_signal_simple
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_object_emit_signal_simple,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__index\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_widget_index as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_widget_index,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__newindex\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_widget_newindex as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_widget_newindex,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__gc\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_widget_gc as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_widget_gc,
                 };
                 init
             },
-            {
-                let mut init = luaL_Reg {
-                    name: std::ptr::null(),
-                    func: None,
-                };
-                init
-            },
+            // {
+            //     let mut init = luaL_Reg {
+            //         name: std::ptr::null(),
+            //         func: None,
+            //     };
+            //     init
+            // },
         ]
     };
     luaH_class_setup(
@@ -821,10 +824,10 @@ pub unsafe extern "C" fn widget_class_setup(mut L: *mut lua_State) {
         &mut widget_class,
         b"widget\0" as *const u8 as *const std::ffi::c_char,
         ::core::mem::transmute::<
-            Option<unsafe extern "C" fn(*mut lua_State) -> *mut widget_t>,
+            Option<unsafe extern "C-unwind" fn(*mut lua_State) -> *mut widget_t>,
             lua_class_allocator_t,
         >(Some(
-            widget_new as unsafe extern "C" fn(*mut lua_State) -> *mut widget_t,
+            widget_new as unsafe extern "C-unwind" fn(*mut lua_State) -> *mut widget_t,
         )),
         None,
         None,
@@ -835,16 +838,18 @@ pub unsafe extern "C" fn widget_class_setup(mut L: *mut lua_State) {
         &mut widget_class,
         L_TK_TYPE,
         ::core::mem::transmute::<
-            Option<unsafe extern "C" fn(*mut lua_State, *mut widget_t) -> gint>,
+            Option<unsafe extern "C-unwind" fn(*mut lua_State, *mut widget_t) -> gint>,
             lua_class_propfunc_t,
         >(Some(
-            luaH_widget_set_type as unsafe extern "C" fn(*mut lua_State, *mut widget_t) -> gint,
+            luaH_widget_set_type
+                as unsafe extern "C-unwind" fn(*mut lua_State, *mut widget_t) -> gint,
         )),
         ::core::mem::transmute::<
-            Option<unsafe extern "C" fn(*mut lua_State, *mut widget_t) -> gint>,
+            Option<unsafe extern "C-unwind" fn(*mut lua_State, *mut widget_t) -> gint>,
             lua_class_propfunc_t,
         >(Some(
-            luaH_widget_get_type as unsafe extern "C" fn(*mut lua_State, *mut widget_t) -> gint,
+            luaH_widget_get_type
+                as unsafe extern "C-unwind" fn(*mut lua_State, *mut widget_t) -> gint,
         )),
         None,
     );

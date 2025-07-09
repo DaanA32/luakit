@@ -1,35 +1,6 @@
-use ::c2rust_bitfields;
-use ::libc;
-use glib_sys::{g_assertion_message_expr, g_free, g_strdup, gpointer};
-use libc::{FILE, chmod, fclose, fopen, mode_t, strcmp};
-use lua::ffi::{
-    LUA_MULTRET, LUA_TNIL, lua_State, lua_gettop, lua_pushstring, lua_type, luaL_Reg,
-    luaL_checklstring, luaL_error,
-};
-use webkit2gtk::ffi::{
-    WEBKIT_COOKIE_PERSISTENT_STORAGE_SQLITE, WEBKIT_COOKIE_POLICY_ACCEPT_ALWAYS,
-    WEBKIT_COOKIE_POLICY_ACCEPT_NEVER, WEBKIT_COOKIE_POLICY_ACCEPT_NO_THIRD_PARTY,
-    WEBKIT_NETWORK_PROXY_MODE_CUSTOM, WEBKIT_NETWORK_PROXY_MODE_DEFAULT,
-    WEBKIT_NETWORK_PROXY_MODE_NO_PROXY, webkit_cookie_manager_set_accept_policy,
-    webkit_cookie_manager_set_persistent_storage, webkit_network_proxy_settings_free,
-    webkit_network_proxy_settings_new, webkit_web_context_get_cookie_manager,
-    webkit_web_context_get_website_data_manager, webkit_web_context_set_network_proxy_settings,
-};
-pub mod soup_uri_utils_h {
-    use glib_sys::{
-        G_URI_FLAGS_ENCODED_FRAGMENT, G_URI_FLAGS_ENCODED_PATH, G_URI_FLAGS_ENCODED_QUERY,
-        G_URI_FLAGS_HAS_PASSWORD, G_URI_FLAGS_SCHEME_NORMALIZE,
-    };
-
-    pub const SOUP_HTTP_URI_FLAGS: std::ffi::c_int = G_URI_FLAGS_HAS_PASSWORD as std::ffi::c_int
-        | G_URI_FLAGS_ENCODED_PATH as std::ffi::c_int
-        | G_URI_FLAGS_ENCODED_QUERY as std::ffi::c_int
-        | G_URI_FLAGS_ENCODED_FRAGMENT as std::ffi::c_int
-        | G_URI_FLAGS_SCHEME_NORMALIZE as std::ffi::c_int;
-}
 pub mod soup_h {
     pub static mut scheme_reg: *mut GRegex = 0 as *const GRegex as *mut GRegex;
-    pub unsafe extern "C" fn luaH_soup_uri_tostring(mut L: *mut lua_State) -> gint {
+    pub unsafe extern "C-unwind" fn luaH_soup_uri_tostring(mut L: *mut lua_State) -> gint {
         let mut p = 0 as *const gchar;
         let mut port: gint = 0;
         if !(lua_type(L, 1 as std::ffi::c_int) == LUA_TTABLE) {
@@ -188,7 +159,10 @@ pub mod soup_h {
         g_free(uri as gpointer);
         return 1 as std::ffi::c_int;
     }
-    pub unsafe extern "C" fn luaH_soup_push_uri(mut L: *mut lua_State, mut uri: *mut GUri) -> gint {
+    pub unsafe extern "C-unwind" fn luaH_soup_push_uri(
+        mut L: *mut lua_State,
+        mut uri: *mut GUri,
+    ) -> gint {
         let mut p = 0 as *const gchar;
         let mut port: gint = 0;
         lua_createtable(L, 0 as std::ffi::c_int, 0 as std::ffi::c_int);
@@ -285,12 +259,12 @@ pub mod soup_h {
                     .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
                     .wrapping_sub(1),
             );
-            lua_pushnumber(L, port as Number);
+            lua_pushnumber(L, port as f64);
             lua_rawset(L, -(3 as std::ffi::c_int));
         }
         return 1 as std::ffi::c_int;
     }
-    pub unsafe extern "C" fn luaH_soup_parse_uri(mut L: *mut lua_State) -> gint {
+    pub unsafe extern "C-unwind" fn luaH_soup_parse_uri(mut L: *mut lua_State) -> gint {
         let mut str =
             luaL_checklstring(L, 1 as std::ffi::c_int, std::ptr::null_mut()) as *mut gchar;
         if *str.offset(0 as std::ffi::c_int as isize) == 0 {
@@ -316,7 +290,7 @@ pub mod soup_h {
         }
         return 0 as std::ffi::c_int;
     }
-    pub unsafe extern "C" fn soup_lib_setup_common() {
+    pub unsafe extern "C-unwind" fn soup_lib_setup_common() {
         scheme_reg = g_regex_new(
             b"^[a-z][a-z0-9\\+\\-\\.]*:\0" as *const u8 as *const std::ffi::c_char,
             G_REGEX_DEFAULT,
@@ -331,14 +305,12 @@ pub mod soup_h {
         g_uri_get_query, g_uri_get_scheme, g_uri_get_user, g_uri_join_with_user, g_uri_parse,
         g_uri_unref, gpointer,
     };
-    use lua::Number;
-    use lua::ffi::{
+    use mlua_sys::{
         LUA_TNIL, LUA_TTABLE, lua_State, lua_createtable, lua_pushlstring, lua_pushnumber,
         lua_pushstring, lua_rawget, lua_rawset, lua_settop, lua_tolstring, lua_tonumber, lua_type,
         luaL_argerror, luaL_checklstring,
     };
 
-    use crate::clib::soup::SOUP_HTTP_URI_FLAGS;
     use crate::gtypes::{gchar, gint};
 }
 use crate::{
@@ -356,8 +328,6 @@ use crate::{
     web_context::web_context_get,
 };
 
-pub use self::soup_uri_utils_h::SOUP_HTTP_URI_FLAGS;
-
 static mut soup_class: lua_class_t = lua_class_t {
     name: 0 as *const gchar,
     signals: 0 as *const signal_t as *mut signal_t,
@@ -370,7 +340,7 @@ static mut proxy_uri: *mut gchar = 0 as *const gchar as *mut gchar;
 static mut accept_policy: *mut gchar = 0 as *const gchar as *mut gchar;
 static mut cookies_storage: *mut gchar = 0 as *const gchar as *mut gchar;
 #[inline]
-unsafe extern "C" fn luaH_soup_class_emit_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_soup_class_emit_signal(mut L: *mut lua_State) -> gint {
     return luaH_class_emit_signal(
         L,
         &mut soup_class,
@@ -380,7 +350,7 @@ unsafe extern "C" fn luaH_soup_class_emit_signal(mut L: *mut lua_State) -> gint 
     );
 }
 #[inline]
-unsafe extern "C" fn luaH_soup_class_remove_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_soup_class_remove_signal(mut L: *mut lua_State) -> gint {
     luaH_class_remove_signal(
         L,
         &mut soup_class,
@@ -390,7 +360,7 @@ unsafe extern "C" fn luaH_soup_class_remove_signal(mut L: *mut lua_State) -> gin
     return 0 as std::ffi::c_int;
 }
 #[inline]
-unsafe extern "C" fn luaH_soup_class_add_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_soup_class_add_signal(mut L: *mut lua_State) -> gint {
     luaH_class_add_signal(
         L,
         &mut soup_class,
@@ -399,7 +369,7 @@ unsafe extern "C" fn luaH_soup_class_add_signal(mut L: *mut lua_State) -> gint {
     );
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_soup_index(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_soup_index(mut L: *mut lua_State) -> gint {
     let mut prop = luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut());
     let mut token = l_tokenize(prop);
     match token as std::ffi::c_uint {
@@ -419,7 +389,7 @@ unsafe extern "C" fn luaH_soup_index(mut L: *mut lua_State) -> gint {
     }
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_soup_set_proxy_uri(mut L: *mut lua_State) {
+unsafe extern "C-unwind" fn luaH_soup_set_proxy_uri(mut L: *mut lua_State) {
     let mut ctx = web_context_get();
     let mut dm = webkit_web_context_get_website_data_manager(ctx);
     let mut new_proxy_uri = if lua_type(L, 3 as std::ffi::c_int) == LUA_TNIL {
@@ -460,7 +430,7 @@ unsafe extern "C" fn luaH_soup_set_proxy_uri(mut L: *mut lua_State) {
         webkit_network_proxy_settings_free(proxy_settings);
     };
 }
-unsafe extern "C" fn luaH_soup_set_accept_policy(mut L: *mut lua_State) {
+unsafe extern "C-unwind" fn luaH_soup_set_accept_policy(mut L: *mut lua_State) {
     let mut new_policy = luaL_checklstring(L, 3 as std::ffi::c_int, std::ptr::null_mut());
     if !(strcmp(
         new_policy as *const std::ffi::c_char,
@@ -522,7 +492,7 @@ unsafe extern "C" fn luaH_soup_set_accept_policy(mut L: *mut lua_State) {
     }
     webkit_cookie_manager_set_accept_policy(cookie_mgr, policy);
 }
-unsafe extern "C" fn luaH_soup_set_cookies_storage(mut L: *mut lua_State) {
+unsafe extern "C-unwind" fn luaH_soup_set_cookies_storage(mut L: *mut lua_State) {
     let mut new_path = luaL_checklstring(L, 3 as std::ffi::c_int, std::ptr::null_mut());
     let mut f = 0 as *mut FILE;
     if strcmp(
@@ -553,7 +523,7 @@ unsafe extern "C" fn luaH_soup_set_cookies_storage(mut L: *mut lua_State) {
         WEBKIT_COOKIE_PERSISTENT_STORAGE_SQLITE,
     );
 }
-unsafe extern "C" fn luaH_soup_newindex(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_soup_newindex(mut L: *mut lua_State) -> gint {
     let mut prop = luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut());
     let mut token = l_tokenize(prop);
     match token as std::ffi::c_uint {
@@ -571,73 +541,66 @@ unsafe extern "C" fn luaH_soup_newindex(mut L: *mut lua_State) -> gint {
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn soup_lib_setup(mut L: *mut lua_State) {
+pub unsafe extern "C-unwind" fn soup_lib_setup(mut L: *mut lua_State) {
     soup_lib_setup_common();
-    static mut soup_lib: [luaL_Reg; 8] = unsafe {
+    static mut soup_lib: [luaL_Reg; 7] = unsafe {
         [
             {
                 let mut init = luaL_Reg {
                     name: b"add_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_soup_class_add_signal as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_soup_class_add_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"remove_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_soup_class_remove_signal
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_soup_class_remove_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"emit_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_soup_class_emit_signal as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_soup_class_emit_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__index\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_soup_index as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_soup_index,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__newindex\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_soup_newindex),
+                    func: luaH_soup_newindex,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"parse_uri\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_soup_parse_uri),
+                    func: luaH_soup_parse_uri,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"uri_tostring\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_soup_uri_tostring),
+                    func: luaH_soup_uri_tostring,
                 };
                 init
             },
-            {
-                let mut init = luaL_Reg {
-                    name: std::ptr::null(),
-                    func: None,
-                };
-                init
-            },
+            //{
+            //    let mut init = luaL_Reg {
+            //        name: std::ptr::null(),
+            //        func: None,
+            //    };
+            //    init
+            //},
         ]
     };
     soup_class.signals = signal_new();

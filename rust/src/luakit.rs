@@ -18,16 +18,18 @@
 #![allow(unused_parens)]
 #![allow(unused_unsafe)]
 
-use gtk4_sys::{gtk_disable_setlocale, gtk_init};
+use gtk_sys::{gtk_disable_setlocale, gtk_get_option_group, gtk_init};
 
 pub mod clib;
 pub mod common;
+pub mod extension;
 pub mod globalconf;
 pub mod gtypes;
 pub mod ipc;
 pub mod log;
 pub mod luah;
 pub mod web_context;
+pub mod widgets;
 
 use glib_sys::{
     G_LOG_LEVEL_MASK, G_LOG_WRITER_HANDLED, G_LOG_WRITER_UNHANDLED, G_OPTION_ARG_NONE,
@@ -36,14 +38,17 @@ use glib_sys::{
     g_get_user_cache_dir, g_get_user_config_dir, g_get_user_data_dir, g_log_set_writer_func,
     g_mkdir_with_parents, g_option_context_add_group, g_option_context_add_main_entries,
     g_option_context_free, g_option_context_new, g_option_context_parse, g_ptr_array_add,
-    g_ptr_array_new, g_ptr_array_new_with_free_func, g_ptr_array_remove_index, g_strdupv,
+    g_ptr_array_new, g_ptr_array_new_with_free_func, g_ptr_array_remove_index, g_strdup, g_strdupv,
     g_strfreev, g_strsplit, gboolean, gpointer,
 };
 use globalconf::globalconf;
 use libc::{
     __errno_location, c_void, exit, fork, memset, pid_t, setlocale, setsid, strchr, strcmp, strlen,
 };
-use lua::ffi::lua_State;
+use mlua_sys::lua_State;
+use webkit2gtk::ffi::{
+    webkit_get_major_version, webkit_get_micro_version, webkit_get_minor_version,
+};
 
 use crate::{
     common::clib::luakit::l_time,
@@ -53,7 +58,7 @@ use crate::{
         _log, LOG_LEVEL_debug, LOG_LEVEL_fatal, LOG_LEVEL_info, LOG_LEVEL_verbose, LOG_LEVEL_warn,
         log_init, log_level_from_string, log_level_t, log_set_verbosity,
     },
-    luah::{g_strdup_inline, gsize, luaH_init, luaH_parserc},
+    luah::{luaH_init, luaH_parserc},
     web_context::*,
 };
 
@@ -125,7 +130,7 @@ unsafe extern "C" fn parseopts(
     globalconf.profile = 0 as *mut gchar;
     let mut verbose: gboolean = 0 as std::ffi::c_int;
     let mut log_lvl: *mut gchar = 0 as *mut gchar;
-    globalconf.execpath = g_strdup_inline(*argv.offset(0 as std::ffi::c_int as isize));
+    globalconf.execpath = g_strdup(*argv.offset(0 as std::ffi::c_int as isize));
     globalconf.nounique = 0 as std::ffi::c_int;
     let entries: [GOptionEntry; 10] = [
         {
@@ -255,7 +260,7 @@ unsafe extern "C" fn parseopts(
     while i < *argc {
         g_ptr_array_add(
             globalconf.argv,
-            g_strdup_inline(*argv.offset(i as isize)) as gpointer,
+            g_strdup(*argv.offset(i as isize)) as gpointer,
         );
         i += 1;
         i;
@@ -320,16 +325,10 @@ unsafe extern "C" fn parseopts(
         init_directories();
         luaH_init(0 as *mut *mut gchar);
         if luaH_parserc(globalconf.confpath, 0 as std::ffi::c_int) == 0 {
-            g_fprintf(
-                stderr,
-                b"Confiuration file syntax error.\n\0" as *const u8 as *const std::ffi::c_char,
-            );
+            eprintln!("Confiuration file syntax error.");
             exit(1 as std::ffi::c_int);
         } else {
-            g_fprintf(
-                stderr,
-                b"Configuration file syntax OK.\n\0" as *const u8 as *const std::ffi::c_char,
-            );
+            eprintln!("Configuration file syntax OK.");
             exit(0 as std::ffi::c_int);
         }
     }
@@ -564,7 +563,7 @@ unsafe fn main_0(mut argc: gint, mut argv: *mut *mut gchar) -> gint {
             );
         }
     }
-    gtk_init(/*&mut argc, &mut argv*/);
+    gtk_init(&mut argc, &mut argv);
     g_log_set_writer_func(Some(glib_log_writer), 0 as *mut std::ffi::c_void, None);
     init_directories();
     web_context_init();

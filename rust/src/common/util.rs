@@ -7,18 +7,18 @@ use glib_sys::{
     g_regex_replace_literal, g_strdup_printf, gboolean,
 };
 use libc::{access, ssize_t};
-use lua::ffi::{lua_Debug, lua_State, lua_getinfo, lua_getstack, lua_tolstring};
+use mlua_sys::{lua_Debug, lua_State, lua_getinfo, lua_getstack, lua_tolstring};
 
 use crate::{
     gtypes::gchar,
     log::{_log, LOG_LEVEL_error},
 };
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn file_exists(mut filename: *const gchar) -> gboolean {
+pub unsafe extern "C-unwind" fn file_exists(mut filename: *const gchar) -> gboolean {
     return (access(filename, 0 as std::ffi::c_int) == 0 as std::ffi::c_int) as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_callerinfo(mut L: *mut lua_State) -> *mut gchar {
+pub unsafe extern "C-unwind" fn luaH_callerinfo(mut L: *mut lua_State) -> *mut gchar {
     let mut ar = MaybeUninit::<lua_Debug>::uninit();
     if lua_getstack(L, 1 as std::ffi::c_int, ar.as_mut_ptr()) != 0
         && lua_getinfo(
@@ -46,7 +46,7 @@ pub unsafe extern "C" fn luaH_callerinfo(mut L: *mut lua_State) -> *mut gchar {
     return 0 as *mut gchar;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_panic(mut L: *mut lua_State) -> std::ffi::c_int {
+pub unsafe extern "C-unwind" fn luaH_panic(mut L: *mut lua_State) -> std::ffi::c_int {
     _log(
         LOG_LEVEL_error,
         b"common/util.c\0" as *const u8 as *const std::ffi::c_char,
@@ -56,7 +56,7 @@ pub unsafe extern "C" fn luaH_panic(mut L: *mut lua_State) -> std::ffi::c_int {
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn strip_ansi_escapes(mut in_0: *const gchar) -> *mut gchar {
+pub unsafe extern "C-unwind" fn strip_ansi_escapes(mut in_0: *const gchar) -> *mut gchar {
     static mut reg: *mut GRegex = 0 as *const GRegex as *mut GRegex;
     if reg.is_null() {
         let mut expr: *const gchar =
@@ -98,6 +98,6 @@ pub unsafe extern "C" fn strip_ansi_escapes(mut in_0: *const gchar) -> *mut gcha
     );
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luakit_error_quark() -> GQuark {
+pub unsafe extern "C-unwind" fn luakit_error_quark() -> GQuark {
     return g_quark_from_static_string(b"LuakitError\0" as *const u8 as *const std::ffi::c_char);
 }

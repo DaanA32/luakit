@@ -1,7 +1,12 @@
+pub mod download;
+pub mod ipc;
 pub mod luakit;
 pub mod msg;
+pub mod request;
 pub mod soup;
 pub mod sqlite3;
 pub mod stylesheet;
+pub mod unique;
 pub mod web_module;
 pub mod widget;
+pub mod xdg;

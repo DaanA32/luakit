@@ -3,22 +3,24 @@ use glib_sys::{
     gboolean, gpointer,
 };
 use libc::{gettimeofday, size_t, timeval, timezone};
-use lua::ffi::{
+use mlua_sys::{
     lua_State, lua_gettop, lua_pushboolean, lua_pushnumber, lua_pushstring, lua_settop,
-    lua_toboolean, lua_topointer, lua_type, luaL_checklstring,
+    lua_toboolean, lua_topointer, lua_type, luaL_argerror, luaL_checklstring,
 };
 
 use crate::{
     common::{
-        luaobject::{luaH_object_decref, luaH_object_incref, luaH_object_registry_push},
+        lualib::luaH_dofunction,
+        luaobject::{
+            luaH_object_decref, luaH_object_incref, luaH_object_push, luaH_object_registry_push,
+        },
         *,
     },
     gtypes::{gchar, gdouble, gint},
-    luah::luaH_dofunction,
 };
 
 #[inline]
-pub unsafe extern "C" fn l_time() -> gdouble {
+pub unsafe extern "C-unwind" fn l_time() -> gdouble {
     let mut tv: timeval = timeval {
         tv_sec: 0,
         tv_usec: 0,
@@ -28,12 +30,12 @@ pub unsafe extern "C" fn l_time() -> gdouble {
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_luakit_time(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_luakit_time(mut L: *mut lua_State) -> gint {
     lua_pushnumber(L, l_time());
     return 1 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_luakit_uri_encode(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_luakit_uri_encode(mut L: *mut lua_State) -> gint {
     let mut string: *const gchar = luaL_checklstring(L, 1 as std::ffi::c_int, 0 as *mut size_t);
     let mut allowed: *const gchar = 0 as *const gchar;
     if (1 as std::ffi::c_int) < lua_gettop(L)
@@ -47,7 +49,7 @@ pub unsafe extern "C" fn luaH_luakit_uri_encode(mut L: *mut lua_State) -> gint {
     return 1 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_luakit_uri_decode(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_luakit_uri_decode(mut L: *mut lua_State) -> gint {
     let mut string: *const gchar = luaL_checklstring(L, 1 as std::ffi::c_int, 0 as *mut size_t);
     let mut illegal: *const gchar = 0 as *const gchar;
     if (1 as std::ffi::c_int) < lua_gettop(L)
@@ -64,7 +66,7 @@ pub unsafe extern "C" fn luaH_luakit_uri_decode(mut L: *mut lua_State) -> gint {
     return 1 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn idle_cb(mut func: gpointer) -> gboolean {
+pub unsafe extern "C-unwind" fn idle_cb(mut func: gpointer) -> gboolean {
     let mut L: *mut lua_State = common.L;
     let mut top: gint = lua_gettop(L);
     luaH_object_push(L, func);
@@ -77,7 +79,7 @@ pub unsafe extern "C" fn idle_cb(mut func: gpointer) -> gboolean {
     return (keep != 0 && ok != 0) as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_luakit_idle_add(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_luakit_idle_add(mut L: *mut lua_State) -> gint {
     if !(lua_type(L, 1 as std::ffi::c_int) == 6 as std::ffi::c_int) {
         luaL_argerror(
             L,
@@ -87,13 +89,13 @@ pub unsafe extern "C" fn luaH_luakit_idle_add(mut L: *mut lua_State) -> gint {
     }
     let mut func: gpointer = luaH_object_ref(L, 1 as std::ffi::c_int);
     g_idle_add(
-        Some(idle_cb as unsafe extern "C" fn(gpointer) -> gboolean),
+        Some(idle_cb as unsafe extern "C-unwind" fn(gpointer) -> gboolean),
         func,
     );
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_luakit_idle_remove(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_luakit_idle_remove(mut L: *mut lua_State) -> gint {
     if !(lua_type(L, 1 as std::ffi::c_int) == 6 as std::ffi::c_int) {
         luaL_argerror(
             L,
@@ -107,7 +109,7 @@ pub unsafe extern "C" fn luaH_luakit_idle_remove(mut L: *mut lua_State) -> gint 
     return 1 as std::ffi::c_int;
 }
 
-pub unsafe extern "C" fn luaH_object_ref(mut L: *mut lua_State, mut oud: gint) -> gpointer {
+pub unsafe extern "C-unwind" fn luaH_object_ref(mut L: *mut lua_State, mut oud: gint) -> gpointer {
     luaH_object_registry_push(L);
     let mut p: gpointer = luaH_object_incref(
         L,
@@ -122,7 +124,7 @@ pub unsafe extern "C" fn luaH_object_ref(mut L: *mut lua_State, mut oud: gint) -
     return p;
 }
 
-pub unsafe extern "C" fn luaH_object_unref(mut L: *mut lua_State, mut p: gpointer) {
+pub unsafe extern "C-unwind" fn luaH_object_unref(mut L: *mut lua_State, mut p: gpointer) {
     luaH_object_registry_push(L);
     luaH_object_decref(L, -(1 as std::ffi::c_int), p);
     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);

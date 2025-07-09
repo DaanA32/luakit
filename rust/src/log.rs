@@ -20,7 +20,7 @@ use libc::{
     c_void, close, exit, getenv, isatty, memcmp, size_t, ssize_t, strcmp, strlen, strncmp, strrchr,
     unlink, unsetenv, write,
 };
-use lua::ffi::{
+use mlua_sys::{
     lua_State, lua_pushnumber, lua_pushstring, lua_settop, lua_tointeger, lua_tolstring,
 };
 

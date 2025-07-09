@@ -1,6 +1,6 @@
 use crate::gtypes::*;
 use glib_sys::{GPtrArray, gboolean};
-use gtk4_sys::GtkApplication;
+use gtk_sys::GtkApplication;
 
 #[derive(Copy, Clone)]
 #[repr(C)]

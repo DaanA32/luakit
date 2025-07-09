@@ -1,11 +1,11 @@
 use ::libc;
 use libc::size_t;
-use lua::ffi::*;
+use mlua_sys::*;
 pub mod signal_h {
     pub type signal_t = GTree;
     pub type signal_array_t = GPtrArray;
     #[inline]
-    pub unsafe extern "C" fn signal_cmp(
+    pub unsafe extern "C-unwind" fn signal_cmp(
         mut a: gconstpointer,
         mut b: gconstpointer,
         mut UNUSED_p: gpointer,
@@ -13,33 +13,34 @@ pub mod signal_h {
         return g_strcmp0(a as *const std::ffi::c_char, b as *const std::ffi::c_char);
     }
     #[inline]
-    pub unsafe extern "C" fn signal_array_destroy(mut sigfuncs: *mut gpointer) {
+    pub unsafe extern "C-unwind" fn signal_array_destroy(mut sigfuncs: *mut gpointer) {
         g_ptr_array_free(
             sigfuncs as *mut GPtrArray,
             (0 as std::ffi::c_int == 0) as std::ffi::c_int,
         );
     }
     #[inline]
-    pub unsafe extern "C" fn signal_new() -> *mut signal_t {
+    pub unsafe extern "C-unwind" fn signal_new() -> *mut signal_t {
         return g_tree_new_full(
             ::core::mem::transmute::<
-                Option<unsafe extern "C" fn(gconstpointer, gconstpointer, gpointer) -> gint>,
+                Option<unsafe extern "C-unwind" fn(gconstpointer, gconstpointer, gpointer) -> gint>,
                 GCompareDataFunc,
             >(Some(
-                signal_cmp as unsafe extern "C" fn(gconstpointer, gconstpointer, gpointer) -> gint,
+                signal_cmp
+                    as unsafe extern "C-unwind" fn(gconstpointer, gconstpointer, gpointer) -> gint,
             )),
             0 as *mut std::ffi::c_void,
-            Some(g_free as unsafe extern "C" fn(gpointer) -> ()),
+            Some(g_free as unsafe extern "C-unwind" fn(gpointer) -> ()),
             ::core::mem::transmute::<
-                Option<unsafe extern "C" fn(*mut gpointer) -> ()>,
+                Option<unsafe extern "C-unwind" fn(*mut gpointer) -> ()>,
                 GDestroyNotify,
             >(Some(
-                signal_array_destroy as unsafe extern "C" fn(*mut gpointer) -> (),
+                signal_array_destroy as unsafe extern "C-unwind" fn(*mut gpointer) -> (),
             )),
         ) as *mut signal_t;
     }
     #[inline]
-    pub unsafe extern "C" fn signal_lookup(
+    pub unsafe extern "C-unwind" fn signal_lookup(
         mut signals: *mut signal_t,
         mut name: *const gchar,
     ) -> *mut signal_array_t {
@@ -47,7 +48,7 @@ pub mod signal_h {
             as *mut signal_array_t;
     }
     #[inline]
-    pub unsafe extern "C" fn signal_add(
+    pub unsafe extern "C-unwind" fn signal_add(
         mut signals: *mut signal_t,
         mut name: *const gchar,
         mut func: gpointer,
@@ -64,7 +65,7 @@ pub mod signal_h {
         g_ptr_array_add(sigfuncs as *mut GPtrArray, func);
     }
     #[inline]
-    pub unsafe extern "C" fn signal_remove(
+    pub unsafe extern "C-unwind" fn signal_remove(
         mut signals: *mut signal_t,
         mut name: *const gchar,
         mut func: gpointer,
@@ -78,7 +79,10 @@ pub mod signal_h {
         }
     }
 
-    pub unsafe extern "C" fn signals_remove(mut signals: *mut signal_t, mut name: *const gchar) {
+    pub unsafe extern "C-unwind" fn signals_remove(
+        mut signals: *mut signal_t,
+        mut name: *const gchar,
+    ) {
         let mut sigfuncs: *mut signal_array_t = signal_lookup(signals, name);
         if !sigfuncs.is_null() {
             g_ptr_array_remove(sigfuncs as *mut GPtrArray, std::ptr::null_mut());
@@ -88,7 +92,7 @@ pub mod signal_h {
         }
     }
 
-    pub unsafe extern "C" fn signal_destroy(mut signals: *mut signal_t) {
+    pub unsafe extern "C-unwind" fn signal_destroy(mut signals: *mut signal_t) {
         g_tree_destroy(signals as *mut GTree);
     }
     use glib_sys::*;
@@ -96,7 +100,7 @@ pub mod signal_h {
     use crate::gtypes::{gchar, gint};
 }
 pub type lua_class_propfunc_t =
-    Option<unsafe extern "C" fn(*mut lua_State, *mut lua_object_t) -> gint>;
+    Option<unsafe extern "C-unwind" fn(*mut lua_State, *mut lua_object_t) -> gint>;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct lua_object_t {
@@ -104,7 +108,8 @@ pub struct lua_object_t {
 }
 pub type lua_class_property_t = lua_class_property;
 pub type lua_class_property_array_t = GHashTable;
-pub type lua_class_allocator_t = Option<unsafe extern "C" fn(*mut lua_State) -> *mut lua_object_t>;
+pub type lua_class_allocator_t =
+    Option<unsafe extern "C-unwind" fn(*mut lua_State) -> *mut lua_object_t>;
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct lua_class_t {
@@ -131,7 +136,7 @@ use glib_sys::{
     g_hash_table_insert, g_hash_table_lookup, g_hash_table_new, g_malloc0_n, g_ptr_array_add,
     g_ptr_array_new, g_strdup_printf, gboolean, gconstpointer, gpointer,
 };
-use lua::ffi::lua_State;
+use mlua_sys::lua_State;
 use signal_h::signal_t;
 
 #[derive(Copy, Clone)]
@@ -143,7 +148,7 @@ pub struct lua_class_property {
 }
 static mut luaH_classes: *mut GPtrArray = 0 as *const GPtrArray as *mut GPtrArray;
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_toudata(
+pub unsafe extern "C-unwind" fn luaH_toudata(
     mut L: *mut lua_State,
     mut ud: gint,
     mut class: *mut lua_class_t,
@@ -162,7 +167,7 @@ pub unsafe extern "C" fn luaH_toudata(
     return p;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_checkudata(
+pub unsafe extern "C-unwind" fn luaH_checkudata(
     mut L: *mut lua_State,
     mut ud: gint,
     mut class: *mut lua_class_t,
@@ -174,7 +179,10 @@ pub unsafe extern "C" fn luaH_checkudata(
     return p;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_class_get(mut L: *mut lua_State, mut idx: gint) -> *mut lua_class_t {
+pub unsafe extern "C-unwind" fn luaH_class_get(
+    mut L: *mut lua_State,
+    mut idx: gint,
+) -> *mut lua_class_t {
     let mut type_0: gint = lua_type(L, idx);
     let mut class: *mut lua_class_t = 0 as *mut lua_class_t;
     if type_0 == 7 as std::ffi::c_int && !luaH_classes.is_null() {
@@ -191,7 +199,10 @@ pub unsafe extern "C" fn luaH_class_get(mut L: *mut lua_State, mut idx: gint) ->
     return 0 as *mut lua_class_t;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_typename(mut L: *mut lua_State, mut idx: gint) -> *const gchar {
+pub unsafe extern "C-unwind" fn luaH_typename(
+    mut L: *mut lua_State,
+    mut idx: gint,
+) -> *const gchar {
     let mut type_0: gint = lua_type(L, idx);
     if type_0 == 7 as std::ffi::c_int {
         let mut lua_class: *mut lua_class_t = luaH_class_get(L, idx);
@@ -202,7 +213,7 @@ pub unsafe extern "C" fn luaH_typename(mut L: *mut lua_State, mut idx: gint) -> 
     return lua_typename(L, type_0);
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_openlib(
+pub unsafe extern "C-unwind" fn luaH_openlib(
     mut L: *mut lua_State,
     mut name: *const gchar,
     mut methods: *const luaL_Reg,
@@ -222,7 +233,7 @@ pub unsafe extern "C" fn luaH_openlib(
     lua_settop(L, -(2 as std::ffi::c_int) - 1 as std::ffi::c_int);
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_class_add_property(
+pub unsafe extern "C-unwind" fn luaH_class_add_property(
     mut lua_class: *mut lua_class_t,
     mut token: luakit_token_t,
     mut cb_new: lua_class_propfunc_t,
@@ -255,7 +266,7 @@ pub unsafe extern "C" fn luaH_class_add_property(
     );
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_class_setup(
+pub unsafe extern "C-unwind" fn luaH_class_setup(
     mut L: *mut lua_State,
     mut class: *mut lua_class_t,
     mut name: *const gchar,
@@ -290,8 +301,10 @@ pub unsafe extern "C" fn luaH_class_setup(
     (*class).newindex_miss_property = newindex_miss_property;
     (*class).signals = signal_new();
     (*class).properties = g_hash_table_new(
-        Some(g_direct_hash as unsafe extern "C" fn(gconstpointer) -> guint),
-        Some(g_direct_equal as unsafe extern "C" fn(gconstpointer, gconstpointer) -> gboolean),
+        Some(g_direct_hash as unsafe extern "C-unwind" fn(gconstpointer) -> guint),
+        Some(
+            g_direct_equal as unsafe extern "C-unwind" fn(gconstpointer, gconstpointer) -> gboolean,
+        ),
     ) as *mut lua_class_property_array_t;
     if luaH_classes.is_null() {
         luaH_classes = g_ptr_array_new();
@@ -299,7 +312,7 @@ pub unsafe extern "C" fn luaH_class_setup(
     g_ptr_array_add(luaH_classes, class as gpointer);
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_class_add_signal(
+pub unsafe extern "C-unwind" fn luaH_class_add_signal(
     mut L: *mut lua_State,
     mut lua_class: *mut lua_class_t,
     mut name: *const gchar,
@@ -322,7 +335,7 @@ pub unsafe extern "C" fn luaH_class_add_signal(
     signal_add((*lua_class).signals, name, luaH_object_ref(L, ud));
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_class_remove_signal(
+pub unsafe extern "C-unwind" fn luaH_class_remove_signal(
     mut L: *mut lua_State,
     mut lua_class: *mut lua_class_t,
     mut name: *const gchar,
@@ -337,7 +350,7 @@ pub unsafe extern "C" fn luaH_class_remove_signal(
     lua_remove(L, ud);
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_class_emit_signal(
+pub unsafe extern "C-unwind" fn luaH_class_emit_signal(
     mut L: *mut lua_State,
     mut lua_class: *mut lua_class_t,
     mut name: *const gchar,
@@ -347,7 +360,7 @@ pub unsafe extern "C" fn luaH_class_emit_signal(
     return signal_object_emit(L, (*lua_class).signals, name, nargs, nret);
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_class_property_signal(
+pub unsafe extern "C-unwind" fn luaH_class_property_signal(
     mut L: *mut lua_State,
     mut lua_class: *mut lua_class_t,
     mut tok: luakit_token_t,
@@ -367,7 +380,7 @@ pub unsafe extern "C" fn luaH_class_property_signal(
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_usemetatable(
+pub unsafe extern "C-unwind" fn luaH_usemetatable(
     mut L: *mut lua_State,
     mut idxobj: gint,
     mut idxfield: gint,
@@ -382,7 +395,7 @@ pub unsafe extern "C" fn luaH_usemetatable(
     lua_settop(L, -(2 as std::ffi::c_int) - 1 as std::ffi::c_int);
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_class_property_get(
+unsafe extern "C-unwind" fn luaH_class_property_get(
     mut L: *mut lua_State,
     mut lua_class: *mut lua_class_t,
     mut fieldidx: gint,
@@ -395,7 +408,7 @@ unsafe extern "C" fn luaH_class_property_get(
     ) as *mut lua_class_property_t;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_class_index(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_class_index(mut L: *mut lua_State) -> gint {
     if luaH_usemetatable(L, 1 as std::ffi::c_int, 2 as std::ffi::c_int) != 0 {
         return 1 as std::ffi::c_int;
     }
@@ -418,7 +431,7 @@ pub unsafe extern "C" fn luaH_class_index(mut L: *mut lua_State) -> gint {
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_class_newindex(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_class_newindex(mut L: *mut lua_State) -> gint {
     if luaH_usemetatable(L, 1 as std::ffi::c_int, 2 as std::ffi::c_int) != 0 {
         return 1 as std::ffi::c_int;
     }
@@ -441,7 +454,7 @@ pub unsafe extern "C" fn luaH_class_newindex(mut L: *mut lua_State) -> gint {
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_class_new(
+pub unsafe extern "C-unwind" fn luaH_class_new(
     mut L: *mut lua_State,
     mut lua_class: *mut lua_class_t,
 ) -> gint {

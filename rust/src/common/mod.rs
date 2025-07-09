@@ -1,13 +1,20 @@
 pub mod clib;
+pub mod ipc;
 pub mod luaclass;
 pub mod luah;
+pub mod luajs;
+pub mod lualib;
 pub mod luaobject;
+pub mod luaserialize;
+pub mod luauniq;
 pub mod luautil;
+pub mod luayield;
 pub mod property;
+pub mod resource;
 pub mod tokenize;
 pub mod util;
 
-use lua::ffi::lua_State;
+use mlua_sys::lua_State;
 
 #[derive(Copy, Clone)]
 #[repr(C)]

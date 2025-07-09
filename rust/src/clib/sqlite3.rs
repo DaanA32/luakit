@@ -1,16 +1,10 @@
 use glib_sys::*;
 use libc::*;
-use lua::ffi::{
-    LUA_MULTRET, LUA_TNUMBER, LUA_TSTRING, LUA_TTABLE, lua_State, lua_createtable, lua_error,
-    lua_gettop, lua_newuserdata, lua_next, lua_pushfstring, lua_pushlstring, lua_pushnil,
-    lua_pushnumber, lua_pushstring, lua_pushvalue, lua_rawset, lua_rawseti, lua_setmetatable,
-    lua_settop, lua_toboolean, lua_tointeger, lua_tolstring, lua_tonumber, lua_type, lua_typename,
-    luaL_Reg, luaL_argerror, luaL_checklstring,
-};
-use lua::{Function, Number};
+use mlua_sys::*;
 
 pub mod sqlite3_h {
-    pub type sqlite3_destructor_type = Option<unsafe extern "C" fn(*mut std::ffi::c_void) -> ()>;
+    pub type sqlite3_destructor_type =
+        Option<unsafe extern "C-unwind" fn(*mut std::ffi::c_void) -> ()>;
     pub const SQLITE_OK: std::ffi::c_int = 0 as std::ffi::c_int;
     pub const SQLITE_RANGE: std::ffi::c_int = 25 as std::ffi::c_int;
     pub const SQLITE_ROW: std::ffi::c_int = 100 as std::ffi::c_int;
@@ -21,7 +15,7 @@ pub mod sqlite3_h {
     pub const SQLITE_NULL: std::ffi::c_int = 5;
     pub const SQLITE_TEXT: std::ffi::c_int = 3;
     pub const SQLITE_TRANSIENT: std::ffi::c_int = -(1 as std::ffi::c_int);
-    unsafe extern "C" {
+    unsafe extern "C-unwind" {
         pub type sqlite3_stmt;
         pub type sqlite3;
         pub fn sqlite3_close(_: *mut sqlite3) -> std::ffi::c_int;
@@ -53,7 +47,7 @@ pub mod sqlite3_h {
             _: std::ffi::c_int,
             _: *const std::ffi::c_char,
             _: std::ffi::c_int,
-            _: Option<unsafe extern "C" fn(*mut std::ffi::c_void) -> ()>,
+            _: Option<unsafe extern "C-unwind" fn(*mut std::ffi::c_void) -> ()>,
         ) -> std::ffi::c_int;
         pub fn sqlite3_bind_parameter_index(
             _: *mut sqlite3_stmt,
@@ -135,7 +129,7 @@ static mut sqlite3_stmt_class: lua_class_t = lua_class_t {
     newindex_miss_property: None,
 };
 #[inline]
-unsafe extern "C" fn luaH_sqlite3_class_emit_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_sqlite3_class_emit_signal(mut L: *mut lua_State) -> gint {
     return luaH_class_emit_signal(
         L,
         &mut sqlite3_class,
@@ -145,7 +139,7 @@ unsafe extern "C" fn luaH_sqlite3_class_emit_signal(mut L: *mut lua_State) -> gi
     );
 }
 #[inline]
-unsafe extern "C" fn luaH_sqlite3_class_remove_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_sqlite3_class_remove_signal(mut L: *mut lua_State) -> gint {
     luaH_class_remove_signal(
         L,
         &mut sqlite3_class,
@@ -155,7 +149,7 @@ unsafe extern "C" fn luaH_sqlite3_class_remove_signal(mut L: *mut lua_State) -> 
     return 0 as std::ffi::c_int;
 }
 #[inline]
-unsafe extern "C" fn luaH_sqlite3_class_add_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_sqlite3_class_add_signal(mut L: *mut lua_State) -> gint {
     luaH_class_add_signal(
         L,
         &mut sqlite3_class,
@@ -165,7 +159,7 @@ unsafe extern "C" fn luaH_sqlite3_class_add_signal(mut L: *mut lua_State) -> gin
     return 0 as std::ffi::c_int;
 }
 #[inline]
-unsafe extern "C" fn sqlite3_new(mut L: *mut lua_State) -> *mut sqlite3_t {
+unsafe extern "C-unwind" fn sqlite3_new(mut L: *mut lua_State) -> *mut sqlite3_t {
     let mut p = lua_newuserdata(L, ::core::mem::size_of::<sqlite3_t>()) as *mut sqlite3_t;
     memset(
         p as *mut std::ffi::c_void,
@@ -189,7 +183,10 @@ unsafe extern "C" fn sqlite3_new(mut L: *mut lua_State) -> *mut sqlite3_t {
     return p;
 }
 #[inline]
-unsafe extern "C" fn luaH_sqlite3_checkopen(mut L: *mut lua_State, mut sqlite: *mut sqlite3_t) {
+unsafe extern "C-unwind" fn luaH_sqlite3_checkopen(
+    mut L: *mut lua_State,
+    mut sqlite: *mut sqlite3_t,
+) {
     if ((*sqlite).db).is_null() {
         lua_pushlstring(
             L,
@@ -201,7 +198,7 @@ unsafe extern "C" fn luaH_sqlite3_checkopen(mut L: *mut lua_State, mut sqlite: *
         lua_error(L);
     }
 }
-unsafe extern "C" fn luaH_sqlite3_stmt_gc(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_sqlite3_stmt_gc(mut L: *mut lua_State) -> gint {
     let mut stmt =
         luaH_checkudata(L, 1 as std::ffi::c_int, &mut sqlite3_stmt_class) as *mut sqlite3_stmt_t;
     luaH_object_unref(L, (*stmt).parent_ref);
@@ -209,7 +206,7 @@ unsafe extern "C" fn luaH_sqlite3_stmt_gc(mut L: *mut lua_State) -> gint {
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn sqlite3_stmt_new(mut L: *mut lua_State) -> *mut sqlite3_stmt_t {
+pub unsafe extern "C-unwind" fn sqlite3_stmt_new(mut L: *mut lua_State) -> *mut sqlite3_stmt_t {
     let mut p = lua_newuserdata(L, ::core::mem::size_of::<sqlite3_stmt_t>()) as *mut sqlite3_stmt_t;
     memset(
         p as *mut std::ffi::c_void,
@@ -223,7 +220,7 @@ pub unsafe extern "C" fn sqlite3_stmt_new(mut L: *mut lua_State) -> *mut sqlite3
     println!("lua_setfenv(L, -(2 as std::ffi::c_int));");
     return p;
 }
-unsafe extern "C" fn luaH_sqlite3_compile(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_sqlite3_compile(mut L: *mut lua_State) -> gint {
     let mut sqlite = luaH_checkudata(L, 1 as std::ffi::c_int, &mut sqlite3_class) as *mut sqlite3_t;
     luaH_sqlite3_checkopen(L, sqlite);
     let mut sql = luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut());
@@ -262,7 +259,7 @@ unsafe extern "C" fn luaH_sqlite3_compile(mut L: *mut lua_State) -> gint {
     }
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_sqlite3_close(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_sqlite3_close(mut L: *mut lua_State) -> gint {
     let mut sqlite = luaH_checkudata(L, 1 as std::ffi::c_int, &mut sqlite3_class) as *mut sqlite3_t;
     if !((*sqlite).filename).is_null() {
         g_free((*sqlite).filename as gpointer);
@@ -274,11 +271,11 @@ unsafe extern "C" fn luaH_sqlite3_close(mut L: *mut lua_State) -> gint {
     }
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_sqlite3_gc(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_sqlite3_gc(mut L: *mut lua_State) -> gint {
     luaH_sqlite3_close(L);
     return luaH_object_gc(L);
 }
-unsafe extern "C" fn luaH_sqlite3_set_filename(
+unsafe extern "C-unwind" fn luaH_sqlite3_set_filename(
     mut L: *mut lua_State,
     mut sqlite: *mut sqlite3_t,
 ) -> gint {
@@ -296,20 +293,20 @@ unsafe extern "C" fn luaH_sqlite3_set_filename(
     (*sqlite).filename = g_strdup(filename);
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_sqlite3_get_filename(
+unsafe extern "C-unwind" fn luaH_sqlite3_get_filename(
     mut L: *mut lua_State,
     mut sqlite: *mut sqlite3_t,
 ) -> gint {
     lua_pushstring(L, (*sqlite).filename);
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_sqlite3_changes(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_sqlite3_changes(mut L: *mut lua_State) -> gint {
     let mut sqlite = luaH_checkudata(L, 1 as std::ffi::c_int, &mut sqlite3_class) as *mut sqlite3_t;
     luaH_sqlite3_checkopen(L, sqlite);
-    lua_pushnumber(L, sqlite3_changes((*sqlite).db) as Number);
+    lua_pushnumber(L, sqlite3_changes((*sqlite).db) as lua_Number);
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_param_index(
+unsafe extern "C-unwind" fn luaH_param_index(
     mut L: *mut lua_State,
     mut stmt: *mut sqlite3_stmt,
     mut idx: gint,
@@ -322,7 +319,7 @@ unsafe extern "C" fn luaH_param_index(
     }
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_bind_value(
+unsafe extern "C-unwind" fn luaH_bind_value(
     mut L: *mut lua_State,
     mut stmt: *mut sqlite3_stmt,
     mut bidx: gint,
@@ -364,7 +361,7 @@ unsafe extern "C" fn luaH_bind_value(
     }
     return SQLITE_OK;
 }
-unsafe extern "C" fn luaH_sqlite3_do_exec(
+unsafe extern "C-unwind" fn luaH_sqlite3_do_exec(
     mut L: *mut lua_State,
     mut stmt: *mut sqlite3_stmt,
 ) -> gint {
@@ -414,7 +411,7 @@ unsafe extern "C" fn luaH_sqlite3_do_exec(
         }
     }
 }
-unsafe extern "C" fn luaH_sqlite3_exec(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_sqlite3_exec(mut L: *mut lua_State) -> gint {
     let mut sqlite = luaH_checkudata(L, 1 as std::ffi::c_int, &mut sqlite3_class) as *mut sqlite3_t;
     luaH_sqlite3_checkopen(L, sqlite);
     let mut sql = luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut());
@@ -492,7 +489,7 @@ unsafe extern "C" fn luaH_sqlite3_exec(mut L: *mut lua_State) -> gint {
     }
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_sqlite3_stmt_exec(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_sqlite3_stmt_exec(mut L: *mut lua_State) -> gint {
     let mut stmt =
         luaH_checkudata(L, 1 as std::ffi::c_int, &mut sqlite3_stmt_class) as *mut sqlite3_stmt_t;
     let mut sqlite = (*stmt).sqlite;
@@ -541,7 +538,7 @@ unsafe extern "C" fn luaH_sqlite3_stmt_exec(mut L: *mut lua_State) -> gint {
     }
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_sqlite3_new(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_sqlite3_new(mut L: *mut lua_State) -> gint {
     luaH_class_new(L, &mut sqlite3_class);
     let mut sqlite =
         luaH_checkudata(L, -(1 as std::ffi::c_int), &mut sqlite3_class) as *mut sqlite3_t;
@@ -559,152 +556,139 @@ unsafe extern "C" fn luaH_sqlite3_new(mut L: *mut lua_State) -> gint {
     return 1 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn sqlite3_class_setup(mut L: *mut lua_State) {
-    static mut sqlite3_methods: [luaL_Reg; 5] = unsafe {
+pub unsafe extern "C-unwind" fn sqlite3_class_setup(mut L: *mut lua_State) {
+    static mut sqlite3_methods: [luaL_Reg; 4] = unsafe {
         [
             {
                 let mut init = luaL_Reg {
                     name: b"add_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_sqlite3_class_add_signal
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_sqlite3_class_add_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"remove_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_sqlite3_class_remove_signal
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_sqlite3_class_remove_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"emit_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_sqlite3_class_emit_signal
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_sqlite3_class_emit_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__call\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_sqlite3_new as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_sqlite3_new,
                 };
                 init
             },
-            {
-                let mut init = luaL_Reg {
-                    name: std::ptr::null(),
-                    func: None,
-                };
-                init
-            },
+            // {
+            //     let mut init = luaL_Reg {
+            //         name: std::ptr::null(),
+            //         func: None,
+            //     };
+            //     init
+            // },
         ]
     };
-    static mut sqlite3_meta: [luaL_Reg; 13] = unsafe {
+    static mut sqlite3_meta: [luaL_Reg; 12] = unsafe {
         [
             {
                 let mut init = luaL_Reg {
                     name: b"__tostring\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_object_tostring),
+                    func: luaH_object_tostring,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"add_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_object_add_signal_simple),
+                    func: luaH_object_add_signal_simple,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"remove_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_object_remove_signal_simple),
+                    func: luaH_object_remove_signal_simple,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"remove_signals\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_object_remove_signals_simple),
+                    func: luaH_object_remove_signals_simple,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"emit_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_object_emit_signal_simple),
+                    func: luaH_object_emit_signal_simple,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__index\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_class_index),
+                    func: luaH_class_index,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__newindex\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_class_newindex),
+                    func: luaH_class_newindex,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"exec\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_sqlite3_exec as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_sqlite3_exec,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"close\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_sqlite3_close as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_sqlite3_close,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"compile\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_sqlite3_compile as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_sqlite3_compile,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"changes\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_sqlite3_changes as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_sqlite3_changes,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__gc\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_sqlite3_gc as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_sqlite3_gc,
                 };
                 init
             },
-            {
-                let mut init = luaL_Reg {
-                    name: std::ptr::null(),
-                    func: None,
-                };
-                init
-            },
+            // {
+            //     let mut init = luaL_Reg {
+            //         name: std::ptr::null(),
+            //         func: 0 as unsafe extern "C-unwind" fn(*mut lua_State) -> i32,
+            //     };
+            //     init
+            // },
         ]
     };
     luaH_class_setup(
@@ -712,13 +696,13 @@ pub unsafe extern "C" fn sqlite3_class_setup(mut L: *mut lua_State) {
         &mut sqlite3_class,
         b"sqlite3\0" as *const u8 as *const std::ffi::c_char,
         ::core::mem::transmute::<
-            Option<unsafe extern "C" fn(*mut lua_State) -> *mut sqlite3_t>,
+            Option<unsafe extern "C-unwind" fn(*mut lua_State) -> *mut sqlite3_t>,
             lua_class_allocator_t,
         >(Some(
-            sqlite3_new as unsafe extern "C" fn(*mut lua_State) -> *mut sqlite3_t,
+            sqlite3_new as unsafe extern "C-unwind" fn(*mut lua_State) -> *mut sqlite3_t,
         )),
-        ::core::mem::transmute::<libc::intptr_t, lua_class_propfunc_t>(NULL as libc::intptr_t),
-        ::core::mem::transmute::<libc::intptr_t, lua_class_propfunc_t>(NULL as libc::intptr_t),
+        None,
+        None,
         sqlite3_methods.as_ptr(),
         sqlite3_meta.as_ptr(),
     );
@@ -726,59 +710,53 @@ pub unsafe extern "C" fn sqlite3_class_setup(mut L: *mut lua_State) {
         &mut sqlite3_class,
         L_TK_FILENAME,
         ::core::mem::transmute::<
-            Option<unsafe extern "C" fn(*mut lua_State, *mut sqlite3_t) -> gint>,
+            Option<unsafe extern "C-unwind" fn(*mut lua_State, *mut sqlite3_t) -> gint>,
             lua_class_propfunc_t,
         >(Some(
             luaH_sqlite3_set_filename
-                as unsafe extern "C" fn(*mut lua_State, *mut sqlite3_t) -> gint,
+                as unsafe extern "C-unwind" fn(*mut lua_State, *mut sqlite3_t) -> gint,
         )),
         ::core::mem::transmute::<
-            Option<unsafe extern "C" fn(*mut lua_State, *mut sqlite3_t) -> gint>,
+            Option<unsafe extern "C-unwind" fn(*mut lua_State, *mut sqlite3_t) -> gint>,
             lua_class_propfunc_t,
         >(Some(
             luaH_sqlite3_get_filename
-                as unsafe extern "C" fn(*mut lua_State, *mut sqlite3_t) -> gint,
+                as unsafe extern "C-unwind" fn(*mut lua_State, *mut sqlite3_t) -> gint,
         )),
-        ::core::mem::transmute::<libc::intptr_t, lua_class_propfunc_t>(NULL as libc::intptr_t),
+        None,
     );
-    static mut sqlite3_stmt_meta: [luaL_Reg; 3] = unsafe {
+    static mut sqlite3_stmt_meta: [luaL_Reg; 2] = unsafe {
         [
             {
                 let mut init = luaL_Reg {
                     name: b"exec\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_sqlite3_stmt_exec as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_sqlite3_stmt_exec,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__gc\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_sqlite3_stmt_gc as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_sqlite3_stmt_gc,
                 };
                 init
             },
-            {
-                let mut init = luaL_Reg {
-                    name: std::ptr::null(),
-                    func: ::core::mem::transmute::<libc::intptr_t, Function>(
-                        NULL as libc::intptr_t,
-                    ),
-                };
-                init
-            },
+            // {
+            //     let mut init = luaL_Reg {
+            //         name: std::ptr::null(),
+            //         func: None,
+            //     };
+            //     init
+            // },
         ]
     };
     luaH_class_setup(
         L,
         &mut sqlite3_stmt_class,
         b"sqlite3::statement\0" as *const u8 as *const std::ffi::c_char,
-        ::core::mem::transmute::<libc::intptr_t, lua_class_allocator_t>(std::ptr::null()),
-        ::core::mem::transmute::<libc::intptr_t, lua_class_propfunc_t>(std::ptr::null()),
-        ::core::mem::transmute::<libc::intptr_t, lua_class_propfunc_t>(std::ptr::null()),
+        None,
+        None,
+        None,
         std::ptr::null(),
         sqlite3_stmt_meta.as_ptr(),
     );

@@ -1,19 +1,21 @@
 use libc::size_t;
-use lua::ffi::*;
+use mlua_sys::*;
 
 pub mod msg_h {
     use std::{ffi::c_void, mem::MaybeUninit};
 
     use glib_sys::*;
     use libc::size_t;
-    use lua::ffi::*;
+    use mlua_sys::*;
 
     use crate::{common::luaobject::luaH_object_push, gtypes::*, log::*};
 
     pub static mut string_format_ref: gpointer =
         0 as *const std::ffi::c_void as *mut std::ffi::c_void;
     pub static mut tostring_ref: gpointer = 0 as *const std::ffi::c_void as *mut std::ffi::c_void;
-    pub unsafe extern "C" fn luaH_msg_string_from_args(mut L: *mut lua_State) -> *const gchar {
+    pub unsafe extern "C-unwind" fn luaH_msg_string_from_args(
+        mut L: *mut lua_State,
+    ) -> *const gchar {
         let mut nargs: gint = lua_gettop(L);
         let mut i: gint = 1 as std::ffi::c_int;
         while i <= nargs {
@@ -43,7 +45,7 @@ pub mod msg_h {
         }
         return lua_tolstring(L, -(1 as std::ffi::c_int), 0 as *mut size_t);
     }
-    pub unsafe extern "C" fn luaH_msg(mut L: *mut lua_State, mut lvl: log_level_t) -> gint {
+    pub unsafe extern "C-unwind" fn luaH_msg(mut L: *mut lua_State, mut lvl: log_level_t) -> gint {
         let mut ar = MaybeUninit::<lua_Debug>::uninit();
         lua_getstack(L, 1 as std::ffi::c_int, ar.as_mut_ptr());
         lua_getinfo(
@@ -68,22 +70,22 @@ pub mod msg_h {
         );
         return 0 as std::ffi::c_int;
     }
-    pub unsafe extern "C" fn luaH_msg_info(mut L: *mut lua_State) -> gint {
+    pub unsafe extern "C-unwind" fn luaH_msg_info(mut L: *mut lua_State) -> gint {
         return luaH_msg(L, LOG_LEVEL_info);
     }
-    pub unsafe extern "C" fn luaH_msg_debug(mut L: *mut lua_State) -> gint {
+    pub unsafe extern "C-unwind" fn luaH_msg_debug(mut L: *mut lua_State) -> gint {
         return luaH_msg(L, LOG_LEVEL_debug);
     }
-    pub unsafe extern "C" fn luaH_msg_warn(mut L: *mut lua_State) -> gint {
+    pub unsafe extern "C-unwind" fn luaH_msg_warn(mut L: *mut lua_State) -> gint {
         return luaH_msg(L, LOG_LEVEL_warn);
     }
-    pub unsafe extern "C" fn luaH_msg_verbose(mut L: *mut lua_State) -> gint {
+    pub unsafe extern "C-unwind" fn luaH_msg_verbose(mut L: *mut lua_State) -> gint {
         return luaH_msg(L, LOG_LEVEL_verbose);
     }
-    pub unsafe extern "C" fn luaH_msg_error(mut L: *mut lua_State) -> gint {
+    pub unsafe extern "C-unwind" fn luaH_msg_error(mut L: *mut lua_State) -> gint {
         return luaH_msg(L, LOG_LEVEL_error);
     }
-    pub unsafe extern "C" fn luaH_msg_fatal(mut L: *mut lua_State) -> gint {
+    pub unsafe extern "C-unwind" fn luaH_msg_fatal(mut L: *mut lua_State) -> gint {
         return luaH_msg(L, LOG_LEVEL_fatal);
     }
 }
@@ -109,7 +111,7 @@ static mut msg_class: lua_class_t = lua_class_t {
     newindex_miss_property: None,
 };
 #[inline]
-unsafe extern "C" fn luaH_msg_class_emit_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_msg_class_emit_signal(mut L: *mut lua_State) -> gint {
     return luaH_class_emit_signal(
         L,
         &mut msg_class,
@@ -119,7 +121,7 @@ unsafe extern "C" fn luaH_msg_class_emit_signal(mut L: *mut lua_State) -> gint {
     );
 }
 #[inline]
-unsafe extern "C" fn luaH_msg_class_remove_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_msg_class_remove_signal(mut L: *mut lua_State) -> gint {
     luaH_class_remove_signal(
         L,
         &mut msg_class,
@@ -129,7 +131,7 @@ unsafe extern "C" fn luaH_msg_class_remove_signal(mut L: *mut lua_State) -> gint
     return 0 as std::ffi::c_int;
 }
 #[inline]
-unsafe extern "C" fn luaH_msg_class_add_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_msg_class_add_signal(mut L: *mut lua_State) -> gint {
     luaH_class_add_signal(
         L,
         &mut msg_class,
@@ -139,90 +141,83 @@ unsafe extern "C" fn luaH_msg_class_add_signal(mut L: *mut lua_State) -> gint {
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn msg_lib_get_msg_class() -> *mut lua_class_t {
+pub unsafe extern "C-unwind" fn msg_lib_get_msg_class() -> *mut lua_class_t {
     return &mut msg_class;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn msg_lib_setup(mut L: *mut lua_State) {
-    static mut msg_lib: [luaL_Reg; 10] = unsafe {
+pub unsafe extern "C-unwind" fn msg_lib_setup(mut L: *mut lua_State) {
+    static mut msg_lib: [luaL_Reg; 9] = unsafe {
         [
             {
                 let mut init = luaL_Reg {
                     name: b"add_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_msg_class_add_signal as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_msg_class_add_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"remove_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_msg_class_remove_signal
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_msg_class_remove_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"emit_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_msg_class_emit_signal as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_msg_class_emit_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"fatal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_msg_fatal as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_msg_fatal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"error\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_msg_error as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_msg_error,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"warn\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_msg_warn as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_msg_warn,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"info\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_msg_info as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_msg_info,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"verbose\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_msg_verbose as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_msg_verbose,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"debug\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_msg_debug as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_msg_debug,
                 };
                 init
             },
-            {
-                let mut init = luaL_Reg {
-                    name: 0 as *const std::ffi::c_char,
-                    func: None,
-                };
-                init
-            },
+            // {
+            //     let mut init = luaL_Reg {
+            //         name: 0 as *const std::ffi::c_char,
+            //         func: None,
+            //     };
+            //     init
+            // },
         ]
     };
     luaH_openlib(

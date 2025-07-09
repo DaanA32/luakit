@@ -10,12 +10,52 @@ pub mod luakit_h {
 
     use crate::gtypes::gint;
 }
-use gdk4_sys::GdkClipboard;
+use gdk_sys::*;
+use glib_sys::*;
+use libc::*;
+use mlua_sys::*;
+
+use crate::common::clib::luakit::*;
+use crate::common::common;
+use crate::common::luaclass::*;
+use crate::common::luah::*;
+use crate::common::luaobject::*;
+use crate::common::luauniq::*;
+use crate::common::tokenize::*;
+use crate::globalconf::*;
+use crate::log::*;
+use crate::luah::*;
+use crate::web_context::*;
+
+use crate::gtypes::*;
+use gdk_sys::*;
+use glib_sys::*;
+use libc::getenv;
+use mlua_sys::*;
+use webkit2gtk::{ffi::*, glib::gobject_ffi::*};
+
+use crate::clib::msg::*;
+use crate::clib::soup::*;
+use crate::clib::sqlite3::*;
+use crate::clib::stylesheet::*;
+use crate::clib::web_module::*;
+use crate::clib::widget::*;
+use crate::common::luaclass::luaH_typename;
+use crate::common::luah::*;
+use crate::common::luaobject::*;
+use crate::common::luautil::*;
+use crate::common::luayield::luaH_yield;
+use crate::common::util::*;
+use crate::common::*;
+use crate::globalconf::*;
+use crate::gtypes::*;
+use crate::log::*;
+use gdk_sys::GdkAtom;
 use gio_sys::{GAsyncReadyCallback, GAsyncResult, GCancellable, GFile};
 use glib_sys::*;
-use gtk4_sys::*;
+use gtk_sys::*;
 use libc::*;
-use lua::ffi::*;
+use mlua_sys::*;
 use webkit2gtk::{
     ffi::*,
     gio::ffi::{GTlsCertificate, g_tls_certificate_new_from_pem},
@@ -30,28 +70,29 @@ use crate::{
     clib::widget::{widget_class, widget_t},
     common::{
         clib::luakit::{
-            luaH_luakit_idle_add, luaH_luakit_idle_remove, luaH_object_ref, luaH_object_unref,
+            luaH_luakit_idle_add, luaH_luakit_idle_remove, luaH_luakit_uri_decode, luaH_object_ref,
+            luaH_object_unref,
         },
-        common,
         luaclass::{
             lua_class_property_array_t, lua_class_t, lua_object_t, luaH_checkudata,
             luaH_class_add_signal, luaH_class_emit_signal, luaH_class_remove_signal, luaH_openlib,
             luaH_usemetatable,
             signal_h::{signal_new, signal_t},
         },
+        lualib::luaH_dofunction,
         luaobject::luaH_object_push,
         tokenize::{L_TK_PRIMARY, L_TK_SECONDARY, l_tokenize, luakit_token_t},
     },
     globalconf::globalconf,
     gtypes::{gchar, gint, gint64, gsize, guint, guint64},
+    ipc::ipc_remove_socket_file,
     log::{_log, LOG_LEVEL_fatal, LOG_LEVEL_verbose, log_get_verbosity},
-    luah::luaH_dofunction,
     web_context::web_context_get,
 };
 
 pub use self::luakit_h::proc_callback_data_t;
 
-unsafe extern "C" {
+unsafe extern "C-unwind" {
     pub fn luakit_uri_scheme_request_cb(_: *mut WebKitURISchemeRequest, _: gpointer);
 }
 pub type website_data_remove_task_t = _website_data_remove_task_t;
@@ -71,7 +112,7 @@ static mut luakit_class: lua_class_t = lua_class_t {
     newindex_miss_property: None,
 };
 #[inline]
-unsafe extern "C" fn luaH_luakit_class_add_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_class_add_signal(mut L: *mut lua_State) -> gint {
     luaH_class_add_signal(
         L,
         &mut luakit_class,
@@ -81,7 +122,7 @@ unsafe extern "C" fn luaH_luakit_class_add_signal(mut L: *mut lua_State) -> gint
     return 0 as std::ffi::c_int;
 }
 #[inline]
-unsafe extern "C" fn luaH_luakit_class_remove_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_class_remove_signal(mut L: *mut lua_State) -> gint {
     luaH_class_remove_signal(
         L,
         &mut luakit_class,
@@ -91,7 +132,7 @@ unsafe extern "C" fn luaH_luakit_class_remove_signal(mut L: *mut lua_State) -> g
     return 0 as std::ffi::c_int;
 }
 #[inline]
-unsafe extern "C" fn luaH_luakit_class_emit_signal(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_class_emit_signal(mut L: *mut lua_State) -> gint {
     return luaH_class_emit_signal(
         L,
         &mut luakit_class,
@@ -101,39 +142,38 @@ unsafe extern "C" fn luaH_luakit_class_emit_signal(mut L: *mut lua_State) -> gin
     );
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_clipboard_get(
+pub unsafe extern "C-unwind" fn luaH_clipboard_get(
     mut L: *mut lua_State,
     mut idx: gint,
-) -> *mut GdkClipboard {
+) -> *mut GtkClipboard {
     match l_tokenize(luaL_checklstring(L, idx, 0 as *mut size_t)) as std::ffi::c_uint {
         L_TK_PRIMARY => {
-            return todo!("gtk_widget_get_primary_clipboard(2 as *mut GtkWidget);");
+            return gtk_clipboard_get(1 as GdkAtom);
         }
         L_TK_SECONDARY => {
-            return todo!("gtk_widget_get_clipboard(2 as *mut GtkWidget);");
+            return gtk_clipboard_get(2 as GdkAtom);
         }
         L_TK_CLIPBOARD => {
-            return todo!("gtk_widget_get_clipboard();");
+            return gtk_clipboard_get(69 as GdkAtom);
         }
         _ => {}
     }
-    return 0 as *mut GdkClipboard;
+    return 0 as *mut GtkClipboard;
 }
-unsafe extern "C" fn luaH_luakit_selection_index(mut L: *mut lua_State) -> gint {
-    let mut selection: *mut GdkClipboard = luaH_clipboard_get(L, 2 as std::ffi::c_int);
-    todo!();
-    // if !selection.is_null() {
-    //     let mut text: *mut gchar = gdk_clipboard_wait_for_text(selection);
-    //     if !text.is_null() {
-    //         lua_pushstring(L, text);
-    //         g_free(text as gpointer);
-    //         return 1 as std::ffi::c_int;
-    //     }
-    // }
+unsafe extern "C-unwind" fn luaH_luakit_selection_index(mut L: *mut lua_State) -> gint {
+    let mut selection: *mut GtkClipboard = luaH_clipboard_get(L, 2 as std::ffi::c_int);
+    if !selection.is_null() {
+        let mut text: *mut gchar = gtk_clipboard_wait_for_text(selection);
+        if !text.is_null() {
+            lua_pushstring(L, text);
+            g_free(text as gpointer);
+            return 1 as std::ffi::c_int;
+        }
+    }
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_luakit_selection_newindex(mut L: *mut lua_State) -> gint {
-    let mut selection: *mut GdkClipboard = luaH_clipboard_get(L, 2 as std::ffi::c_int);
+unsafe extern "C-unwind" fn luaH_luakit_selection_newindex(mut L: *mut lua_State) -> gint {
+    let mut selection: *mut GtkClipboard = luaH_clipboard_get(L, 2 as std::ffi::c_int);
     if !selection.is_null() {
         let mut text: *const gchar = if !(lua_type(L, 3 as std::ffi::c_int) == 0 as std::ffi::c_int)
         {
@@ -142,14 +182,14 @@ unsafe extern "C" fn luaH_luakit_selection_newindex(mut L: *mut lua_State) -> gi
             0 as *const std::ffi::c_char
         };
         if !text.is_null() && *text as std::ffi::c_int != 0 {
-            todo!("gtk_clipboard_set_text(selection, text, -(1 as std::ffi::c_int));");
+            gtk_clipboard_set_text(selection, text, -(1 as std::ffi::c_int));
         } else {
-            todo!("gtk_clipboard_clear(selection);");
+            gtk_clipboard_clear(selection);
         }
     }
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_luakit_selection_table_push(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_selection_table_push(mut L: *mut lua_State) -> gint {
     lua_createtable(L, 0 as std::ffi::c_int, 0 as std::ffi::c_int);
     lua_createtable(L, 0 as std::ffi::c_int, 2 as std::ffi::c_int);
     lua_pushlstring(
@@ -159,11 +199,7 @@ unsafe extern "C" fn luaH_luakit_selection_table_push(mut L: *mut lua_State) -> 
             .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
             .wrapping_sub(1),
     );
-    lua_pushcclosure(
-        L,
-        Some(luaH_luakit_selection_index as unsafe extern "C" fn(*mut lua_State) -> gint),
-        0 as std::ffi::c_int,
-    );
+    lua_pushcclosure(L, luaH_luakit_selection_index, 0 as std::ffi::c_int);
     lua_rawset(L, -(3 as std::ffi::c_int));
     lua_pushlstring(
         L,
@@ -172,16 +208,12 @@ unsafe extern "C" fn luaH_luakit_selection_table_push(mut L: *mut lua_State) -> 
             .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
             .wrapping_sub(1),
     );
-    lua_pushcclosure(
-        L,
-        Some(luaH_luakit_selection_newindex as unsafe extern "C" fn(*mut lua_State) -> gint),
-        0 as std::ffi::c_int,
-    );
+    lua_pushcclosure(L, luaH_luakit_selection_newindex, 0 as std::ffi::c_int);
     lua_rawset(L, -(3 as std::ffi::c_int));
     lua_setmetatable(L, -(2 as std::ffi::c_int));
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_luakit_save_file(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_save_file(mut L: *mut lua_State) -> gint {
     let mut title: *const gchar = luaL_checklstring(L, 1 as std::ffi::c_int, 0 as *mut size_t);
     let mut parent_window: *mut GtkWindow = 0 as *mut GtkWindow;
     if !(lua_type(L, 2 as std::ffi::c_int) == 0 as std::ffi::c_int) {
@@ -229,8 +261,7 @@ unsafe extern "C" fn luaH_luakit_save_file(mut L: *mut lua_State) -> gint {
     gtk_file_chooser_set_current_folder(
         g_type_check_instance_cast(dialog as *mut GTypeInstance, gtk_file_chooser_get_type())
             as *mut std::ffi::c_void as *mut GtkFileChooser,
-        default_folder as *mut GFile,
-        std::ptr::null_mut(),
+        default_folder,
     );
     gtk_file_chooser_set_current_name(
         g_type_check_instance_cast(dialog as *mut GTypeInstance, gtk_file_chooser_get_type())
@@ -262,7 +293,7 @@ unsafe extern "C" fn luaH_luakit_save_file(mut L: *mut lua_State) -> gint {
     gtk_widget_destroy(dialog);
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_luakit_spawn_sync(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_spawn_sync(mut L: *mut lua_State) -> gint {
     let mut e: *mut GError = 0 as *mut GError;
     let mut _stdout: *mut gchar = std::ptr::null_mut();
     let mut _stderr: *mut gchar = std::ptr::null_mut();
@@ -319,7 +350,7 @@ unsafe extern "C" fn luaH_luakit_spawn_sync(mut L: *mut lua_State) -> gint {
     return 3 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn read_proc_output(
+pub unsafe extern "C-unwind" fn read_proc_output(
     mut fd: std::ffi::c_int,
     mut L: *mut lua_State,
     mut ptr_out: *mut *mut gchar,
@@ -420,7 +451,7 @@ pub unsafe extern "C" fn async_callback_handler(
     g_free(str_stderr as gpointer);
     luaH_object_unref(L, cb_ref);
 }
-unsafe extern "C" fn luaH_luakit_spawn(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_spawn(mut L: *mut lua_State) -> gint {
     let mut e: *mut GError = 0 as *mut GError;
     let mut pid: GPid = 0 as std::ffi::c_int;
     let mut command: *const gchar = luaL_checklstring(L, 1 as std::ffi::c_int, 0 as *mut size_t);
@@ -459,11 +490,7 @@ unsafe extern "C" fn luaH_luakit_spawn(mut L: *mut lua_State) -> gint {
             &mut e,
         ) == 0)
         {
-            g_child_watch_add(
-                pid,
-                Some(async_callback_handler as unsafe extern "C" fn(GPid, gint, gpointer) -> ()),
-                cb as gpointer,
-            );
+            g_child_watch_add(pid, Some(async_callback_handler), cb as gpointer);
             g_strfreev(argv);
             lua_pushnumber(L, pid as lua_Number);
             return 1 as std::ffi::c_int;
@@ -476,7 +503,7 @@ unsafe extern "C" fn luaH_luakit_spawn(mut L: *mut lua_State) -> gint {
     lua_error(L);
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_luakit_exec(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_exec(mut L: *mut lua_State) -> gint {
     static mut shell: *const gchar = 0 as *const gchar;
     if shell.is_null() && {
         shell = g_getenv(b"SHELL\0" as *const u8 as *const std::ffi::c_char);
@@ -494,21 +521,21 @@ unsafe extern "C" fn luaH_luakit_exec(mut L: *mut lua_State) -> gint {
     );
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_luakit_push_options_table(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_push_options_table(mut L: *mut lua_State) -> gint {
     lua_createtable(L, 0 as std::ffi::c_int, 0 as std::ffi::c_int);
-    let mut i: guint = 0 as std::ffi::c_int as guint;
+    let mut i = 0;
     while i < (*globalconf.argv).len {
         lua_pushstring(
             L,
             *((*globalconf.argv).pdata).offset(i as isize) as *const std::ffi::c_char,
         );
-        lua_rawseti(L, -(2 as std::ffi::c_int), i.wrapping_add(1));
+        lua_rawseti(L, -(2 as std::ffi::c_int), i.wrapping_add(1).into());
         i = i.wrapping_add(1);
         i;
     }
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_parse_website_data_types_table(
+unsafe extern "C-unwind" fn luaH_parse_website_data_types_table(
     mut L: *mut lua_State,
     mut idx: gint,
 ) -> WebKitWebsiteDataTypes {
@@ -520,7 +547,7 @@ unsafe extern "C" fn luaH_parse_website_data_types_table(
     let mut len: size_t = lua_objlen(L, idx);
     let mut i: size_t = 1 as std::ffi::c_int as size_t;
     while i <= len {
-        lua_rawgeti(L, idx, i as std::ffi::c_int);
+        lua_rawgeti(L, idx, i as i64);
         if lua_isstring(L, -(1 as std::ffi::c_int)) == 0 {
             luaL_error(
                 L,
@@ -643,7 +670,7 @@ unsafe extern "C" fn luaH_parse_website_data_types_table(
     }
     return types;
 }
-unsafe extern "C" fn website_data_fetch_finish(
+unsafe extern "C-unwind" fn website_data_fetch_finish(
     mut manager: *mut WebKitWebsiteDataManager,
     mut result: *mut GAsyncResult,
     mut L: *mut lua_State,
@@ -833,7 +860,7 @@ unsafe extern "C" fn website_data_fetch_finish(
     g_list_free(items);
     luaH_resume(L, lua_gettop(L));
 }
-unsafe extern "C" fn luaH_luakit_website_data_fetch(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_website_data_fetch(mut L: *mut lua_State) -> gint {
     let mut data_types: WebKitWebsiteDataTypes =
         luaH_parse_website_data_types_table(L, 1 as std::ffi::c_int);
     if data_types as std::ffi::c_uint == 0 as std::ffi::c_int as std::ffi::c_uint {
@@ -851,7 +878,7 @@ unsafe extern "C" fn luaH_luakit_website_data_fetch(mut L: *mut lua_State) -> gi
         0 as *mut GCancellable,
         ::core::mem::transmute::<
             Option<
-                unsafe extern "C" fn(
+                unsafe extern "C-unwind" fn(
                     *mut WebKitWebsiteDataManager,
                     *mut GAsyncResult,
                     *mut lua_State,
@@ -860,7 +887,7 @@ unsafe extern "C" fn luaH_luakit_website_data_fetch(mut L: *mut lua_State) -> gi
             GAsyncReadyCallback,
         >(Some(
             website_data_fetch_finish
-                as unsafe extern "C" fn(
+                as unsafe extern "C-unwind" fn(
                     *mut WebKitWebsiteDataManager,
                     *mut GAsyncResult,
                     *mut lua_State,
@@ -870,7 +897,7 @@ unsafe extern "C" fn luaH_luakit_website_data_fetch(mut L: *mut lua_State) -> gi
     );
     return luaH_yield(L);
 }
-unsafe extern "C" fn website_data_remove_finish(
+unsafe extern "C-unwind" fn website_data_remove_finish(
     mut manager: *mut WebKitWebsiteDataManager,
     mut result: *mut GAsyncResult,
     mut wdrt: *mut website_data_remove_task_t,
@@ -905,12 +932,12 @@ unsafe extern "C" fn website_data_remove_finish(
     }
     g_free((*wdrt).domain as gpointer);
     g_slice_free1(
-        ::core::mem::size_of::<website_data_remove_task_t>() as std::ffi::c_ulong,
-        wdrt as gpointer,
+        ::core::mem::size_of::<website_data_remove_task_t>(),
+        wdrt as *mut c_void,
     );
     luaH_resume(L, lua_gettop(L));
 }
-unsafe extern "C" fn luaH_luakit_website_data_remove_cont(
+unsafe extern "C-unwind" fn luaH_luakit_website_data_remove_cont(
     mut manager: *mut WebKitWebsiteDataManager,
     mut result: *mut GAsyncResult,
     mut wdrt: *mut website_data_remove_task_t,
@@ -942,8 +969,8 @@ unsafe extern "C" fn luaH_luakit_website_data_remove_cont(
         g_error_free(error);
         g_free((*wdrt).domain as gpointer);
         g_slice_free1(
-            ::core::mem::size_of::<website_data_remove_task_t>() as std::ffi::c_ulong,
-            wdrt as gpointer,
+            ::core::mem::size_of::<website_data_remove_task_t>(),
+            wdrt as *mut c_void,
         );
         luaL_error(
             L,
@@ -967,8 +994,8 @@ unsafe extern "C" fn luaH_luakit_website_data_remove_cont(
     if items.is_null() {
         g_free((*wdrt).domain as gpointer);
         g_slice_free1(
-            ::core::mem::size_of::<website_data_remove_task_t>() as std::ffi::c_ulong,
-            wdrt as gpointer,
+            ::core::mem::size_of::<website_data_remove_task_t>(),
+            wdrt as *mut c_void,
         );
         lua_pushboolean(L, (0 as std::ffi::c_int == 0) as std::ffi::c_int);
         luaH_resume(L, 1 as std::ffi::c_int);
@@ -984,7 +1011,7 @@ unsafe extern "C" fn luaH_luakit_website_data_remove_cont(
         0 as *mut GCancellable,
         ::core::mem::transmute::<
             Option<
-                unsafe extern "C" fn(
+                unsafe extern "C-unwind" fn(
                     *mut WebKitWebsiteDataManager,
                     *mut GAsyncResult,
                     *mut website_data_remove_task_t,
@@ -993,7 +1020,7 @@ unsafe extern "C" fn luaH_luakit_website_data_remove_cont(
             GAsyncReadyCallback,
         >(Some(
             website_data_remove_finish
-                as unsafe extern "C" fn(
+                as unsafe extern "C-unwind" fn(
                     *mut WebKitWebsiteDataManager,
                     *mut GAsyncResult,
                     *mut website_data_remove_task_t,
@@ -1008,7 +1035,7 @@ unsafe extern "C" fn luaH_luakit_website_data_remove_cont(
     }
     g_list_free(items);
 }
-unsafe extern "C" fn luaH_luakit_website_data_remove(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_website_data_remove(mut L: *mut lua_State) -> gint {
     let mut data_types: WebKitWebsiteDataTypes =
         luaH_parse_website_data_types_table(L, 1 as std::ffi::c_int);
     if data_types as std::ffi::c_uint == 0 as std::ffi::c_int as std::ffi::c_uint {
@@ -1019,9 +1046,9 @@ unsafe extern "C" fn luaH_luakit_website_data_remove(mut L: *mut lua_State) -> g
     }
     let mut domain: *const std::ffi::c_char =
         luaL_checklstring(L, 2 as std::ffi::c_int, 0 as *mut size_t);
-    let mut wdrt: *mut website_data_remove_task_t =
-        g_slice_alloc0(::core::mem::size_of::<website_data_remove_task_t>() as std::ffi::c_ulong)
-            as *mut website_data_remove_task_t;
+    let mut wdrt: *mut website_data_remove_task_t = g_slice_alloc0(::core::mem::size_of::<
+        website_data_remove_task_t,
+    >()) as *mut website_data_remove_task_t;
     (*wdrt).L = L;
     (*wdrt).domain = g_strdup(domain);
     (*wdrt).data_types = data_types;
@@ -1034,7 +1061,7 @@ unsafe extern "C" fn luaH_luakit_website_data_remove(mut L: *mut lua_State) -> g
         0 as *mut GCancellable,
         ::core::mem::transmute::<
             Option<
-                unsafe extern "C" fn(
+                unsafe extern "C-unwind" fn(
                     *mut WebKitWebsiteDataManager,
                     *mut GAsyncResult,
                     *mut website_data_remove_task_t,
@@ -1043,7 +1070,7 @@ unsafe extern "C" fn luaH_luakit_website_data_remove(mut L: *mut lua_State) -> g
             GAsyncReadyCallback,
         >(Some(
             luaH_luakit_website_data_remove_cont
-                as unsafe extern "C" fn(
+                as unsafe extern "C-unwind" fn(
                     *mut WebKitWebsiteDataManager,
                     *mut GAsyncResult,
                     *mut website_data_remove_task_t,
@@ -1053,7 +1080,7 @@ unsafe extern "C" fn luaH_luakit_website_data_remove(mut L: *mut lua_State) -> g
     );
     return luaH_yield(L);
 }
-unsafe extern "C" fn website_data_clear_finish(
+unsafe extern "C-unwind" fn website_data_clear_finish(
     mut manager: *mut WebKitWebsiteDataManager,
     mut result: *mut GAsyncResult,
     mut L: *mut lua_State,
@@ -1087,7 +1114,7 @@ unsafe extern "C" fn website_data_clear_finish(
     }
     luaH_resume(L, lua_gettop(L));
 }
-unsafe extern "C" fn luaH_luakit_website_data_clear(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_website_data_clear(mut L: *mut lua_State) -> gint {
     let mut data_types: WebKitWebsiteDataTypes =
         luaH_parse_website_data_types_table(L, 1 as std::ffi::c_int);
     if data_types as std::ffi::c_uint == 0 as std::ffi::c_int as std::ffi::c_uint {
@@ -1108,7 +1135,7 @@ unsafe extern "C" fn luaH_luakit_website_data_clear(mut L: *mut lua_State) -> gi
         0 as *mut GCancellable,
         ::core::mem::transmute::<
             Option<
-                unsafe extern "C" fn(
+                unsafe extern "C-unwind" fn(
                     *mut WebKitWebsiteDataManager,
                     *mut GAsyncResult,
                     *mut lua_State,
@@ -1117,7 +1144,7 @@ unsafe extern "C" fn luaH_luakit_website_data_clear(mut L: *mut lua_State) -> gi
             GAsyncReadyCallback,
         >(Some(
             website_data_clear_finish
-                as unsafe extern "C" fn(
+                as unsafe extern "C-unwind" fn(
                     *mut WebKitWebsiteDataManager,
                     *mut GAsyncResult,
                     *mut lua_State,
@@ -1127,67 +1154,45 @@ unsafe extern "C" fn luaH_luakit_website_data_clear(mut L: *mut lua_State) -> gi
     );
     return luaH_yield(L);
 }
-unsafe extern "C" fn luaH_luakit_website_data_index(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_website_data_index(mut L: *mut lua_State) -> gint {
     let mut prop: *const gchar = luaL_checklstring(L, 2 as std::ffi::c_int, 0 as *mut size_t);
     let mut token: luakit_token_t = l_tokenize(prop);
     match token as std::ffi::c_uint {
         93 => {
-            lua_pushcclosure(
-                L,
-                Some(
-                    luaH_luakit_website_data_fetch as unsafe extern "C" fn(*mut lua_State) -> gint,
-                ),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_luakit_website_data_fetch, 0);
             luaH_yield_wrap_function(L);
             return 1 as std::ffi::c_int;
         }
         180 => {
-            lua_pushcclosure(
-                L,
-                Some(
-                    luaH_luakit_website_data_remove as unsafe extern "C" fn(*mut lua_State) -> gint,
-                ),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_luakit_website_data_remove, 0);
             luaH_yield_wrap_function(L);
             return 1 as std::ffi::c_int;
         }
         26 => {
-            lua_pushcclosure(
-                L,
-                Some(
-                    luaH_luakit_website_data_clear as unsafe extern "C" fn(*mut lua_State) -> gint,
-                ),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_luakit_website_data_clear, 0);
             luaH_yield_wrap_function(L);
             return 1 as std::ffi::c_int;
         }
         _ => return 0 as std::ffi::c_int,
     };
 }
-unsafe extern "C" fn luaH_luakit_push_website_data_table(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_push_website_data_table(mut L: *mut lua_State) -> gint {
     lua_createtable(L, 0 as std::ffi::c_int, 0 as std::ffi::c_int);
     lua_createtable(L, 0 as std::ffi::c_int, 2 as std::ffi::c_int);
     lua_pushlstring(
         L,
         b"__index\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 8]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 8]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_pushvalue(L, 1 as std::ffi::c_int);
-    lua_pushcclosure(
-        L,
-        Some(luaH_luakit_website_data_index as unsafe extern "C" fn(*mut lua_State) -> gint),
-        1 as std::ffi::c_int,
-    );
+    lua_pushcclosure(L, luaH_luakit_website_data_index, 1);
     lua_rawset(L, -(3 as std::ffi::c_int));
     lua_setmetatable(L, -(2 as std::ffi::c_int));
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_string_wch_convert_case(
+unsafe extern "C-unwind" fn luaH_string_wch_convert_case(
     mut L: *mut lua_State,
     mut key: *const std::ffi::c_char,
     mut upper: gboolean,
@@ -1220,34 +1225,36 @@ unsafe extern "C" fn luaH_string_wch_convert_case(
     luaH_keystr_push(L, cased);
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_luakit_wch_lower(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_wch_lower(mut L: *mut lua_State) -> gint {
     return luaH_string_wch_convert_case(
         L,
         luaL_checklstring(L, 1 as std::ffi::c_int, 0 as *mut size_t),
         0 as std::ffi::c_int,
     );
 }
-unsafe extern "C" fn luaH_luakit_wch_upper(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_wch_upper(mut L: *mut lua_State) -> gint {
     return luaH_string_wch_convert_case(
         L,
         luaL_checklstring(L, 1 as std::ffi::c_int, 0 as *mut size_t),
         (0 as std::ffi::c_int == 0) as std::ffi::c_int,
     );
 }
-unsafe extern "C" fn luaH_luakit_clear_favicon_database(mut UNUSED_L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_clear_favicon_database(
+    mut UNUSED_L: *mut lua_State,
+) -> gint {
     let mut ctx: *mut WebKitWebContext = web_context_get();
     let mut fdb: *mut WebKitFaviconDatabase = webkit_web_context_get_favicon_database(ctx);
     webkit_favicon_database_clear(fdb);
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_luakit_push_install_paths_table(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_push_install_paths_table(mut L: *mut lua_State) -> gint {
     lua_createtable(L, 0 as std::ffi::c_int, 6 as std::ffi::c_int);
     lua_pushlstring(
         L,
         b"/usr/local/share/luakit\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 24]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 24]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_setfield(
         L,
@@ -1257,9 +1264,9 @@ unsafe extern "C" fn luaH_luakit_push_install_paths_table(mut L: *mut lua_State)
     lua_pushlstring(
         L,
         b"/etc/xdg\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 9]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 9]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_setfield(
         L,
@@ -1269,9 +1276,9 @@ unsafe extern "C" fn luaH_luakit_push_install_paths_table(mut L: *mut lua_State)
     lua_pushlstring(
         L,
         b"/usr/local/share/luakit/doc\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 28]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 28]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_setfield(
         L,
@@ -1281,9 +1288,9 @@ unsafe extern "C" fn luaH_luakit_push_install_paths_table(mut L: *mut lua_State)
     lua_pushlstring(
         L,
         b"/usr/local/share/man\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 21]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 21]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_setfield(
         L,
@@ -1293,9 +1300,9 @@ unsafe extern "C" fn luaH_luakit_push_install_paths_table(mut L: *mut lua_State)
     lua_pushlstring(
         L,
         b"/usr/local/share/pixmaps\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 25]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 25]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_setfield(
         L,
@@ -1305,9 +1312,9 @@ unsafe extern "C" fn luaH_luakit_push_install_paths_table(mut L: *mut lua_State)
     lua_pushlstring(
         L,
         b"/usr/local/share/applications\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 30]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 30]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_setfield(
         L,
@@ -1316,7 +1323,7 @@ unsafe extern "C" fn luaH_luakit_push_install_paths_table(mut L: *mut lua_State)
     );
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_luakit_index(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_index(mut L: *mut lua_State) -> gint {
     if luaH_usemetatable(L, 1 as std::ffi::c_int, 2 as std::ffi::c_int) != 0 {
         return 1 as std::ffi::c_int;
     }
@@ -1382,15 +1389,11 @@ unsafe extern "C" fn luaH_luakit_index(mut L: *mut lua_State) -> gint {
         }
         264 => {
             lua_createtable(L, 0 as std::ffi::c_int, 0 as std::ffi::c_int);
-            let mut i: guint = 0 as std::ffi::c_int as guint;
+            let mut i = 0;
             while i < (*globalconf.windows).len {
                 w = *((*globalconf.windows).pdata).offset(i as isize) as *mut widget_t;
                 luaH_object_push(L, (*w).ref_0);
-                lua_rawseti(
-                    L,
-                    -(2 as std::ffi::c_int),
-                    i.wrapping_add(1 as std::ffi::c_int as guint) as std::ffi::c_int,
-                );
+                lua_rawseti(L, -(2 as std::ffi::c_int), i.wrapping_add(1) as i64);
                 i = i.wrapping_add(1);
                 i;
             }
@@ -1426,9 +1429,9 @@ unsafe extern "C" fn luaH_luakit_index(mut L: *mut lua_State) -> gint {
             lua_pushlstring(
                 L,
                 b"/usr/local/share/luakit\0" as *const u8 as *const std::ffi::c_char,
-                (::core::mem::size_of::<[std::ffi::c_char; 24]>() as std::ffi::c_ulong)
-                    .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-                    .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+                (::core::mem::size_of::<[std::ffi::c_char; 24]>())
+                    .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+                    .wrapping_sub(1),
             );
             return 1 as std::ffi::c_int;
         }
@@ -1437,9 +1440,9 @@ unsafe extern "C" fn luaH_luakit_index(mut L: *mut lua_State) -> gint {
             lua_pushlstring(
                 L,
                 b"64175ca2\0" as *const u8 as *const std::ffi::c_char,
-                (::core::mem::size_of::<[std::ffi::c_char; 9]>() as std::ffi::c_ulong)
-                    .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-                    .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+                (::core::mem::size_of::<[std::ffi::c_char; 9]>())
+                    .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+                    .wrapping_sub(1),
             );
             return 1 as std::ffi::c_int;
         }
@@ -1458,7 +1461,7 @@ unsafe extern "C" fn luaH_luakit_index(mut L: *mut lua_State) -> gint {
     }
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_luakit_newindex(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_newindex(mut L: *mut lua_State) -> gint {
     if lua_isstring(L, 2 as std::ffi::c_int) == 0 {
         return 0 as std::ffi::c_int;
     }
@@ -1509,7 +1512,7 @@ unsafe extern "C" fn luaH_luakit_newindex(mut L: *mut lua_State) -> gint {
     }
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_luakit_quit(mut UNUSED_L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_quit(mut UNUSED_L: *mut lua_State) -> gint {
     if gtk_main_level() != 0 {
         gtk_main_quit();
     } else {
@@ -1517,7 +1520,7 @@ unsafe extern "C" fn luaH_luakit_quit(mut UNUSED_L: *mut lua_State) -> gint {
     }
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_luakit_register_scheme(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_luakit_register_scheme(mut L: *mut lua_State) -> gint {
     let mut scheme: *const gchar = luaL_checklstring(L, 1 as std::ffi::c_int, 0 as *mut size_t);
     if strcmp(
         scheme as *const std::ffi::c_char,
@@ -1559,19 +1562,20 @@ unsafe extern "C" fn luaH_luakit_register_scheme(mut L: *mut lua_State) -> gint 
         web_context_get(),
         scheme,
         ::core::mem::transmute::<
-            Option<unsafe extern "C" fn(*mut WebKitURISchemeRequest, gpointer) -> ()>,
+            Option<unsafe extern "C-unwind" fn(*mut WebKitURISchemeRequest, gpointer) -> ()>,
             WebKitURISchemeRequestCallback,
         >(Some(
             luakit_uri_scheme_request_cb
-                as unsafe extern "C" fn(*mut WebKitURISchemeRequest, gpointer) -> (),
+                as unsafe extern "C-unwind" fn(*mut WebKitURISchemeRequest, gpointer) -> (),
         )),
         g_strdup(scheme) as gpointer,
-        Some(g_free as unsafe extern "C" fn(gpointer) -> ()),
+        Some(g_free),
     );
     return 0 as std::ffi::c_int;
 }
+
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_luakit_allow_certificate(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_luakit_allow_certificate(mut L: *mut lua_State) -> gint {
     let mut host: *const gchar = luaL_checklstring(L, 1 as std::ffi::c_int, 0 as *mut size_t);
     let mut len: size_t = 0;
     let mut cert_pem: *const gchar = luaL_checklstring(L, 2 as std::ffi::c_int, &mut len);
@@ -1593,7 +1597,7 @@ pub unsafe extern "C" fn luaH_luakit_allow_certificate(mut L: *mut lua_State) ->
     return 1 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_class_index_miss_property(
+pub unsafe extern "C-unwind" fn luaH_class_index_miss_property(
     mut L: *mut lua_State,
     mut UNUSED_obj: *mut lua_object_t,
 ) -> gint {
@@ -1607,7 +1611,7 @@ pub unsafe extern "C" fn luaH_class_index_miss_property(
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luaH_class_newindex_miss_property(
+pub unsafe extern "C-unwind" fn luaH_class_newindex_miss_property(
     mut L: *mut lua_State,
     mut UNUSED_obj: *mut lua_object_t,
 ) -> gint {
@@ -1621,191 +1625,156 @@ pub unsafe extern "C" fn luaH_class_newindex_miss_property(
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luakit_lib_setup(mut L: *mut lua_State) {
-    static mut luakit_lib: [luaL_Reg; 21] = unsafe {
+pub unsafe extern "C-unwind" fn luakit_lib_setup(mut L: *mut lua_State) {
+    static mut luakit_lib: [luaL_Reg; 20] = unsafe {
         [
             {
                 let mut init = luaL_Reg {
                     name: b"add_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_class_add_signal
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_class_add_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"remove_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_class_remove_signal
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_class_remove_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"emit_signal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_class_emit_signal
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_class_emit_signal,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"time\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_luakit_time as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_luakit_time,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"uri_encode\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_uri_encode as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_uri_encode,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"uri_decode\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_uri_decode as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_uri_decode,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"idle_add\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_idle_add as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_idle_add,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"idle_remove\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_idle_remove as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_idle_remove,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__index\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_luakit_index as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_luakit_index,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"__newindex\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_newindex as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_newindex,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"exec\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_luakit_exec as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_luakit_exec,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"quit\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_luakit_quit as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_luakit_quit,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"save_file\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_save_file as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_save_file,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"spawn\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(luaH_luakit_spawn as unsafe extern "C" fn(*mut lua_State) -> gint),
+                    func: luaH_luakit_spawn,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"spawn_sync\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_spawn_sync as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_spawn_sync,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"register_scheme\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_register_scheme as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_register_scheme,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"allow_certificate\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_allow_certificate
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_allow_certificate,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"wch_lower\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_wch_lower as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_wch_lower,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"wch_upper\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_wch_upper as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_wch_upper,
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"clear_favicon_database\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_luakit_clear_favicon_database
-                            as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: luaH_luakit_clear_favicon_database,
                 };
                 init
             },
-            {
-                let mut init = luaL_Reg {
-                    name: 0 as *const std::ffi::c_char,
-                    func: None,
-                };
-                init
-            },
+            // {
+            //     let mut init = luaL_Reg {
+            //         name: 0 as *const std::ffi::c_char,
+            //         func: None,
+            //     };
+            //     init
+            // },
         ]
     };
     luakit_class.signals = signal_new();
@@ -1817,6 +1786,6 @@ pub unsafe extern "C" fn luakit_lib_setup(mut L: *mut lua_State) {
     );
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn luakit_lib_get_luakit_class() -> *mut lua_class_t {
+pub unsafe extern "C-unwind" fn luakit_lib_get_luakit_class() -> *mut lua_class_t {
     return &mut luakit_class;
 }
