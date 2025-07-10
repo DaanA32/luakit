@@ -24,3 +24,6 @@ buildopts.h
 tags
 cscope.*
 
+html/
+latex/
+config.dox

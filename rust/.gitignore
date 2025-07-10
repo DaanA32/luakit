@@ -3,3 +3,5 @@ errors.json
 watch/
 *.mm_profdata
 profile/
+rustc.svg
+config.toml
