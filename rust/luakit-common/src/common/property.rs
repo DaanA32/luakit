@@ -1,7 +1,8 @@
 use glib_sys::*;
+use gobject_sys::*;
 use libc::size_t;
 use mlua_sys::*;
-use webkit2gtk::glib::gobject_ffi::{GObject, g_object_get, g_object_set};
+use webkit2gtk_sys::*;
 
 pub mod property_h {
     use glib_sys::gboolean;

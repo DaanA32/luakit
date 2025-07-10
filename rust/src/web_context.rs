@@ -4,13 +4,7 @@ use crate::{
     log::{_log, LOG_LEVEL_verbose},
 };
 use glib_sys::*;
-use webkit2gtk::{
-    ffi::*,
-    glib::gobject_ffi::{
-        G_CONNECT_DEFAULT, GCallback, GObject, GTypeInstance, g_signal_connect_data,
-        g_type_check_instance_cast,
-    },
-};
+use webkit2gtk_sys::*;
 
 unsafe extern "C" {
     pub fn download_start_cb(

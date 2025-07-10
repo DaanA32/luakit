@@ -1,25 +1,10 @@
-use gdk_sys::*;
-use glib_sys::*;
-use libc::*;
-use mlua_sys::*;
+use glib_sys::{g_assertion_message_expr, gpointer};
+use mlua_sys::{
+    lua_State, lua_createtable, lua_pushlightuserdata, lua_pushnil, lua_pushstring, lua_pushvalue,
+    lua_rawget, lua_rawset, lua_remove, lua_setmetatable, lua_settop, lua_type,
+};
 
-use crate::clib::luakit::*;
-use crate::clib::msg::*;
-use crate::clib::soup::*;
-use crate::clib::sqlite3::*;
-use crate::clib::stylesheet::*;
-use crate::clib::web_module::*;
-use crate::clib::widget::*;
-use crate::common::luaclass::*;
-use crate::common::luah::*;
-use crate::common::lualib::*;
-use crate::common::luaobject::*;
-use crate::common::luautil::*;
-use crate::common::util::*;
-use crate::common::*;
-use crate::globalconf::*;
-use crate::gtypes::*;
-use crate::log::*;
+use crate::gtypes::gchar;
 
 pub unsafe extern "C" fn luaH_uniq_setup(
     mut L: *mut lua_State,

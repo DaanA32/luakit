@@ -4,10 +4,8 @@ use libc::*;
 use mlua_sys::*;
 
 use crate::clib::luakit::*;
-use crate::common::clib::ipc::*;
 use crate::common::clib::luakit::*;
 use crate::common::common;
-use crate::common::ipc::*;
 use crate::common::luaclass::signal_h::*;
 use crate::common::luaclass::*;
 use crate::common::luah::*;
@@ -17,6 +15,8 @@ use crate::common::luauniq::*;
 use crate::common::tokenize::*;
 use crate::globalconf::*;
 use crate::ipc::*;
+use crate::ipc_common::clib::ipc::*;
+use crate::ipc_common::ipc::*;
 use crate::log::*;
 use crate::luah::*;
 use crate::web_context::*;
@@ -24,7 +24,8 @@ use crate::widgets::webview::*;
 use crate::widgets::*;
 
 use crate::gtypes::*;
-use webkit2gtk::{ffi::*, glib::gobject_ffi::*};
+use gobject_sys::*;
+use webkit2gtk_sys::*;
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn ipc_channel_send(mut L: *mut lua_State) -> gint {

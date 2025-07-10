@@ -4,22 +4,14 @@ use libc::*;
 use mlua_sys::*;
 use std::mem::MaybeUninit;
 
-use crate::clib::luakit::*;
-use crate::clib::msg::*;
-use crate::clib::soup::*;
-use crate::clib::sqlite3::*;
-use crate::clib::stylesheet::*;
-use crate::clib::web_module::*;
-use crate::clib::widget::*;
 use crate::common::luaclass::*;
 use crate::common::luah::*;
 use crate::common::lualib::*;
 use crate::common::luaobject::*;
 use crate::common::util::*;
 use crate::common::*;
-use crate::globalconf::*;
-use crate::gtypes::*;
-use crate::log::*;
+use crate::gtypes::{gchar, gint, guint};
+use crate::log::{_log, LOG_LEVEL_warn};
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn luaH_traceback(
@@ -48,7 +40,7 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
             b"%s:%d\0" as *const u8 as *const std::ffi::c_char,
             if !(g_strstr_len(
                 (*ar.as_ptr()).source,
-                3 as std::ffi::c_int as gssize,
+                3 as std::ffi::c_int as ssize_t,
                 b"@./\0" as *const u8 as *const std::ffi::c_char,
             ))
             .is_null()
@@ -106,7 +98,7 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
         } else {
             let mut src: *const std::ffi::c_char = if !(g_strstr_len(
                 (*ar.as_ptr()).source,
-                3 as std::ffi::c_int as gssize,
+                3 as std::ffi::c_int as ssize_t,
                 b"@./\0" as *const u8 as *const std::ffi::c_char,
             ))
             .is_null()
@@ -162,9 +154,9 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
                         __val,
                         if !__val.is_null() {
                             strlen(__val.offset(__val.is_null() as std::ffi::c_int as isize))
-                                as gssize
+                                as ssize_t
                         } else {
-                            -(1 as std::ffi::c_int) as gssize
+                            -(1 as std::ffi::c_int) as ssize_t
                         },
                     );
                 });
@@ -176,9 +168,9 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
                         __val,
                         if !__val.is_null() {
                             strlen(__val.offset(__val.is_null() as std::ffi::c_int as isize))
-                                as gssize
+                                as ssize_t
                         } else {
-                            -(1 as std::ffi::c_int) as gssize
+                            -(1 as std::ffi::c_int) as ssize_t
                         },
                     );
                 });
@@ -186,7 +178,7 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
                 g_string_append_len(
                     tb,
                     b"\x1B[37m in main chunk\x1B[0m\0" as *const u8 as *const std::ffi::c_char,
-                    -(1 as std::ffi::c_int) as gssize,
+                    -(1 as std::ffi::c_int) as ssize_t,
                 );
             };
         } else {
@@ -210,9 +202,9 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
                         __val,
                         if !__val.is_null() {
                             strlen(__val.offset(__val.is_null() as std::ffi::c_int as isize))
-                                as gssize
+                                as ssize_t
                         } else {
-                            -(1 as std::ffi::c_int) as gssize
+                            -(1 as std::ffi::c_int) as ssize_t
                         },
                     );
                 });
@@ -224,9 +216,9 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
                         __val,
                         if !__val.is_null() {
                             strlen(__val.offset(__val.is_null() as std::ffi::c_int as isize))
-                                as gssize
+                                as ssize_t
                         } else {
-                            -(1 as std::ffi::c_int) as gssize
+                            -(1 as std::ffi::c_int) as ssize_t
                         },
                     );
                 });
@@ -234,7 +226,7 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
                 g_string_append_len(
                     tb,
                     b"\n\0" as *const u8 as *const std::ffi::c_char,
-                    -(1 as std::ffi::c_int) as gssize,
+                    -(1 as std::ffi::c_int) as ssize_t,
                 );
             };
         }

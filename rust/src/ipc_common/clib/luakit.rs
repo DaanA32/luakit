@@ -10,12 +10,9 @@ use mlua_sys::{
 
 use crate::{
     common::{
+        common,
         lualib::luaH_dofunction,
-        luaobject::{
-            luaH_object_decref, luaH_object_incref, luaH_object_push, luaH_object_ref,
-            luaH_object_registry_push, luaH_object_unref,
-        },
-        *,
+        luaobject::{luaH_object_push, luaH_object_ref, luaH_object_unref},
     },
     gtypes::{gchar, gdouble, gint},
 };

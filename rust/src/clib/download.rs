@@ -18,7 +18,8 @@ use crate::luah::*;
 use crate::web_context::*;
 
 use crate::gtypes::*;
-use webkit2gtk::{ffi::*, glib::gobject_ffi::*};
+use gobject_sys::*;
+use webkit2gtk_sys::*;
 
 #[derive(Copy, Clone)]
 #[repr(C)]

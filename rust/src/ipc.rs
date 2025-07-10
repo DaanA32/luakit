@@ -70,7 +70,12 @@ pub mod ipc_h {
     }
     pub type ipc_endpoint_t = _ipc_endpoint_t;
     use crate::gtypes::{gchar, gint, gsize, guint, guint64};
-    use glib_sys::*;
+    use glib_sys::{
+        G_FILE_TEST_EXISTS, GCond, GFunc, GIOChannel, GMutex, GPtrArray, GQueue, GVariant,
+        g_build_filename, g_cond_signal, g_cond_wait, g_file_test, g_free, g_get_current_dir,
+        g_get_tmp_dir, g_mutex_lock, g_mutex_unlock, g_ptr_array_foreach, g_random_int_range,
+        g_strdup_printf, g_thread_new, g_unlink, g_variant_new, gboolean, gpointer,
+    };
     use libc::pid_t;
     unsafe extern "C" {
         pub fn ipc_endpoint_new(name: *const gchar) -> *mut ipc_endpoint_t;
@@ -84,12 +89,16 @@ pub mod ipc_h {
 }
 
 use crate::{
-    clib::{web_module::web_module_load_modules_on_endpoint, widget::widget_t},
+    clib::{ipc::ipc_channel_recv, web_module::web_module_load_modules_on_endpoint},
     common::common,
     globalconf::globalconf,
-    gtypes::*,
+    gtypes::{gchar, gint, gsize, guint, guint8, guint64},
     log::{_log, LOG_LEVEL_debug, LOG_LEVEL_fatal, LOG_LEVEL_verbose},
     web_context::web_context_get,
+    widgets::{
+        webview::{webview_connect_to_endpoint, webview_get_by_id, webview_set_web_process_id},
+        widget_t,
+    },
 };
 use glib_sys::{
     G_FILE_TEST_EXISTS, GCond, GFunc, GIOChannel, GMutex, GPtrArray, GQueue, GVariant,
@@ -103,12 +112,9 @@ use libc::{
     unlink,
 };
 use mlua_sys::{lua_getfield, lua_settop, lua_tolstring};
-use webkit2gtk::{
-    ffi::{
-        WebKitWebContext, webkit_web_context_set_web_extensions_directory,
-        webkit_web_context_set_web_extensions_initialization_user_data,
-    },
-    glib::gobject_ffi::{G_CONNECT_DEFAULT, GCallback, GObject, g_signal_connect_data},
+use webkit2gtk_sys::{
+    WebKitWebContext, webkit_web_context_set_web_extensions_directory,
+    webkit_web_context_set_web_extensions_initialization_user_data,
 };
 
 pub use self::ipc_h::{

@@ -1,15 +1,10 @@
-use gdk_sys::*;
-use glib_sys::*;
-use libc::*;
-use mlua_sys::*;
+use glib_sys::gboolean;
+use libc::{c_void, size_t, strlen};
+use mlua_sys::{
+    lua_State, lua_call, lua_getfield, lua_gettop, lua_insert, lua_pushcclosure, lua_resume,
+    lua_settop, lua_tolstring, lua_type, luaL_loadbuffer, luaL_typerror,
+};
 
-use crate::clib::luakit::*;
-use crate::clib::msg::*;
-use crate::clib::soup::*;
-use crate::clib::sqlite3::*;
-use crate::clib::stylesheet::*;
-use crate::clib::web_module::*;
-use crate::clib::widget::*;
 use crate::common::luaclass::*;
 use crate::common::luah::*;
 use crate::common::lualib::*;
@@ -17,9 +12,8 @@ use crate::common::luaobject::*;
 use crate::common::luautil::*;
 use crate::common::util::*;
 use crate::common::*;
-use crate::globalconf::*;
-use crate::gtypes::*;
-use crate::log::*;
+use crate::gtypes::gint;
+use crate::log::{_log, LOG_LEVEL_error};
 
 static mut wrap_function_ref: *mut std::ffi::c_void =
     0 as *const std::ffi::c_void as *mut std::ffi::c_void;

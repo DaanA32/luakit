@@ -1,5 +1,7 @@
 use gdk_sys::*;
+use gio_sys::*;
 use glib_sys::*;
+use gobject_sys::*;
 use libc::*;
 use mlua_sys::*;
 
@@ -18,7 +20,7 @@ use crate::luah::*;
 use crate::web_context::*;
 
 use crate::gtypes::*;
-use webkit2gtk::{ffi::*, glib::gobject_ffi::*};
+use webkit2gtk_sys::*;
 
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -156,12 +158,12 @@ unsafe extern "C-unwind" fn luaH_request_finish(mut L: *mut lua_State) -> gint {
                 b"text/html\0" as *const u8 as *const std::ffi::c_char
             };
             stream = g_memory_input_stream_new_from_data(
-                g_memdup2(data as *const c_void, length) as *const std::ffi::c_void,
-                length as gssize,
+                g_memdup2(data as *const c_void, length) as *mut u8,
+                length as ssize_t,
                 Some(g_free),
             );
             webkit_uri_scheme_request_finish((*request).request, stream, length as gint64, mime);
-            g_object_unref(stream as gpointer);
+            g_object_unref(stream as *mut GObject);
             return 0 as std::ffi::c_int;
         }
     }

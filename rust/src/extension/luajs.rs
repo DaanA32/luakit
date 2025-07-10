@@ -1,9 +1,10 @@
 use gdk_sys::*;
 use glib_sys::*;
+use gobject_sys::*;
 use javascriptcore_rs_sys::*;
 use libc::*;
 use mlua_sys::*;
-use webkit2gtk::glib::gobject_ffi::*;
+use webkit2gtk_sys::*;
 
 use crate::clib::luakit::*;
 use crate::clib::msg::*;

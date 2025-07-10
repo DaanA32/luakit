@@ -1,4 +1,35 @@
+use glib_sys::{
+    G_REGEX_DEFAULT, G_REGEX_MATCH_DEFAULT, G_URI_FLAGS_ENCODED_FRAGMENT, G_URI_FLAGS_ENCODED_PATH,
+    G_URI_FLAGS_ENCODED_QUERY, G_URI_FLAGS_HAS_PASSWORD, G_URI_FLAGS_SCHEME_NORMALIZE, GError,
+    GMatchInfo, GRegex, GUri, GUriFlags, g_assertion_message_expr, g_free, g_regex_match,
+    g_regex_new, g_strcmp0, g_strdup, g_strdup_printf, g_uri_get_fragment, g_uri_get_host,
+    g_uri_get_password, g_uri_get_path, g_uri_get_port, g_uri_get_query, g_uri_get_scheme,
+    g_uri_get_user, g_uri_join_with_user, g_uri_parse, g_uri_unref, gpointer,
+};
+use libc::{FILE, chmod, fclose, fopen, mode_t, strcmp};
+use mlua_sys::{
+    LUA_MULTRET, LUA_TNIL, LUA_TTABLE, lua_State, lua_createtable, lua_gettop, lua_pushlstring,
+    lua_pushnumber, lua_pushstring, lua_rawget, lua_rawset, lua_settop, lua_tolstring,
+    lua_tonumber, lua_type, luaL_Reg, luaL_argerror, luaL_checklstring, luaL_error,
+};
+use webkit2gtk_sys::{
+    WEBKIT_COOKIE_PERSISTENT_STORAGE_SQLITE, WEBKIT_COOKIE_POLICY_ACCEPT_ALWAYS,
+    WEBKIT_COOKIE_POLICY_ACCEPT_NEVER, WEBKIT_COOKIE_POLICY_ACCEPT_NO_THIRD_PARTY,
+    WEBKIT_NETWORK_PROXY_MODE_CUSTOM, WEBKIT_NETWORK_PROXY_MODE_DEFAULT,
+    WEBKIT_NETWORK_PROXY_MODE_NO_PROXY, webkit_cookie_manager_set_accept_policy,
+    webkit_cookie_manager_set_persistent_storage, webkit_network_proxy_settings_free,
+    webkit_network_proxy_settings_new, webkit_web_context_get_cookie_manager,
+    webkit_web_context_get_website_data_manager, webkit_web_context_set_network_proxy_settings,
+};
+
+pub const SOUP_HTTP_URI_FLAGS: std::ffi::c_int = G_URI_FLAGS_HAS_PASSWORD as std::ffi::c_int
+    | G_URI_FLAGS_ENCODED_PATH as std::ffi::c_int
+    | G_URI_FLAGS_ENCODED_QUERY as std::ffi::c_int
+    | G_URI_FLAGS_ENCODED_FRAGMENT as std::ffi::c_int
+    | G_URI_FLAGS_SCHEME_NORMALIZE as std::ffi::c_int;
+
 pub mod soup_h {
+    use mlua_sys::{LUA_MULTRET, lua_gettop, luaL_Reg, luaL_error};
     pub static mut scheme_reg: *mut GRegex = 0 as *const GRegex as *mut GRegex;
     pub unsafe extern "C-unwind" fn luaH_soup_uri_tostring(mut L: *mut lua_State) -> gint {
         let mut p = 0 as *const gchar;
@@ -311,7 +342,10 @@ pub mod soup_h {
         luaL_argerror, luaL_checklstring,
     };
 
-    use crate::gtypes::{gchar, gint};
+    use crate::{
+        clib::soup::SOUP_HTTP_URI_FLAGS,
+        gtypes::{gchar, gint},
+    };
 }
 use crate::{
     clib::soup::soup_h::{luaH_soup_parse_uri, luaH_soup_uri_tostring, soup_lib_setup_common},

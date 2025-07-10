@@ -1,28 +1,32 @@
 use core::intrinsics::AtomicOrdering;
-use gdk_sys::*;
-use glib_sys::*;
-use libc::*;
-use mlua_sys::*;
+use glib_sys::{
+    G_IO_HUP, G_IO_IN, GAsyncQueue, GByteArray, GError, GIOChannel, GIOCondition, GIOFunc,
+    GPtrArray, GQueue, GThread, g_assertion_message_expr, g_async_queue_new, g_async_queue_pop,
+    g_async_queue_push, g_byte_array_new, g_byte_array_unref, g_error_free, g_free, g_io_add_watch,
+    g_io_channel_read_chars, g_io_channel_set_buffered, g_io_channel_set_encoding,
+    g_io_channel_shutdown, g_io_channel_unix_new, g_io_channel_write_chars, g_malloc,
+    g_ptr_array_add, g_ptr_array_new, g_ptr_array_remove_fast, g_ptr_array_sized_new, g_queue_free,
+    g_queue_is_empty, g_queue_new, g_queue_pop_head, g_queue_push_tail, g_slice_alloc0,
+    g_slice_free1, g_source_remove, g_thread_new, gboolean, gpointer,
+};
+use libc::{c_void, memcpy, size_t, ssize_t, strcmp};
 
-use crate::clib::luakit::*;
-use crate::clib::msg::*;
-use crate::clib::soup::*;
-use crate::clib::sqlite3::*;
-use crate::clib::stylesheet::*;
-use crate::clib::web_module::*;
-use crate::clib::widget::*;
+use crate::common::lua_State;
 use crate::common::luaclass::luaH_typename;
-use crate::common::luah::*;
-use crate::common::luaobject::*;
-use crate::common::luaserialize::*;
-use crate::common::luautil::*;
-use crate::common::util::*;
-use crate::common::*;
-use crate::globalconf::*;
-use crate::gtypes::*;
-use crate::ipc::ipc_h::*;
-use crate::ipc::*;
-use crate::log::*;
+use crate::common::luaserialize::lua_serialize_range;
+use crate::gtypes::{gchar, gint, gsize, guint, guint8};
+use crate::ipc::ipc_h::{
+    _ipc_header_t, IPC_ENDPOINT_CONNECTED, IPC_ENDPOINT_DISCONNECTED, IPC_ENDPOINT_FREED,
+    IPC_TYPE_log, ipc_endpoint_t, ipc_header_t, ipc_lua_ipc_t, ipc_page_created_t,
+    ipc_recv_state_t, ipc_scroll_t, ipc_type_t,
+};
+use crate::ipc::{
+    ipc_recv_crash, ipc_recv_eval_js, ipc_recv_extension_init, ipc_recv_lua_ipc,
+    ipc_recv_lua_require_module, ipc_recv_page_created, ipc_recv_scroll,
+};
+use crate::log::{
+    _log, LOG_LEVEL_debug, LOG_LEVEL_error, LOG_LEVEL_fatal, LOG_LEVEL_verbose, ipc_recv_log,
+};
 
 static mut send_thread: *mut GThread = 0 as *const GThread as *mut GThread;
 static mut send_queue: *mut GAsyncQueue = 0 as *const GAsyncQueue as *mut GAsyncQueue;

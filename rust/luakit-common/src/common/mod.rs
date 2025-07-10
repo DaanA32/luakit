@@ -1,5 +1,4 @@
 pub mod clib;
-pub mod ipc;
 pub mod luaclass;
 pub mod luah;
 pub mod luajs;

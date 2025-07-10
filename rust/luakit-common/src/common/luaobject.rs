@@ -3,21 +3,9 @@ use glib_sys::*;
 use libc::getenv;
 use mlua_sys::*;
 
-use crate::clib::luakit::*;
-use crate::clib::msg::*;
-use crate::clib::soup::*;
-use crate::clib::sqlite3::*;
-use crate::clib::stylesheet::*;
-use crate::clib::web_module::*;
-use crate::clib::widget::*;
 use crate::common::luaclass::luaH_typename;
-use crate::common::luah::*;
-use crate::common::luautil::*;
-use crate::common::util::*;
-use crate::common::*;
-use crate::globalconf::*;
-use crate::gtypes::*;
-use crate::log::*;
+use crate::common::{common, lua_State};
+use crate::log::{_log, LOG_LEVEL_debug, LOG_LEVEL_warn};
 
 use crate::{
     common::{

@@ -1,4 +1,4 @@
-pub mod ipc;
+// pub mod ipc;
 pub mod luakit;
 pub mod regex;
 pub mod timer;

@@ -1,24 +1,14 @@
-use gdk_sys::*;
-use glib_sys::*;
+use glib_sys::gboolean;
 use libc::getenv;
-use mlua_sys::*;
+use mlua_sys::{
+    lua_Integer, lua_State, lua_gettop, lua_insert, lua_next, lua_objlen, lua_pcall,
+    lua_pushcclosure, lua_pushnil, lua_pushvalue, lua_remove, lua_settop, lua_toboolean,
+    lua_tointeger, lua_tolstring, lua_tonumber, lua_topointer, lua_type, lua_typename,
+};
 
-use crate::clib::luakit::*;
-use crate::clib::msg::*;
-use crate::clib::soup::*;
-use crate::clib::sqlite3::*;
-use crate::clib::stylesheet::*;
-use crate::clib::web_module::*;
-use crate::clib::widget::*;
 use crate::common::luaclass::luaH_typename;
-use crate::common::luah::*;
-use crate::common::luaobject::*;
-use crate::common::luautil::*;
-use crate::common::util::*;
-use crate::common::*;
-use crate::globalconf::*;
-use crate::gtypes::*;
-use crate::log::*;
+use crate::common::luautil::luaH_dofunction_on_error;
+use crate::gtypes::guint;
 
 pub mod lualib_h {
     #[inline]
@@ -128,7 +118,7 @@ pub unsafe extern "C" fn luaH_dump_stack(mut L: *mut lua_State) {
             }
             _ => {
                 eprintln!(
-                    "{}: {}\t#{:?}\t{:?}",
+                    "{:?}: {:?}\t#{:?}\t{:?}",
                     i,
                     lua_typename(L, t),
                     lua_objlen(L, i),
@@ -159,8 +149,8 @@ pub unsafe extern "C" fn luaH_dofunction(
             lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null_mut()),
         );
         lua_settop(L, -(2 as std::ffi::c_int) - 1 as std::ffi::c_int);
-        return FALSE;
+        return GFALSE;
     }
     lua_remove(L, error_func_pos);
-    return TRUE;
+    return GTRUE;
 }

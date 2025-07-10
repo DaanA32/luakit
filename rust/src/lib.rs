@@ -20,9 +20,11 @@
 
 use gtk_sys::{gtk_disable_setlocale, gtk_get_option_group, gtk_init};
 
+pub use luakit_common::common;
+
 pub mod clib;
-pub mod common;
-pub mod extension;
+pub mod ipc_common;
+// pub mod extension;
 pub mod globalconf;
 pub mod gtypes;
 pub mod ipc;
@@ -46,9 +48,7 @@ use libc::{
     __errno_location, c_void, exit, fork, memset, pid_t, setlocale, setsid, strchr, strcmp, strlen,
 };
 use mlua_sys::lua_State;
-use webkit2gtk::ffi::{
-    webkit_get_major_version, webkit_get_micro_version, webkit_get_minor_version,
-};
+use webkit2gtk_sys::*;
 
 use crate::{
     common::clib::luakit::l_time,

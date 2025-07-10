@@ -122,9 +122,8 @@ pub struct lua_class_t {
 }
 use crate::{
     common::{
-        clib::luakit::{luaH_object_ref, luaH_object_unref},
         luaclass::signal_h::{signal_add, signal_new, signal_remove},
-        luaobject::signal_object_emit,
+        luaobject::{luaH_object_ref, luaH_object_unref, signal_object_emit},
         tokenize::{L_TK_UNKNOWN, l_tokenize, luakit_token_t, token_tostring},
         util::luaH_callerinfo,
     },

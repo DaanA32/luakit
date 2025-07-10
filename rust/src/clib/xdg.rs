@@ -19,7 +19,7 @@ use crate::luah::*;
 use crate::web_context::*;
 
 use crate::gtypes::*;
-use webkit2gtk::{ffi::*, glib::gobject_ffi::*};
+use webkit2gtk_sys::*;
 
 unsafe extern "C-unwind" fn str_chomp_slashes(mut path: *mut gchar) {
     if path.is_null() {

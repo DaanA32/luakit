@@ -32,10 +32,12 @@ use crate::web_context::*;
 
 use crate::gtypes::*;
 use gdk_sys::*;
+use gio_sys::*;
 use glib_sys::*;
+use gobject_sys::*;
 use libc::getenv;
 use mlua_sys::*;
-use webkit2gtk::{ffi::*, glib::gobject_ffi::*};
+use webkit2gtk_sys::*;
 
 use crate::clib::msg::*;
 use crate::clib::soup::*;
@@ -59,15 +61,6 @@ use glib_sys::*;
 use gtk_sys::*;
 use libc::*;
 use mlua_sys::*;
-use webkit2gtk::{
-    ffi::*,
-    gio::ffi::{GTlsCertificate, g_tls_certificate_new_from_pem},
-    glib::gobject_ffi::{
-        GObject, GTypeInstance, g_object_unref, g_type_check_instance_cast,
-        g_type_check_instance_is_a,
-    },
-    *,
-};
 
 use crate::{
     common::{
@@ -544,7 +537,7 @@ unsafe extern "C-unwind" fn luaH_parse_website_data_types_table(
     if !(lua_type(L, idx) == 5 as std::ffi::c_int) {
         luaL_argerror(L, idx, b"table\0" as *const u8 as *const std::ffi::c_char);
     }
-    let mut len: size_t = lua_len(L, idx);
+    let mut len: size_t = lua_objlen(L, idx);
     let mut i: size_t = 1 as std::ffi::c_int as size_t;
     while i <= len {
         lua_rawgeti(L, idx, i as i64);

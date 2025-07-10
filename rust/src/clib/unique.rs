@@ -1,26 +1,35 @@
-use gdk_sys::*;
-use glib_sys::*;
-use libc::*;
-use mlua_sys::*;
-use webkit2gtk::glib::ToVariant;
-use webkit2gtk::glib::Variant;
+use gio_sys::{
+    G_APPLICATION_DEFAULT_FLAGS, GActionEntry, GActionGroup, GActionMap, GApplication,
+    GSimpleAction, g_action_group_activate_action, g_action_group_get_type,
+    g_action_map_add_action_entries, g_action_map_get_type, g_application_get_application_id,
+    g_application_get_is_registered, g_application_get_is_remote, g_application_get_type,
+    g_application_id_is_valid, g_application_register,
+};
+use glib_sys::{
+    G_VARIANT_TYPE_STRING, GTRUE, GType, GVariant, GVariantType, g_error_free,
+    g_variant_get_string, g_variant_is_of_type, g_variant_new_string, gboolean, gpointer,
+};
+use gobject_sys::{GObject, GTypeInstance, g_object_unref, g_type_check_instance_cast};
+use gtk_sys::{gtk_application_get_active_window, gtk_application_new, gtk_window_get_screen};
+use libc::{c_void, intptr_t, strcmp};
+use mlua_sys::{
+    LUA_GLOBALSINDEX, LUA_MULTRET, lua_CFunction, lua_State, lua_createtable, lua_getfield,
+    lua_gettable, lua_gettop, lua_pushboolean, lua_pushcclosure, lua_pushlightuserdata,
+    lua_pushlstring, lua_pushstring, lua_pushvalue, lua_rawset, lua_setfield, lua_setmetatable,
+    lua_settop, luaL_Reg, luaL_checklstring, luaL_error, luaL_newmetatable, luaL_register,
+};
 
-use crate::clib::luakit::*;
-use crate::common::clib::luakit::*;
 use crate::common::common;
-use crate::common::luaclass::signal_h::*;
-use crate::common::luaclass::*;
-use crate::common::luah::*;
-use crate::common::luaobject::*;
-use crate::common::luauniq::*;
-use crate::common::tokenize::*;
-use crate::globalconf::*;
-use crate::log::*;
-use crate::luah::*;
-use crate::web_context::*;
+use crate::common::luaclass::signal_h::{signal_new, signal_t};
+use crate::common::luaclass::{
+    lua_class_property_array_t, lua_class_t, luaH_class_add_signal, luaH_class_emit_signal,
+    luaH_class_remove_signal,
+};
+use crate::common::luaobject::signal_object_emit;
+use crate::globalconf::globalconf;
+use crate::log::{_log, LOG_LEVEL_verbose, LOG_LEVEL_warn};
 
-use crate::gtypes::*;
-use webkit2gtk::{ffi::*, glib::gobject_ffi::*};
+use crate::gtypes::{gchar, gint};
 
 static mut unique_class: lua_class_t = lua_class_t {
     name: 0 as *const gchar,
@@ -35,7 +44,7 @@ unsafe extern "C-unwind" fn luaH_unique_class_emit_signal(mut L: *mut lua_State)
     return luaH_class_emit_signal(
         L,
         &mut unique_class,
-        luaL_checklstring(L, 1 as std::ffi::c_int, NULL as *mut size_t),
+        luaL_checklstring(L, 1 as std::ffi::c_int, std::ptr::null_mut()),
         lua_gettop(L) - 1 as std::ffi::c_int,
         LUA_MULTRET,
     );
@@ -45,7 +54,7 @@ unsafe extern "C-unwind" fn luaH_unique_class_remove_signal(mut L: *mut lua_Stat
     luaH_class_remove_signal(
         L,
         &mut unique_class,
-        luaL_checklstring(L, 1 as std::ffi::c_int, NULL as *mut size_t),
+        luaL_checklstring(L, 1 as std::ffi::c_int, std::ptr::null_mut()),
         2 as std::ffi::c_int,
     );
     return 0 as std::ffi::c_int;
@@ -55,21 +64,23 @@ unsafe extern "C-unwind" fn luaH_unique_class_add_signal(mut L: *mut lua_State) 
     luaH_class_add_signal(
         L,
         &mut unique_class,
-        luaL_checklstring(L, 1 as std::ffi::c_int, NULL as *mut size_t),
+        luaL_checklstring(L, 1 as std::ffi::c_int, std::ptr::null_mut()),
         2 as std::ffi::c_int,
     );
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C-unwind" fn message_cb(
+unsafe extern "C" fn message_cb(
     mut UNUSED_a: *mut GSimpleAction,
     mut message_data: *mut GVariant,
     mut L: *mut lua_State,
 ) {
-    let variant = Variant::from_glib_ptr_borrow(
-        *&(message_data as *const GVariant) as *const *const GVariant,
-    );
-    if !message_data.is_null() && variant.is_type(VariantType::String) {
-        let mut text = g_variant_get_string(message_data, NULL as *mut gsize);
+    if !message_data.is_null()
+        && g_variant_is_of_type(
+            message_data,
+            G_VARIANT_TYPE_STRING.as_ptr() as *const GVariantType,
+        ) == GTRUE
+    {
+        let mut text = g_variant_get_string(message_data, std::ptr::null_mut());
         lua_pushstring(L, text);
         let mut window = gtk_application_get_active_window(globalconf.application);
         if window.is_null() {
@@ -105,7 +116,7 @@ unsafe extern "C-unwind" fn unique_is_registered() -> gboolean {
     return TRUE;
 }
 unsafe extern "C-unwind" fn luaH_unique_new(mut L: *mut lua_State) -> gint {
-    let mut name = luaL_checklstring(L, 1 as std::ffi::c_int, NULL as *mut size_t);
+    let mut name = luaL_checklstring(L, 1 as std::ffi::c_int, std::ptr::null_mut());
     if g_application_id_is_valid(name) == 0 {
         return luaL_error(
             L,
@@ -138,7 +149,7 @@ unsafe extern "C-unwind" fn luaH_unique_new(mut L: *mut lua_State) -> gint {
         }
         return 0 as std::ffi::c_int;
     }
-    let mut error = NULL as *mut GError;
+    let mut error = std::ptr::null_mut();
     if (globalconf.application).is_null() {
         globalconf.application = gtk_application_new(name, G_APPLICATION_DEFAULT_FLAGS);
     }
@@ -147,7 +158,7 @@ unsafe extern "C-unwind" fn luaH_unique_new(mut L: *mut lua_State) -> gint {
             globalconf.application as *mut GTypeInstance,
             g_application_get_type(),
         ) as *mut std::ffi::c_void as *mut GApplication,
-        NULL as *mut GCancellable,
+        std::ptr::null_mut(),
         &mut error,
     );
     if !error.is_null() {
@@ -161,26 +172,20 @@ unsafe extern "C-unwind" fn luaH_unique_new(mut L: *mut lua_State) -> gint {
             globalconf.application as *mut GTypeInstance,
             ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
         ) as *mut std::ffi::c_void as *mut GObject);
-        globalconf.application = NULL as *mut GtkApplication;
+        globalconf.application = std::ptr::null_mut();
         return 0 as std::ffi::c_int;
     }
     let entries: [GActionEntry; 1] = [{
-        let mut init = _GActionEntry {
+        let mut init = GActionEntry {
             name: b"message\0" as *const u8 as *const std::ffi::c_char,
             activate: ::core::mem::transmute::<
                 Option<
-                    unsafe extern "C-unwind" fn(
-                        *mut GSimpleAction,
-                        *mut GVariant,
-                        *mut lua_State,
-                    ) -> (),
+                    unsafe extern "C" fn(*mut GSimpleAction, *mut GVariant, *mut lua_State) -> (),
                 >,
-                Option<
-                    unsafe extern "C-unwind" fn(*mut GSimpleAction, *mut GVariant, gpointer) -> (),
-                >,
+                Option<unsafe extern "C" fn(*mut GSimpleAction, *mut GVariant, gpointer) -> ()>,
             >(Some(
                 message_cb
-                    as unsafe extern "C-unwind" fn(
+                    as unsafe extern "C" fn(
                         *mut GSimpleAction,
                         *mut GVariant,
                         *mut lua_State,
@@ -242,7 +247,7 @@ unsafe extern "C-unwind" fn luaH_unique_send_message(mut L: *mut lua_State) -> g
     let mut text = g_variant_new_string(luaL_checklstring(
         L,
         1 as std::ffi::c_int,
-        NULL as *mut size_t,
+        std::ptr::null_mut(),
     ));
     g_action_group_activate_action(
         g_type_check_instance_cast(
@@ -266,9 +271,9 @@ unsafe extern "C-unwind" fn luaH_open_luakit_unique(
         -(2 as std::ffi::c_int),
         b"__index\0" as *const u8 as *const std::ffi::c_char,
     );
-    luaL_register(L, NULL as *const std::ffi::c_char, meta);
+    luaL_register(L, std::ptr::null(), meta);
     lua_createtable(L, 0 as std::ffi::c_int, 0 as std::ffi::c_int);
-    luaL_register(L, NULL as *const std::ffi::c_char, methods);
+    luaL_register(L, std::ptr::null(), methods);
     lua_getfield(
         L,
         LUA_GLOBALSINDEX,
@@ -305,6 +310,8 @@ unsafe extern "C-unwind" fn luaH_open_luakit_unique(
     lua_setmetatable(L, -(2 as std::ffi::c_int));
     lua_settop(L, -(2 as std::ffi::c_int) - 1 as std::ffi::c_int);
 }
+const FALSE: gboolean = 0;
+const TRUE: gboolean = 1;
 static mut warned: gboolean = FALSE;
 unsafe extern "C-unwind" fn luaH_unique_proxy_index(mut L: *mut lua_State) -> std::ffi::c_int {
     if warned == 0 {
@@ -383,7 +390,7 @@ unsafe extern "C-unwind" fn luaH_open_unique_proxy(mut L: *mut lua_State) {
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn unique_lib_setup(mut L: *mut lua_State) {
-    static mut unique_lib: [luaL_Reg; 7] = unsafe {
+    static mut unique_lib: [luaL_Reg; 6] = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -427,15 +434,13 @@ pub unsafe extern "C-unwind" fn unique_lib_setup(mut L: *mut lua_State) {
                 };
                 init
             },
-            {
-                let mut init = luaL_Reg {
-                    name: NULL as *const std::ffi::c_char,
-                    func: ::core::mem::transmute::<libc::intptr_t, lua_CFunction>(
-                        NULL as libc::intptr_t,
-                    ),
-                };
-                init
-            },
+            // {
+            //     let mut init = luaL_Reg {
+            //         name: std::ptr::null(),
+            //         func: ::core::mem::transmute::<libc::intptr_t, lua_CFunction>(0),
+            //     };
+            //     init
+            // },
         ]
     };
     unique_class.signals = signal_new();

@@ -5,10 +5,12 @@ use mlua_sys::*;
 use std::mem::MaybeUninit;
 
 use crate::{
-    common::{luaclass::luaH_typename, luautil::luaH_traceback, util::strip_ansi_escapes},
+    common::{
+        luaclass::luaH_typename, lualib::luaH_dofunction, luautil::luaH_traceback,
+        util::strip_ansi_escapes,
+    },
     gtypes::*,
-    log::_log,
-    log::LOG_LEVEL_warn,
+    log::{_log, LOG_LEVEL_warn},
 };
 
 unsafe extern "C-unwind" fn luaH_utf8_strlen(mut L: *mut lua_State) -> gint {
@@ -319,7 +321,7 @@ pub unsafe extern "C" fn luaH_dofunction_from_registry(
     mut nargs: gint,
     mut nret: gint,
 ) -> gboolean {
-    lua_rawgeti(L, LUA_REGISTRYINDEX, ref_0);
+    lua_rawgeti(L, LUA_REGISTRYINDEX, ref_0 as i64);
     return luaH_dofunction(L, nargs, nret);
 }
 

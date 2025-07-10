@@ -1,27 +1,21 @@
 use std::mem::MaybeUninit;
 
-use gdk_sys::*;
-use glib_sys::*;
-use libc::*;
-use mlua_sys::*;
+use glib_sys::{
+    GByteArray, g_assertion_message_cmpint, g_byte_array_append, g_byte_array_new,
+    g_byte_array_set_size, gpointer,
+};
+use libc::{c_int, c_void, memcpy, size_t};
+use mlua_sys::{
+    lua_Debug, lua_Number, lua_Reader, lua_State, lua_createtable, lua_dump, lua_getinfo,
+    lua_gettop, lua_getupvalue, lua_load, lua_next, lua_pushboolean, lua_pushlightuserdata,
+    lua_pushlstring, lua_pushnil, lua_pushnumber, lua_pushvalue, lua_rawset, lua_settop,
+    lua_setupvalue, lua_toboolean, lua_tolstring, lua_tonumber, lua_touserdata, lua_type,
+    lua_typename, luaL_error,
+};
 
-use crate::clib::luakit::*;
-use crate::clib::msg::*;
-use crate::clib::soup::*;
-use crate::clib::sqlite3::*;
-use crate::clib::stylesheet::*;
-use crate::clib::web_module::*;
-use crate::clib::widget::*;
-use crate::common::luaclass::*;
-use crate::common::luah::*;
-use crate::common::lualib::*;
-use crate::common::luaobject::*;
-use crate::common::luautil::*;
-use crate::common::util::*;
-use crate::common::*;
-use crate::globalconf::*;
-use crate::gtypes::*;
-use crate::log::*;
+use crate::common::lualib::lualib_h::luaH_absindex;
+use crate::gtypes::{gchar, gint64, guint, guint8, guint64};
+use crate::log::{_log, LOG_LEVEL_warn};
 
 static mut bytecode_buf: *mut GByteArray = 0 as *const GByteArray as *mut GByteArray;
 static mut bytecode_len: size_t = 0;
@@ -80,7 +74,7 @@ unsafe extern "C" fn lua_serialize_value(
             );
         }
         1 => {
-            let mut b: c_int = lua_toboolean(L, index) as gint8;
+            let mut b: c_int = lua_toboolean(L, index) as c_int;
             g_byte_array_append(
                 out,
                 &mut b as *mut c_int as *mut guint8,
@@ -113,7 +107,7 @@ unsafe extern "C" fn lua_serialize_value(
                 lua_serialize_value(L, out, -(1 as std::ffi::c_int));
                 lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
             }
-            let mut end: c_int = -(1 as std::ffi::c_int) as gint8;
+            let mut end: c_int = -(1 as std::ffi::c_int) as c_int;
             g_byte_array_append(
                 out,
                 &mut end as *mut c_int as *mut guint8,
@@ -295,7 +289,6 @@ unsafe extern "C" fn lua_deserialize_value(
                 )),
                 bytes as *mut std::ffi::c_void,
                 std::ptr::null_mut(),
-                std::ptr::null_mut(), // TODO: verify
             );
             if status != 0 as std::ffi::c_int {
                 return luaL_error(

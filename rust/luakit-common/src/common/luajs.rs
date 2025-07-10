@@ -1,27 +1,23 @@
-use gdk_sys::*;
-use glib_sys::*;
-use javascriptcore_rs_sys::*;
-use libc::*;
-use mlua_sys::*;
-use webkit2gtk::glib::gobject_ffi::*;
+use glib_sys::{GType, g_strfreev};
+use gobject_sys::{GObject, g_object_unref};
+use javascriptcore_rs_sys::{
+    JSCClass, JSCContext, JSCException, JSCValue, jsc_context_evaluate_with_source_uri,
+    jsc_context_get_exception, jsc_exception_to_string, jsc_value_is_boolean, jsc_value_is_null,
+    jsc_value_is_number, jsc_value_is_object, jsc_value_is_string, jsc_value_is_undefined,
+    jsc_value_new_array, jsc_value_new_boolean, jsc_value_new_null, jsc_value_new_number,
+    jsc_value_new_object, jsc_value_new_string, jsc_value_new_undefined,
+    jsc_value_object_enumerate_properties, jsc_value_object_get_property,
+    jsc_value_object_set_property, jsc_value_object_set_property_at_index, jsc_value_to_boolean,
+    jsc_value_to_double, jsc_value_to_string,
+};
+use libc::{c_void, free, size_t, strtol};
+use mlua_sys::{
+    lua_State, lua_createtable, lua_gettop, lua_next, lua_objlen, lua_pushboolean, lua_pushinteger,
+    lua_pushnil, lua_pushnumber, lua_pushstring, lua_rawset, lua_settop, lua_toboolean,
+    lua_tolstring, lua_tonumber, lua_type,
+};
 
-use crate::clib::luakit::*;
-use crate::clib::msg::*;
-use crate::clib::soup::*;
-use crate::clib::sqlite3::*;
-use crate::clib::stylesheet::*;
-use crate::clib::web_module::*;
-use crate::clib::widget::*;
-use crate::common::luaclass::*;
-use crate::common::luah::*;
-use crate::common::lualib::*;
-use crate::common::luaobject::*;
-use crate::common::luautil::*;
-use crate::common::util::*;
-use crate::common::*;
-use crate::globalconf::*;
-use crate::gtypes::*;
-use crate::log::*;
+use crate::gtypes::guint;
 
 pub unsafe extern "C" fn luajs_tovalue(
     mut L: *mut lua_State,

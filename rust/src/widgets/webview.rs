@@ -4,6 +4,8 @@ use glib_sys::*;
 use libc::*;
 use mlua_sys::*;
 
+use gobject_sys::*;
+
 use crate::clib::luakit::*;
 use crate::clib::msg::*;
 use crate::clib::soup::*;

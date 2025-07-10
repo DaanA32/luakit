@@ -1,30 +1,52 @@
-use gdk_sys::*;
-use glib_sys::*;
+use gdk_sys::{
+    GDK_CONTROL_MASK, GDK_LOCK_MASK, GDK_MOD1_MASK, GDK_MOD2_MASK, GDK_MOD3_MASK, GDK_MOD4_MASK,
+    GDK_MOD5_MASK, GDK_MODIFIER_MASK, GDK_SHIFT_MASK, gdk_keyval_name, gdk_keyval_to_unicode,
+};
+use glib_sys::{
+    GPtrArray, g_build_filename, g_free, g_get_system_config_dirs, g_ptr_array_add,
+    g_ptr_array_free, g_ptr_array_insert, g_ptr_array_new_with_free_func, g_strdup,
+    g_strdup_printf, g_strfreev, g_strjoinv, g_strsplit, g_unichar_isgraph, g_unichar_to_utf8,
+    gboolean, gpointer,
+};
 use libc::atoi;
 use libc::execvp;
 use libc::getenv;
 use libc::setenv;
 use libc::unsetenv;
-use mlua_sys::*;
+use mlua_sys::{
+    lua_Integer, lua_State, lua_atpanic, lua_createtable, lua_pushstring, lua_rawseti,
+    lua_setfield, lua_settop, lua_tolstring, luaL_loadfile, luaL_newstate, luaL_openlibs,
+};
 
-use crate::clib::luakit::*;
-use crate::clib::msg::*;
-use crate::clib::soup::*;
-use crate::clib::sqlite3::*;
-use crate::clib::stylesheet::*;
-use crate::clib::web_module::*;
-use crate::clib::widget::*;
-use crate::common::luah::*;
-use crate::common::lualib::*;
-use crate::common::luaobject::*;
-use crate::common::luautil::*;
-use crate::common::luayield::*;
-use crate::common::util::*;
-use crate::common::*;
-use crate::globalconf::*;
-use crate::gtypes::*;
-use crate::ipc::*;
-use crate::log::*;
+use crate::clib::download::download_class_setup;
+use crate::clib::luakit::luakit_lib_setup;
+use crate::clib::msg::msg_lib_setup;
+use crate::clib::request::request_class_setup;
+use crate::clib::soup::soup_lib_setup;
+use crate::clib::sqlite3::sqlite3_class_setup;
+use crate::clib::stylesheet::stylesheet_class_setup;
+use crate::clib::unique::unique_lib_setup;
+use crate::clib::web_module::web_module_lib_setup;
+use crate::clib::widget::widget_class_setup;
+use crate::clib::xdg::xdg_lib_setup;
+use crate::common::clib::regex::regex_class_setup;
+use crate::common::clib::timer::timer_class_setup;
+use crate::common::clib::utf8::utf8_lib_setup;
+use crate::common::common;
+use crate::common::luah::luaH_fixups;
+use crate::common::lualib::luaH_dofunction;
+use crate::common::luaobject::luaH_object_setup;
+use crate::common::luautil::luaH_add_paths;
+use crate::common::luayield::luaH_yield_setup;
+use crate::common::util::{file_exists, luaH_panic};
+use crate::globalconf::globalconf;
+use crate::gtypes::{gchar, gint, guint, guint32};
+use crate::ipc::ipc_remove_socket_file;
+use crate::ipc_common::clib::ipc::ipc_channel_class_setup;
+use crate::log::{
+    _log, LOG_LEVEL_error, LOG_LEVEL_info, LOG_LEVEL_verbose, LOG_LEVEL_warn,
+    log_dump_queued_emissions,
+};
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn luaH_modifier_table_push(mut L: *mut lua_State, mut state: guint) {

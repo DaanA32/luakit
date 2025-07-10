@@ -1,25 +1,10 @@
-use gdk_sys::*;
-use glib_sys::*;
-use libc::*;
-use mlua_sys::*;
+use glib_sys::{
+    g_assertion_message_expr, g_build_filename, g_free, g_strdup, g_strerror, g_strsplit, gpointer,
+};
+use libc::{__errno_location, access, c_void};
 
-use crate::clib::luakit::*;
-use crate::clib::msg::*;
-use crate::clib::soup::*;
-use crate::clib::sqlite3::*;
-use crate::clib::stylesheet::*;
-use crate::clib::web_module::*;
-use crate::clib::widget::*;
-use crate::common::luaclass::*;
-use crate::common::luah::*;
-use crate::common::lualib::*;
-use crate::common::luaobject::*;
-use crate::common::luautil::*;
-use crate::common::util::*;
-use crate::common::*;
-use crate::globalconf::*;
-use crate::gtypes::*;
-use crate::log::*;
+use crate::gtypes::gchar;
+use crate::log::{_log, LOG_LEVEL_debug, LOG_LEVEL_verbose};
 
 static mut resource_path: *mut gchar = 0 as *const gchar as *mut gchar;
 static mut resource_paths: *mut *mut gchar = 0 as *const *mut gchar as *mut *mut gchar;

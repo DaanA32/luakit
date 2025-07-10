@@ -1,6 +1,12 @@
-use glib_sys::*;
-use libc::*;
-use mlua_sys::*;
+use glib_sys::{g_free, g_strdup, gpointer};
+use libc::{c_void, intptr_t, memset};
+use mlua_sys::{
+    LUA_MULTRET, LUA_TBOOLEAN, LUA_TNUMBER, LUA_TSTRING, LUA_TTABLE, lua_Number, lua_State,
+    lua_createtable, lua_error, lua_gettop, lua_newuserdata, lua_next, lua_pushfstring,
+    lua_pushlstring, lua_pushnil, lua_pushnumber, lua_pushstring, lua_pushvalue, lua_rawset,
+    lua_rawseti, lua_setmetatable, lua_settop, lua_toboolean, lua_tointeger, lua_tolstring,
+    lua_tonumber, lua_type, lua_typename, luaL_Reg, luaL_argerror, luaL_checklstring,
+};
 
 pub mod sqlite3_h {
     pub type sqlite3_destructor_type =
@@ -73,7 +79,6 @@ pub mod sqlite3_h {
         pub fn sqlite3_reset(pStmt: *mut sqlite3_stmt) -> std::ffi::c_int;
     }
 }
-use crate::common::clib::luakit::{luaH_object_ref, luaH_object_unref};
 use crate::common::luaclass::signal_h::{signal_new, signal_t};
 use crate::common::luaclass::{
     lua_class_allocator_t, lua_class_property_array_t, lua_class_propfunc_t, lua_class_t,
@@ -86,6 +91,7 @@ use crate::common::luaobject::{
     luaH_object_remove_signal_simple, luaH_object_remove_signals_simple, luaH_object_tostring,
     luaH_settype,
 };
+use crate::common::luaobject::{luaH_object_ref, luaH_object_unref};
 use crate::common::tokenize::L_TK_FILENAME;
 use crate::gtypes::{gchar, gint};
 use crate::log::{_log, LOG_LEVEL_warn};

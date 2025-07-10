@@ -5,10 +5,7 @@ use mlua_sys::{
     LUA_MULTRET, lua_State, lua_createtable, lua_gettop, lua_newuserdata, lua_pushstring,
     lua_pushvalue, lua_setmetatable, luaL_Reg, luaL_checklstring,
 };
-use webkit2gtk::ffi::{
-    WEBKIT_USER_CONTENT_INJECT_ALL_FRAMES, WEBKIT_USER_STYLE_LEVEL_USER,
-    webkit_user_style_sheet_new, webkit_user_style_sheet_unref,
-};
+use webkit2gtk_sys::*;
 pub mod stylesheet_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
@@ -17,9 +14,9 @@ pub mod stylesheet_h {
         pub stylesheet: *mut WebKitUserStyleSheet,
         pub source: *mut gchar,
     }
-    use webkit2gtk::ffi::WebKitUserStyleSheet;
+    use webkit2gtk_sys::*;
 
-    use crate::{clib::widget::widget_t, common::luaclass::signal_h::signal_t, gtypes::gchar};
+    use crate::{common::luaclass::signal_h::signal_t, gtypes::gchar, widgets::widget_t};
 
     unsafe extern "C-unwind" {
         pub fn webview_stylesheets_regenerate_stylesheet(
@@ -32,7 +29,6 @@ use crate::clib::luakit::{luaH_class_index_miss_property, luaH_class_newindex_mi
 pub use crate::clib::stylesheet::stylesheet_h::{
     lstylesheet_t, webview_stylesheets_regenerate_stylesheet,
 };
-use crate::clib::widget::widget_t;
 use crate::common::luaclass::signal_h::{signal_new, signal_t};
 use crate::common::luaclass::{
     lua_class_allocator_t, lua_class_property_array_t, lua_class_propfunc_t, lua_class_t,
@@ -48,6 +44,7 @@ use crate::common::luaobject::{
 use crate::common::tokenize::L_TK_SOURCE;
 use crate::globalconf::globalconf;
 use crate::gtypes::{gchar, gint};
+use crate::widgets::widget_t;
 
 unsafe extern "C-unwind" {
     pub fn webview_stylesheet_set_enabled(

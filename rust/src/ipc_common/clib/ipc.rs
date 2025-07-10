@@ -1,26 +1,26 @@
-use gdk_sys::*;
-use glib_sys::*;
-use gtk_sys::*;
-use libc::*;
-use mlua_sys::*;
+use glib_sys::{g_free, g_strdup, gpointer};
+use libc::{c_void, memset, size_t};
+use mlua_sys::{
+    lua_State, lua_createtable, lua_gettop, lua_newuserdata, lua_pushstring, lua_pushvalue,
+    lua_rawset, lua_remove, lua_setfenv, lua_setmetatable, luaL_Reg, luaL_checklstring,
+};
 
-use crate::clib::luakit::*;
-use crate::clib::ipc::*;
-use crate::common::clib::luakit::*;
+use crate::clib::ipc::ipc_channel_send;
 use crate::common::common;
-use crate::common::luaclass::signal_h::*;
-use crate::common::luaclass::*;
-use crate::common::luah::*;
-use crate::common::luaobject::*;
-use crate::common::luauniq::*;
-use crate::common::tokenize::*;
-use crate::globalconf::*;
-use crate::log::*;
-use crate::luah::*;
-use crate::web_context::*;
+use crate::common::luaclass::signal_h::{signal_new, signal_t};
+use crate::common::luaclass::{
+    lua_class_allocator_t, lua_class_property_array_t, lua_class_t, luaH_checkudata,
+    luaH_class_add_signal, luaH_class_emit_signal, luaH_class_new, luaH_class_remove_signal,
+    luaH_class_setup,
+};
+use crate::common::luaobject::{
+    luaH_object_add_signal_simple, luaH_object_emit_signal_simple, luaH_object_gc,
+    luaH_object_remove_signal_simple, luaH_object_remove_signals_simple, luaH_object_tostring,
+    luaH_settype,
+};
+use crate::common::luauniq::{luaH_uniq_add, luaH_uniq_get};
 
-use crate::gtypes::*;
-use webkit2gtk::{ffi::*, glib::gobject_ffi::*};
+use crate::gtypes::{gchar, gint};
 
 pub struct ipc_channel_t {
     pub signals: *mut signal_t,

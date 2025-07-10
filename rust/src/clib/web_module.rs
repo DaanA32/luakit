@@ -1,26 +1,12 @@
-use gdk_sys::*;
-use glib_sys::*;
-use libc::*;
-use mlua_sys::*;
-use webkit2gtk::glib::ToVariant;
-use webkit2gtk::glib::Variant;
+use glib_sys::{GPtrArray, g_ptr_array_add, g_ptr_array_new, g_strdup, gpointer};
+use libc::{c_void, strlen};
+use mlua_sys::{lua_State, luaL_Reg, luaL_checklstring};
 
-use crate::clib::luakit::*;
-use crate::common::clib::luakit::*;
 use crate::common::common;
-use crate::common::luaclass::signal_h::*;
-use crate::common::luaclass::*;
-use crate::common::luah::*;
-use crate::common::luaobject::*;
-use crate::common::luauniq::*;
-use crate::common::tokenize::*;
-use crate::globalconf::*;
-use crate::log::*;
-use crate::luah::*;
-use crate::web_context::*;
-
-use crate::gtypes::*;
-use webkit2gtk::{ffi::*, glib::gobject_ffi::*};
+use crate::common::luaclass::luaH_openlib;
+use crate::gtypes::{gchar, guint};
+use crate::ipc::{_ipc_header_t, IPC_TYPE_lua_require_module, ipc_endpoint_t, ipc_send};
+use crate::ipc_common::clib::ipc::luaH_ipc_channel_new;
 
 static mut required_web_modules: *mut GPtrArray = 0 as *const GPtrArray as *mut GPtrArray;
 unsafe extern "C-unwind" fn luaH_require_web_module(mut L: *mut lua_State) -> std::ffi::c_int {

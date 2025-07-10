@@ -1,27 +1,45 @@
-use gdk_sys::*;
-use glib_sys::*;
-use gtk_sys::*;
-use libc::*;
-use mlua_sys::*;
+use glib_sys::{GType, g_assertion_message_expr, g_free, g_strdup, g_strdup_printf, gpointer};
+use gobject_sys::{GObject, GTypeInstance, g_object_set_data, g_type_check_instance_cast};
+use gtk_sys::{
+    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION, GtkStyleProvider, GtkWidget,
+    gtk_css_provider_load_from_data, gtk_css_provider_new, gtk_css_provider_to_string,
+    gtk_style_context_add_provider, gtk_style_provider_get_type, gtk_widget_get_style_context,
+    gtk_widget_get_type, gtk_widget_set_name,
+};
+use libc::{c_void, memset, strlen};
+use mlua_sys::{
+    LUA_MULTRET, lua_State, lua_createtable, lua_gettop, lua_newuserdata, lua_pushboolean,
+    lua_pushstring, lua_pushvalue, lua_setmetatable, lua_settop, lua_touserdata, luaL_Reg,
+    luaL_checklstring, luaL_error,
+};
 
-use crate::clib::luakit::*;
-use crate::common::clib::luakit::*;
 use crate::common::common;
-use crate::common::luaclass::signal_h::*;
-use crate::common::luaclass::*;
-use crate::common::luah::*;
-use crate::common::luaobject::*;
-use crate::common::luauniq::*;
-use crate::common::tokenize::*;
-use crate::globalconf::*;
-use crate::log::*;
-use crate::luah::*;
-use crate::web_context::*;
+use crate::common::luaobject::luaH_object_ref_class;
+use crate::common::tokenize::{
+    L_TK_CAN_FOCUS, L_TK_CSS, L_TK_DRAWING_AREA, L_TK_ENTRY, L_TK_EVENTBOX, L_TK_HBOX, L_TK_HPANED,
+    L_TK_IMAGE, L_TK_IS_ALIVE, L_TK_LABEL, L_TK_MARGIN, L_TK_MARGIN_BOTTOM, L_TK_MARGIN_LEFT,
+    L_TK_MARGIN_RIGHT, L_TK_MARGIN_TOP, L_TK_NOTEBOOK, L_TK_OVERLAY, L_TK_SCROLLED, L_TK_SPINNER,
+    L_TK_STACK, L_TK_TYPE, L_TK_UNKNOWN, L_TK_VBOX, L_TK_VPANED, L_TK_WEBVIEW, L_TK_WINDOW,
+    l_tokenize,
+};
 
-use crate::gtypes::*;
-use webkit2gtk::{ffi::*, glib::gobject_ffi::*};
-
-use crate::widgets::*;
+use crate::widgets::r#box::widget_box;
+use crate::widgets::drawing_area::widget_drawing_area;
+use crate::widgets::entry::widget_entry;
+use crate::widgets::eventbox::widget_eventbox;
+use crate::widgets::image::widget_image;
+use crate::widgets::label::widget_label;
+use crate::widgets::notebook::widget_notebook;
+use crate::widgets::overlay::widget_overlay;
+use crate::widgets::paned::widget_paned;
+use crate::widgets::scrolled::widget_scrolled;
+use crate::widgets::spinner::widget_spinner;
+use crate::widgets::stack::widget_stack;
+use crate::widgets::webview::widget_webview;
+use crate::widgets::window::widget_window;
+use crate::widgets::{
+    luaH_checkwidget, widget_class, widget_constructor_t, widget_info_t, widget_t,
+};
 use crate::{
     common::{
         luaclass::{
@@ -113,7 +131,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_ENTRY,
                 name: b"entry\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_entry as widget_constructor_t),
+                wc: Some(widget_entry),
             };
             init
         },
@@ -121,7 +139,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_EVENTBOX,
                 name: b"eventbox\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_eventbox as widget_constructor_t),
+                wc: Some(widget_eventbox),
             };
             init
         },
@@ -129,7 +147,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_HBOX,
                 name: b"hbox\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_box as widget_constructor_t),
+                wc: Some(widget_box),
             };
             init
         },
@@ -137,7 +155,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_HPANED,
                 name: b"hpaned\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_paned as widget_constructor_t),
+                wc: Some(widget_paned),
             };
             init
         },
@@ -145,7 +163,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_LABEL,
                 name: b"label\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_label as widget_constructor_t),
+                wc: Some(widget_label),
             };
             init
         },
@@ -153,7 +171,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_NOTEBOOK,
                 name: b"notebook\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_notebook as widget_constructor_t),
+                wc: Some(widget_notebook),
             };
             init
         },
@@ -161,7 +179,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_VBOX,
                 name: b"vbox\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_box as widget_constructor_t),
+                wc: Some(widget_box),
             };
             init
         },
@@ -169,7 +187,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_VPANED,
                 name: b"vpaned\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_paned as widget_constructor_t),
+                wc: Some(widget_paned),
             };
             init
         },
@@ -177,7 +195,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_WEBVIEW,
                 name: b"webview\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_webview as widget_constructor_t),
+                wc: Some(widget_webview),
             };
             init
         },
@@ -185,7 +203,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_WINDOW,
                 name: b"window\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_window as widget_constructor_t),
+                wc: Some(widget_window),
             };
             init
         },
@@ -193,7 +211,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_OVERLAY,
                 name: b"overlay\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_overlay as widget_constructor_t),
+                wc: Some(widget_overlay),
             };
             init
         },
@@ -201,7 +219,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_SCROLLED,
                 name: b"scrolled\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_scrolled as widget_constructor_t),
+                wc: Some(widget_scrolled),
             };
             init
         },
@@ -209,7 +227,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_IMAGE,
                 name: b"image\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_image as widget_constructor_t),
+                wc: Some(widget_image),
             };
             init
         },
@@ -217,7 +235,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_SPINNER,
                 name: b"spinner\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_spinner as widget_constructor_t),
+                wc: Some(widget_spinner),
             };
             init
         },
@@ -225,7 +243,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_DRAWING_AREA,
                 name: b"drawing_area\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_drawing_area as widget_constructor_t),
+                wc: Some(widget_drawing_area),
             };
             init
         },
@@ -233,7 +251,7 @@ static mut widgets_list: [widget_info_t; 16] = unsafe {
             let mut init = widget_info_t {
                 tok: L_TK_STACK,
                 name: b"stack\0" as *const u8 as *const std::ffi::c_char,
-                wc: Some(widget_stack as widget_constructor_t),
+                wc: Some(widget_stack),
             };
             init
         },

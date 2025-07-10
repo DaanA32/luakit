@@ -1,26 +1,18 @@
-use gdk_sys::*;
-use glib_sys::*;
-use gtk_sys::*;
-use libc::*;
-use mlua_sys::*;
+use glib_sys::{
+    g_utf8_find_next_char, g_utf8_get_char_validated, g_utf8_offset_to_pointer, g_utf8_strlen,
+    g_utf8_validate,
+};
+use libc::{size_t, ssize_t};
+use mlua_sys::{
+    lua_Integer, lua_State, lua_getfield, lua_pushinteger, lua_pushnil, lua_pushstring,
+    lua_setfield, lua_settop, luaL_Reg, luaL_argerror, luaL_checkinteger, luaL_checklstring,
+    luaL_error, luaL_optinteger,
+};
 
-use crate::clib::ipc::*;
-use crate::clib::luakit::*;
-use crate::common::clib::luakit::*;
 use crate::common::common;
-use crate::common::luaclass::signal_h::*;
-use crate::common::luaclass::*;
-use crate::common::luah::*;
-use crate::common::luaobject::*;
-use crate::common::luauniq::*;
-use crate::common::tokenize::*;
-use crate::globalconf::*;
-use crate::log::*;
-use crate::luah::*;
-use crate::web_context::*;
+use crate::common::luaclass::luaH_openlib;
 
-use crate::gtypes::*;
-use webkit2gtk::{ffi::*, glib::gobject_ffi::*};
+use crate::gtypes::{gchar, gint};
 
 unsafe extern "C" fn abspos(mut offset: i64, mut length: size_t) -> isize {
     if offset == 0 {
@@ -77,7 +69,10 @@ unsafe extern "C-unwind" fn luaH_utf8_len(mut L: *mut lua_State) -> gint {
     }
     lua_pushinteger(
         L,
-        g_utf8_strlen(str.offset(bbeg as isize), bend.wrapping_sub(bbeg) as gssize),
+        g_utf8_strlen(
+            str.offset(bbeg as isize),
+            bend.wrapping_sub(bbeg) as ssize_t,
+        ),
     );
     return 1 as std::ffi::c_int;
 }
