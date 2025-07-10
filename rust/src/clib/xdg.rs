@@ -38,7 +38,7 @@ unsafe extern "C-unwind" fn luaH_push_path(
     mut L: *mut lua_State,
     mut path: *const gchar,
 ) -> std::ffi::c_int {
-    let mut p = g_strdup_inline(path);
+    let mut p = g_strdup(path);
     str_chomp_slashes(p);
     lua_pushstring(L, p);
     g_free(p as gpointer);

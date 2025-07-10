@@ -1,28 +1,17 @@
-use glib_sys::{
-    GType, g_assertion_message_expr, g_free, g_list_free, g_malloc0_n, g_string_append_printf,
-    g_string_free, g_string_free_and_steal, g_string_sized_new, g_utf8_get_char, g_utf8_strlen,
-    g_utf8_validate, gboolean, gpointer,
-};
-use gtk_sys::{
-    GTK_ALIGN_BASELINE, GTK_ALIGN_CENTER, GTK_ALIGN_END, GTK_ALIGN_FILL, GTK_ALIGN_START, GtkBin,
-    GtkContainer, GtkEntry, GtkWidget, GtkWindow, gtk_bin_get_child, gtk_bin_get_type,
-    gtk_container_add, gtk_container_child_get_property, gtk_container_child_set_property,
-    gtk_container_get_children, gtk_container_get_type, gtk_container_remove, gtk_entry_get_type,
-    gtk_entry_grab_focus_without_selecting, gtk_widget_destroy, gtk_widget_get_allocated_height,
-    gtk_widget_get_allocated_width, gtk_widget_get_halign, gtk_widget_get_parent,
-    gtk_widget_get_size_request, gtk_widget_get_tooltip_markup, gtk_widget_get_type,
-    gtk_widget_get_valign_with_baseline, gtk_widget_get_visible, gtk_widget_get_window,
-    gtk_widget_grab_focus, gtk_widget_hide, gtk_widget_is_focus, gtk_widget_set_halign,
-    gtk_widget_set_size_request, gtk_widget_set_tooltip_markup, gtk_widget_set_valign,
-    gtk_widget_set_visible, gtk_widget_show, gtk_window_get_type, gtk_window_has_toplevel_focus,
-    gtk_window_set_focus,
-};
-use mlua_sys::{
-    LUA_TNIL, LUA_TTABLE, lua_Integer, lua_Number, lua_State, lua_createtable, lua_gettop,
-    lua_insert, lua_next, lua_pushboolean, lua_pushinteger, lua_pushlstring, lua_pushnil,
-    lua_pushnumber, lua_pushstring, lua_rawset, lua_rawseti, lua_settop, lua_toboolean,
-    lua_tolstring, lua_tonumber, lua_type, luaL_checklstring, luaL_error, luaL_typerror,
-};
+use crate::gtypes::*;
+use gdk_sys::*;
+use glib_sys::*;
+use gobject_sys::*;
+use gtk_sys::*;
+use mlua_sys::*;
+
+use crate::clib::widget::*;
+use crate::common::common;
+use crate::common::luaclass::*;
+use crate::common::luah::*;
+use crate::common::luaobject::*;
+use crate::common::tokenize::*;
+use crate::widgets::*;
 
 pub struct widget_info_t {
     pub tok: luakit_token_t,
@@ -37,7 +26,6 @@ pub const GOBJECT_LUAKIT_WIDGET_DATA_KEY: [std::ffi::c_char; 19] = unsafe {
     *::core::mem::transmute::<&[u8; 19], &[std::ffi::c_char; 19]>(b"luakit_widget_data\0")
 };
 #[inline]
-
 pub unsafe extern "C" fn luaH_checkwidget(mut L: *mut lua_State, mut udx: gint) -> *mut widget_t {
     let mut w = luaH_checkudata(L, udx, &mut widget_class) as *mut widget_t;
     if ((*w).widget).is_null() {

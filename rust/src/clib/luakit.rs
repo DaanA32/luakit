@@ -26,6 +26,7 @@ use crate::common::luauniq::*;
 use crate::common::resource::*;
 use crate::common::tokenize::*;
 use crate::globalconf::*;
+use crate::ipc::ipc_remove_socket_file;
 use crate::log::*;
 use crate::luah::*;
 use crate::web_context::*;
@@ -77,7 +78,6 @@ use crate::{
     },
     globalconf::globalconf,
     gtypes::{gchar, gint, gint64, gsize, guint, guint64},
-    ipc::ipc_remove_socket_file,
     log::{_log, LOG_LEVEL_fatal, LOG_LEVEL_verbose, log_get_verbosity},
     web_context::web_context_get,
     widgets::*,

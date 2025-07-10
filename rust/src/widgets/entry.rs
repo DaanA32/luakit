@@ -1,19 +1,15 @@
-use glib_sys::{GError, GType, g_free, gboolean, gpointer};
-use gtk_sys::{
-    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION, GtkEditable, GtkEntry, GtkStyleProvider, GtkWidget,
-    gtk_css_provider_load_from_data, gtk_css_provider_new, gtk_editable_get_position,
-    gtk_editable_get_type, gtk_editable_insert_text, gtk_editable_select_region,
-    gtk_editable_set_position, gtk_entry_get_has_frame, gtk_entry_get_text, gtk_entry_get_type,
-    gtk_entry_new, gtk_entry_set_has_frame, gtk_entry_set_text, gtk_style_context_add_provider,
-    gtk_style_provider_get_type, gtk_widget_get_style_context, gtk_widget_get_type,
-    gtk_widget_show,
-};
-use mlua_sys::{
-    lua_Integer, lua_State, lua_gettop, lua_pushboolean, lua_pushcclosure, lua_pushinteger,
-    lua_pushstring, lua_settop, luaL_argerror, luaL_checklstring, luaL_checknumber,
-};
+use crate::gtypes::*;
+use gdk_sys::*;
+use glib_sys::*;
+use gobject_sys::*;
+use gtk_sys::*;
+use mlua_sys::*;
 
-use crate::widgets::luaH_checkwidget;
+use crate::common::luaclass::*;
+use crate::common::luah::*;
+use crate::common::tokenize::*;
+use crate::widgets::*;
+
 unsafe extern "C" fn luaH_entry_insert(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     let mut pos = -(1 as std::ffi::c_int);

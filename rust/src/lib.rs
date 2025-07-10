@@ -21,14 +21,13 @@
 use gtk_sys::{gtk_disable_setlocale, gtk_get_option_group, gtk_init};
 
 pub use luakit_common::common;
+pub use luakit_common::globalconf;
+pub use luakit_common::gtypes;
+pub use luakit_common::log;
 
 pub mod clib;
-pub mod ipc_common;
-// pub mod extension;
-pub mod globalconf;
-pub mod gtypes;
 pub mod ipc;
-pub mod log;
+pub mod ipc_common;
 pub mod luah;
 pub mod web_context;
 pub mod widgets;

@@ -2,10 +2,17 @@ use core::intrinsics::AtomicOrdering;
 use gdk_sys::*;
 use glib_sys::*;
 use libc::*;
-use mlua_sys::*;
-
 use gobject_sys::*;
+use gtk_sys::*;
+use mlua_sys::*;
+use webkit2gtk_sys::*;
 
+use crate::common::luaclass::*;
+use crate::common::luah::*;
+use crate::common::tokenize::*;
+use crate::gtypes::*;
+use crate::widgets::common::*;
+use crate::widgets::*;
 use crate::clib::luakit::*;
 use crate::clib::msg::*;
 use crate::clib::soup::*;
@@ -3264,16 +3271,16 @@ unsafe extern "C" fn context_menu_cb(
     );
     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
     last_popup.old_refs = last_popup.refs;
-    last_popup.refs = NULL_0 as *mut GSList;
+    last_popup.refs = std::ptr::null_mut();
     webkit_context_menu_remove_all(menu);
     context_menu_from_table(L, menu, w);
     g_slist_free_full(
         context_menu_actions,
-        Some(g_object_unref as unsafe extern "C" fn(gpointer) -> ()),
+        Some(g_object_unref),
     );
-    context_menu_actions = NULL_0 as *mut GSList;
+    context_menu_actions = std::ptr::null_mut();
     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
-    return FALSE;
+    return GFALSE;
 }
 unsafe extern "C" fn webview_destructor(mut w: *mut widget_t) {
     let mut d = (*w).data as *mut webview_data_t;

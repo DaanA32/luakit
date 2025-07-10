@@ -1,3 +1,4 @@
+use crate::ipc::ipc_h::*;
 use core::intrinsics::AtomicOrdering;
 use glib_sys::{
     G_IO_HUP, G_IO_IN, GAsyncQueue, GByteArray, GError, GIOChannel, GIOCondition, GIOFunc,
@@ -102,8 +103,8 @@ unsafe extern "C" fn ipc_send_thread(mut UNUSED_user_data: gpointer) -> gpointer
         {
             g_io_channel_write_chars(
                 (*ipc).channel,
-                header as *mut gchar,
-                ::core::mem::size_of::<ipc_header_t>() as std::ffi::c_ulong as gssize,
+                header as *const gchar,
+                ::core::mem::size_of::<ipc_header_t>() as std::ffi::c_ulong as ssize_t,
                 std::ptr::null_mut(),
                 0 as *mut *mut GError,
             );
@@ -114,7 +115,7 @@ unsafe extern "C" fn ipc_send_thread(mut UNUSED_user_data: gpointer) -> gpointer
         {
             g_io_channel_write_chars(
                 (*ipc).channel,
-                data as *mut gchar,
+                data as *const gchar,
                 (*header).length as ssize_t,
                 std::ptr::null_mut(),
                 0 as *mut *mut GError,

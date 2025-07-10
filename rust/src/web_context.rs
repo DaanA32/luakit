@@ -4,6 +4,7 @@ use crate::{
     log::{_log, LOG_LEVEL_verbose},
 };
 use glib_sys::*;
+use gobject_sys::*;
 use webkit2gtk_sys::*;
 
 unsafe extern "C" {

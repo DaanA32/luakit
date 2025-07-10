@@ -1,4 +1,3 @@
-
 pub type ipc_type_t = std::ffi::c_uint;
 pub const IPC_TYPE_crash: ipc_type_t = 128;
 pub const IPC_TYPE_page_created: ipc_type_t = 64;
@@ -85,4 +84,26 @@ unsafe extern "C" {
         header: *const ipc_header_t,
         data: *const std::ffi::c_void,
     );
+}
+
+#[derive(Copy, Clone)]
+#[repr(C)]
+pub struct queued_ipc_t {
+    pub header: ipc_header_t,
+    pub ipc: *mut ipc_endpoint_t,
+    pub payload: [std::ffi::c_char; 0],
+}
+
+pub unsafe extern "C" fn ipc_type_name(mut type_0: ipc_type_t) -> *const std::ffi::c_char {
+    match type_0 as std::ffi::c_uint {
+        1 => return b"lua_require_module\0" as *const u8 as *const std::ffi::c_char,
+        2 => return b"lua_ipc\0" as *const u8 as *const std::ffi::c_char,
+        4 => return b"scroll\0" as *const u8 as *const std::ffi::c_char,
+        8 => return b"extension_init\0" as *const u8 as *const std::ffi::c_char,
+        16 => return b"eval_js\0" as *const u8 as *const std::ffi::c_char,
+        32 => return b"log\0" as *const u8 as *const std::ffi::c_char,
+        64 => return b"page_created\0" as *const u8 as *const std::ffi::c_char,
+        128 => return b"crash\0" as *const u8 as *const std::ffi::c_char,
+        _ => return b"UNKNOWN\0" as *const u8 as *const std::ffi::c_char,
+    };
 }

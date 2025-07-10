@@ -1,17 +1,19 @@
-use glib_sys::{GFALSE, GTRUE, GType, g_free, gboolean, gpointer};
-use gtk_sys::{
-    GTK_ORIENTATION_HORIZONTAL, GTK_ORIENTATION_VERTICAL, GtkBox, GtkContainer, GtkOrientation,
-    GtkWidget, gtk_box_get_homogeneous, gtk_box_get_spacing, gtk_box_get_type, gtk_box_new,
-    gtk_box_pack_end, gtk_box_pack_start, gtk_box_reorder_child, gtk_box_set_homogeneous,
-    gtk_box_set_spacing, gtk_widget_get_type, gtk_widget_show,
-};
-use mlua_sys::{
-    LUA_TNIL, LUA_TTABLE, lua_Number, lua_State, lua_gettop, lua_pushboolean, lua_pushcclosure,
-    lua_pushnumber, lua_pushstring, lua_settop, lua_toboolean, lua_tolstring, lua_tonumber,
-    lua_type, luaL_argerror, luaL_checklstring, luaL_checknumber, luaL_typerror,
-};
+use crate::gtypes::*;
+use crate::widgets::common::*;
+use gdk_sys::*;
+use glib_sys::*;
+use gobject_sys::*;
+use gtk_sys::*;
+use libc::*;
+use mlua_sys::*;
 
-use crate::widgets::luaH_checkwidget;
+use crate::clib::widget::*;
+use crate::common::common;
+use crate::common::luaclass::*;
+use crate::common::luah::*;
+use crate::common::luaobject::*;
+use crate::common::tokenize::*;
+use crate::widgets::*;
 
 unsafe extern "C" fn luaH_box_pack(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
@@ -39,12 +41,12 @@ unsafe extern "C" fn luaH_box_pack(mut L: *mut lua_State) -> gint {
                 == l_tokenize(lua_tolstring(
                     L,
                     -(1 as std::ffi::c_int),
-                    NULL_0 as *mut size_t,
+                    std::ptr::null_mut(),
                 )) as std::ffi::c_uint
             {
-                FALSE
+                GFALSE
             } else {
-                TRUE
+                GTRUE
             };
         }
         if luaH_rawfield(
@@ -54,9 +56,9 @@ unsafe extern "C" fn luaH_box_pack(mut L: *mut lua_State) -> gint {
         ) != 0
         {
             expand = if lua_toboolean(L, -(1 as std::ffi::c_int)) != 0 {
-                TRUE
+                GTRUE
             } else {
-                FALSE
+                GFALSE
             };
         }
         if luaH_rawfield(
@@ -66,9 +68,9 @@ unsafe extern "C" fn luaH_box_pack(mut L: *mut lua_State) -> gint {
         ) != 0
         {
             fill = if lua_toboolean(L, -(1 as std::ffi::c_int)) != 0 {
-                TRUE
+                GTRUE
             } else {
-                FALSE
+                GFALSE
             };
         }
         if luaH_rawfield(
@@ -251,7 +253,7 @@ unsafe extern "C" fn luaH_box_newindex(
 ) -> gint {
     let mut len: size_t = 0;
     let mut tmp = 0 as *const gchar;
-    let mut c = _GdkRGBA {
+    let mut c = GdkRGBA {
         red: 0.,
         green: 0.,
         blue: 0.,
@@ -297,7 +299,7 @@ unsafe extern "C" fn luaH_box_newindex(
                 w,
                 b"background-color\0" as *const u8 as *const std::ffi::c_char,
                 tmp,
-                NULL_0 as *mut std::ffi::c_void,
+                std::ptr::null_mut(),
             );
             g_object_set_data_full(
                 g_type_check_instance_cast(
@@ -340,9 +342,9 @@ pub unsafe extern "C" fn widget_box(
         g_type_check_instance_cast((*w).widget as *mut GTypeInstance, gtk_box_get_type())
             as *mut std::ffi::c_void as *mut GtkBox,
         if token as std::ffi::c_uint == L_TK_VBOX as std::ffi::c_int as std::ffi::c_uint {
-            FALSE
+            GFALSE
         } else {
-            TRUE
+            GTRUE
         },
     );
     g_object_connect(
@@ -414,7 +416,7 @@ pub unsafe extern "C" fn widget_box(
             add_cb as unsafe extern "C" fn(*mut GtkContainer, *mut GtkWidget, *mut widget_t) -> (),
         )),
         w,
-        NULL_0 as *mut std::ffi::c_void,
+        std::ptr::null_mut(),
     );
     gtk_widget_show((*w).widget);
     return w;

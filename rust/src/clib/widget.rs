@@ -24,6 +24,7 @@ use crate::common::tokenize::{
 };
 
 use crate::widgets::r#box::widget_box;
+use crate::widgets::common::GOBJECT_LUAKIT_WIDGET_DATA_KEY;
 use crate::widgets::drawing_area::widget_drawing_area;
 use crate::widgets::entry::widget_entry;
 use crate::widgets::eventbox::widget_eventbox;
