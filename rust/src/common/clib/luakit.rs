@@ -12,7 +12,8 @@ use crate::{
     common::{
         lualib::luaH_dofunction,
         luaobject::{
-            luaH_object_decref, luaH_object_incref, luaH_object_push, luaH_object_registry_push,
+            luaH_object_decref, luaH_object_incref, luaH_object_push, luaH_object_ref,
+            luaH_object_registry_push, luaH_object_unref,
         },
         *,
     },
@@ -88,10 +89,7 @@ pub unsafe extern "C-unwind" fn luaH_luakit_idle_add(mut L: *mut lua_State) -> g
         );
     }
     let mut func: gpointer = luaH_object_ref(L, 1 as std::ffi::c_int);
-    g_idle_add(
-        Some(idle_cb),
-        func,
-    );
+    g_idle_add(Some(idle_cb), func);
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
@@ -107,25 +105,4 @@ pub unsafe extern "C-unwind" fn luaH_luakit_idle_remove(mut L: *mut lua_State) -
     lua_pushboolean(L, g_idle_remove_by_data(func));
     luaH_object_unref(L, func);
     return 1 as std::ffi::c_int;
-}
-
-pub unsafe extern "C-unwind" fn luaH_object_ref(mut L: *mut lua_State, mut oud: gint) -> gpointer {
-    luaH_object_registry_push(L);
-    let mut p: gpointer = luaH_object_incref(
-        L,
-        -(1 as std::ffi::c_int),
-        if oud < 0 as std::ffi::c_int {
-            oud - 1 as std::ffi::c_int
-        } else {
-            oud
-        },
-    );
-    lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
-    return p;
-}
-
-pub unsafe extern "C-unwind" fn luaH_object_unref(mut L: *mut lua_State, mut p: gpointer) {
-    luaH_object_registry_push(L);
-    luaH_object_decref(L, -(1 as std::ffi::c_int), p);
-    lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
 }

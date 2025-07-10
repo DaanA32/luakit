@@ -33,7 +33,7 @@ pub mod lua_h {
 
     pub const LUA_TNUMBER: std::ffi::c_int = 3 as std::ffi::c_int;
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type lua_State;
 
@@ -106,7 +106,7 @@ pub mod lauxlib_h {
         pub func: lua_CFunction,
     }
     use super::lua_h::{lua_CFunction, lua_State};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaL_error(
             L: *mut lua_State,
@@ -132,7 +132,7 @@ pub mod log_h {
 
     pub const LOG_LEVEL_fatal: log_level_t = 0;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn _log(lvl: log_level_t, _: *const gchar, _: *const gchar, _: ...);
     }
@@ -142,7 +142,7 @@ pub mod luaclass_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::gchar;
     use super::lauxlib_h::luaL_Reg;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_openlib(
             _: *mut lua_State,
@@ -200,7 +200,7 @@ pub mod luaobject_h {
         lua_pushlightuserdata, lua_remove,
     };
     use super::gtypes_h::{gint, gpointer};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_object_incref(L: *mut lua_State, tud: gint, oud: gint) -> gpointer;
     }
@@ -347,7 +347,7 @@ pub use self::msg_h::{
     luaH_msg_verbose, luaH_msg_info, luaH_msg_warn, luaH_msg_error, luaH_msg_fatal,
 };
 pub use self::__stddef_null_h::NULL;
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn msg_lib_setup(mut L: *mut lua_State) {
     static mut msg_lib: [luaL_Reg; 7] = unsafe {

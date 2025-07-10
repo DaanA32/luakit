@@ -1,5 +1,5 @@
 use ::libc;
-use ::c2rust_bitfields;
+
 
 pub mod __stddef_ptrdiff_t_h {
 
@@ -69,7 +69,7 @@ pub mod garray_h {
 
     pub type GPtrArray = _GPtrArray;
     use super::gtypes_h::{gpointer, guint, gboolean, GFunc};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_ptr_array_sized_new(reserved_size: guint) -> *mut GPtrArray;
 
@@ -112,7 +112,7 @@ pub mod gerror_h {
 pub mod gconvert_h {
 
     pub type GIConv = *mut _GIConv;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GIConv;
     }
@@ -121,7 +121,7 @@ pub mod gconvert_h {
 pub mod gdataset_h {
 
     pub type GData = _GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GData;
     }
@@ -144,7 +144,7 @@ pub mod glist_h {
 pub mod ghash_h {
 
     pub type GHashTable = _GHashTable;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GHashTable;
     }
@@ -254,7 +254,7 @@ pub mod gmain_h {
     }
     use super::gtypes_h::{gpointer, guint, gint, gboolean};
     use super::gslist_h::GSList;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GMainContext;
 
@@ -278,7 +278,7 @@ pub mod gstring_h {
 }
 
 pub mod giochannel_h {
-    #[derive(Copy, Clone, BitfieldStruct)]
+    #[derive(Copy, Clone)]
     #[repr(C)]
 
     pub struct _GIOChannel {
@@ -294,14 +294,14 @@ pub mod giochannel_h {
         pub encoded_read_buf: *mut GString,
         pub write_buf: *mut GString,
         pub partial_write_buf: [gchar; 6],
-        #[bitfield(name = "use_buffer", ty = "guint", bits = "0..=0")]
-        #[bitfield(name = "do_encode", ty = "guint", bits = "1..=1")]
-        #[bitfield(name = "close_on_unref", ty = "guint", bits = "2..=2")]
-        #[bitfield(name = "is_readable", ty = "guint", bits = "3..=3")]
-        #[bitfield(name = "is_writeable", ty = "guint", bits = "4..=4")]
-        #[bitfield(name = "is_seekable", ty = "guint", bits = "5..=5")]
+
+
+
+
+
+
         pub use_buffer_do_encode_close_on_unref_is_readable_is_writeable_is_seekable: [u8; 1],
-        #[bitfield(padding)]
+
         pub c2rust_padding: [u8; 1],
         pub reserved1: gpointer,
         pub reserved2: gpointer,
@@ -423,7 +423,7 @@ pub mod gtree_h {
 
     pub type GTree = _GTree;
     use super::gtypes_h::{GCompareDataFunc, gpointer, GDestroyNotify};
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GTree;
 
@@ -489,22 +489,22 @@ pub mod gvalue_h {
 }
 
 pub mod gclosure_h {
-    #[derive(Copy, Clone, BitfieldStruct)]
+    #[derive(Copy, Clone)]
     #[repr(C)]
 
     pub struct _GClosure {
-        #[bitfield(name = "ref_count", ty = "guint", bits = "0..=14")]
-        #[bitfield(name = "meta_marshal_nouse", ty = "guint", bits = "15..=15")]
-        #[bitfield(name = "n_guards", ty = "guint", bits = "16..=16")]
-        #[bitfield(name = "n_fnotifiers", ty = "guint", bits = "17..=18")]
-        #[bitfield(name = "n_inotifiers", ty = "guint", bits = "19..=26")]
-        #[bitfield(name = "in_inotify", ty = "guint", bits = "27..=27")]
-        #[bitfield(name = "floating", ty = "guint", bits = "28..=28")]
-        #[bitfield(name = "derivative_flag", ty = "guint", bits = "29..=29")]
-        #[bitfield(name = "in_marshal", ty = "guint", bits = "30..=30")]
-        #[bitfield(name = "is_invalid", ty = "guint", bits = "31..=31")]
+
+
+
+
+
+
+
+
+
+
         pub ref_count_meta_marshal_nouse_n_guards_n_fnotifiers_n_inotifiers_in_inotify_floating_derivative_flag_in_marshal_is_invalid: [u8; 4],
-        #[bitfield(padding)]
+
         pub c2rust_padding: [u8; 4],
         pub marshal: Option::<
             unsafe extern "C" fn(
@@ -551,7 +551,7 @@ pub mod gsignal_h {
     pub const G_CONNECT_DEFAULT: GConnectFlags = 0;
     use super::gtypes_h::{gpointer, gchar, gulong};
     use super::gclosure_h::{GCallback, GClosureNotify};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_signal_connect_data(
             instance: gpointer,
@@ -593,7 +593,7 @@ pub mod WebKitScriptWorld_h {
 
     pub type WebKitScriptWorld = _WebKitScriptWorld;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitScriptWorldPrivate;
     }
@@ -612,7 +612,7 @@ pub mod WebKitWebPage_h {
 
     pub type WebKitWebPage = _WebKitWebPage;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitWebPagePrivate;
     }
@@ -631,7 +631,7 @@ pub mod WebKitWebExtension_h {
 
     pub type WebKitWebExtension = _WebKitWebExtension;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitWebExtensionPrivate;
     }
@@ -650,7 +650,7 @@ pub mod lua_h {
     pub const LUA_TFUNCTION: std::ffi::c_int = 6 as std::ffi::c_int;
     use super::__stddef_ptrdiff_t_h::ptrdiff_t;
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type lua_State;
 
@@ -688,7 +688,7 @@ pub mod lauxlib_h {
     }
     use super::lua_h::{lua_CFunction, lua_State};
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaL_typerror(
             L: *mut lua_State,
@@ -795,7 +795,7 @@ pub mod extension_h {
     use super::WebKitWebExtension_h::WebKitWebExtension;
     use super::ipc_h::ipc_endpoint_t;
     use super::WebKitScriptWorld_h::WebKitScriptWorld;
-    extern "C" {
+    unsafe extern "C" {
 
         pub static mut extension: extension_t;
     }
@@ -1410,7 +1410,7 @@ pub mod tokenize_h {
 
     pub const L_TK_UNKNOWN: luakit_token_t = 0;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn l_tokenize(_: *const gchar) -> luakit_token_t;
     }
@@ -1449,7 +1449,7 @@ pub mod luaclass_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::{gint, gchar};
     use super::lauxlib_h::luaL_Reg;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_class_add_signal(
             _: *mut lua_State,
@@ -1485,7 +1485,7 @@ pub mod luaclass_h {
 }
 
 pub mod string_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn strlen(_: *const std::ffi::c_char) -> std::ffi::c_ulong;
     }
@@ -1493,14 +1493,14 @@ pub mod string_h {
 
 pub mod gmem_h {
     use super::gtypes_h::gpointer;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_free(mem: gpointer);
     }
 }
 
 pub mod gtestutils_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_strcmp0(
             str1: *const std::ffi::c_char,
@@ -1511,7 +1511,7 @@ pub mod gtestutils_h {
 
 pub mod unistd_h {
     use super::types_h::__pid_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn getpid() -> __pid_t;
     }
@@ -1528,7 +1528,7 @@ pub mod WebKitVersion_h {
 
 pub mod luajs_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaJS_register_function(L: *mut lua_State);
     }
@@ -1538,7 +1538,7 @@ pub mod luaobject_h {
     use super::lua_h::lua_State;
     use super::signal_h::signal_t;
     use super::gtypes_h::{gchar, gint};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn signal_object_emit(
             _: *mut lua_State,
@@ -1554,7 +1554,7 @@ pub mod page_h {
     use super::lua_h::lua_State;
     use super::WebKitWebPage_h::WebKitWebPage;
     use super::gtypes_h::gint;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_page_from_web_page(
             L: *mut lua_State,
@@ -1566,7 +1566,7 @@ pub mod page_h {
 pub mod luakit_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::gint;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_luakit_time(L: *mut lua_State) -> gint;
 
@@ -1582,7 +1582,7 @@ pub mod luakit_h {
 
 pub mod resource_h {
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn resource_path_set(path: *const gchar);
 
@@ -1915,7 +1915,7 @@ unsafe extern "C" fn luaH_luakit_register_function(mut L: *mut lua_State) -> gin
     luaJS_register_function(L);
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luakit_lib_setup(mut L: *mut lua_State) {
     static mut luakit_lib: [luaL_Reg; 12] = unsafe {
@@ -2075,7 +2075,7 @@ pub unsafe extern "C" fn luakit_lib_setup(mut L: *mut lua_State) {
         G_CONNECT_DEFAULT,
     );
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luakit_lib_emit_pending_signals(mut L: *mut lua_State) {
     g_ptr_array_foreach(

@@ -629,7 +629,7 @@ pub unsafe extern "C" fn luaH_object_ref_class(
     return luaH_object_ref(L, oud);
 }
 
-pub unsafe extern "C" fn luaH_object_ref(mut L: *mut lua_State, mut oud: gint) -> gpointer {
+pub unsafe extern "C-unwind" fn luaH_object_ref(mut L: *mut lua_State, mut oud: gint) -> gpointer {
     luaH_object_registry_push(L);
     let mut p: gpointer = luaH_object_incref(
         L,
@@ -642,4 +642,10 @@ pub unsafe extern "C" fn luaH_object_ref(mut L: *mut lua_State, mut oud: gint) -
     );
     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
     return p;
+}
+
+pub unsafe extern "C-unwind" fn luaH_object_unref(mut L: *mut lua_State, mut p: gpointer) {
+    luaH_object_registry_push(L);
+    luaH_object_decref(L, -(1 as std::ffi::c_int), p);
+    lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
 }

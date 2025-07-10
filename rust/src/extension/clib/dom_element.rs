@@ -1,5 +1,5 @@
 use ::libc;
-use ::c2rust_bitfields;
+
 
 pub mod __stddef_ptrdiff_t_h {
 
@@ -62,7 +62,7 @@ pub mod garray_h {
 
     pub type GPtrArray = _GPtrArray;
     use super::gtypes_h::{gpointer, guint, GDestroyNotify, gboolean};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_ptr_array_new() -> *mut GPtrArray;
 
@@ -106,7 +106,7 @@ pub mod gerror_h {
 pub mod gconvert_h {
 
     pub type GIConv = *mut _GIConv;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GIConv;
     }
@@ -115,7 +115,7 @@ pub mod gconvert_h {
 pub mod gdataset_h {
 
     pub type GData = _GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GData;
     }
@@ -138,7 +138,7 @@ pub mod glist_h {
 pub mod ghash_h {
 
     pub type GHashTable = _GHashTable;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GHashTable;
     }
@@ -248,7 +248,7 @@ pub mod gmain_h {
     }
     use super::gtypes_h::{gpointer, guint, gint, gboolean};
     use super::gslist_h::GSList;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GMainContext;
 
@@ -272,7 +272,7 @@ pub mod gstring_h {
 }
 
 pub mod giochannel_h {
-    #[derive(Copy, Clone, BitfieldStruct)]
+    #[derive(Copy, Clone)]
     #[repr(C)]
 
     pub struct _GIOChannel {
@@ -288,14 +288,14 @@ pub mod giochannel_h {
         pub encoded_read_buf: *mut GString,
         pub write_buf: *mut GString,
         pub partial_write_buf: [gchar; 6],
-        #[bitfield(name = "use_buffer", ty = "guint", bits = "0..=0")]
-        #[bitfield(name = "do_encode", ty = "guint", bits = "1..=1")]
-        #[bitfield(name = "close_on_unref", ty = "guint", bits = "2..=2")]
-        #[bitfield(name = "is_readable", ty = "guint", bits = "3..=3")]
-        #[bitfield(name = "is_writeable", ty = "guint", bits = "4..=4")]
-        #[bitfield(name = "is_seekable", ty = "guint", bits = "5..=5")]
+
+
+
+
+
+
         pub use_buffer_do_encode_close_on_unref_is_readable_is_writeable_is_seekable: [u8; 1],
-        #[bitfield(padding)]
+
         pub c2rust_padding: [u8; 1],
         pub reserved1: gpointer,
         pub reserved2: gpointer,
@@ -423,7 +423,7 @@ pub mod gtree_h {
     use super::gtypes_h::{
         gboolean, gpointer, GCompareDataFunc, GDestroyNotify, gconstpointer,
     };
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GTree;
 
@@ -479,7 +479,7 @@ pub mod gtype_h {
         << G_TYPE_FUNDAMENTAL_SHIFT;
     use super::glibconfig_h::gsize;
     use super::gtypes_h::gboolean;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_type_check_instance_cast(
             instance: *mut GTypeInstance,
@@ -514,7 +514,7 @@ pub mod gobject_h {
     use super::gtype_h::GTypeInstance;
     use super::gtypes_h::{guint, gpointer, gchar};
     use super::gdataset_h::GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_object_get(object: gpointer, first_property_name: *const gchar, _: ...);
 
@@ -545,7 +545,7 @@ pub mod JSCValue_h {
     use super::gobject_h::GObject;
     use super::JSCContext_h::_JSCContext;
     use super::gtype_h::GType;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _JSCValuePrivate;
 
@@ -575,7 +575,7 @@ pub mod JSCContext_h {
     pub type JSCContextPrivate = _JSCContextPrivate;
     use super::gobject_h::GObject;
     use super::JSCValue_h::{JSCContext, JSCValue};
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _JSCContextPrivate;
 
@@ -679,7 +679,7 @@ pub mod webkitdomdefines_h {
     use super::WebKitDOMKeyboardEvent_h::_WebKitDOMKeyboardEvent;
     use super::WebKitDOMMouseEvent_h::_WebKitDOMMouseEvent;
     use super::WebKitDOMNodeList_h::_WebKitDOMNodeList;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitDOMEventTarget;
     }
@@ -696,7 +696,7 @@ pub mod WebKitDOMNode_h {
     use super::gtype_h::GType;
     use super::gerror_h::GError;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_node_get_type() -> GType;
 
@@ -741,7 +741,7 @@ pub mod WebKitDOMCSSStyleDeclaration_h {
     }
     use super::webkitdomdefines_h::{WebKitDOMObject, WebKitDOMCSSStyleDeclaration};
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_css_style_declaration_get_property_value(
             self_0: *mut WebKitDOMCSSStyleDeclaration,
@@ -760,7 +760,7 @@ pub mod WebKitDOMStyleSheet_h {
     use super::webkitdomdefines_h::{WebKitDOMObject, WebKitDOMStyleSheet};
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_style_sheet_get_type() -> GType;
 
@@ -779,7 +779,7 @@ pub mod WebKitDOMClientRect_h {
     }
     use super::webkitdomdefines_h::{WebKitDOMObject, WebKitDOMClientRect};
     use super::gtypes_h::gfloat;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_client_rect_get_top(
             self_0: *mut WebKitDOMClientRect,
@@ -818,7 +818,7 @@ pub mod WebKitDOMClientRectList_h {
         WebKitDOMObject, WebKitDOMClientRectList, WebKitDOMClientRect,
     };
     use super::gtypes_h::gulong;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_client_rect_list_get_length(
             self_0: *mut WebKitDOMClientRectList,
@@ -843,7 +843,7 @@ pub mod WebKitDOMDOMWindow_h {
         WebKitDOMCSSStyleDeclaration,
     };
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_dom_window_get_computed_style(
             self_0: *mut WebKitDOMDOMWindow,
@@ -865,7 +865,7 @@ pub mod WebKitDOMDocument_h {
     };
     use super::gtypes_h::gchar;
     use super::gerror_h::GError;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_document_create_event(
             self_0: *mut WebKitDOMDocument,
@@ -892,7 +892,7 @@ pub mod WebKitDOMElement_h {
     use super::gtype_h::GType;
     use super::gtypes_h::{gchar, gdouble, glong, gulong};
     use super::gerror_h::GError;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_element_get_type() -> GType;
 
@@ -998,7 +998,7 @@ pub mod WebKitDOMEvent_h {
         WebKitDOMObject, WebKitDOMEvent, WebKitDOMEventTarget,
     };
     use super::gtypes_h::{gchar, gboolean, gushort};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_event_stop_propagation(self_0: *mut WebKitDOMEvent);
 
@@ -1033,7 +1033,7 @@ pub mod WebKitDOMHTMLAnchorElement_h {
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLAnchorElement};
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_anchor_element_get_type() -> GType;
 
@@ -1052,7 +1052,7 @@ pub mod WebKitDOMHTMLElement_h {
     }
     use super::webkitdomdefines_h::WebKitDOMElement;
     use super::gtype_h::GType;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_element_get_type() -> GType;
     }
@@ -1068,7 +1068,7 @@ pub mod WebKitDOMHTMLAreaElement_h {
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLAreaElement};
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_area_element_get_type() -> GType;
 
@@ -1088,7 +1088,7 @@ pub mod WebKitDOMHTMLButtonElement_h {
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLButtonElement};
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_button_element_get_type() -> GType;
 
@@ -1113,7 +1113,7 @@ pub mod WebKitDOMHTMLEmbedElement_h {
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLEmbedElement};
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_embed_element_get_type() -> GType;
 
@@ -1132,7 +1132,7 @@ pub mod WebKitDOMHTMLFormElement_h {
     }
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLFormElement};
     use super::gtype_h::GType;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_form_element_get_type() -> GType;
 
@@ -1154,7 +1154,7 @@ pub mod WebKitDOMHTMLFrameElement_h {
     };
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_frame_element_get_type() -> GType;
 
@@ -1180,7 +1180,7 @@ pub mod WebKitDOMHTMLIFrameElement_h {
     };
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_iframe_element_get_type() -> GType;
 
@@ -1204,7 +1204,7 @@ pub mod WebKitDOMHTMLImageElement_h {
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLImageElement};
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_image_element_get_type() -> GType;
 
@@ -1224,7 +1224,7 @@ pub mod WebKitDOMHTMLInputElement_h {
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLInputElement};
     use super::gtype_h::GType;
     use super::gtypes_h::{gboolean, gchar};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_input_element_get_type() -> GType;
 
@@ -1262,7 +1262,7 @@ pub mod WebKitDOMHTMLLIElement_h {
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLLIElement};
     use super::gtype_h::GType;
     use super::gtypes_h::glong;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_li_element_get_type() -> GType;
 
@@ -1287,7 +1287,7 @@ pub mod WebKitDOMHTMLLinkElement_h {
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLLinkElement};
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_link_element_get_type() -> GType;
 
@@ -1307,7 +1307,7 @@ pub mod WebKitDOMHTMLOptionElement_h {
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLOptionElement};
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_option_element_get_type() -> GType;
 
@@ -1332,7 +1332,7 @@ pub mod WebKitDOMHTMLParamElement_h {
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLParamElement};
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_param_element_get_type() -> GType;
 
@@ -1357,7 +1357,7 @@ pub mod WebKitDOMHTMLScriptElement_h {
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLScriptElement};
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_script_element_get_type() -> GType;
 
@@ -1377,7 +1377,7 @@ pub mod WebKitDOMHTMLSelectElement_h {
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLSelectElement};
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_select_element_get_type() -> GType;
 
@@ -1402,7 +1402,7 @@ pub mod WebKitDOMHTMLTextAreaElement_h {
     use super::webkitdomdefines_h::{WebKitDOMHTMLElement, WebKitDOMHTMLTextAreaElement};
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_text_area_element_get_type() -> GType;
 
@@ -1427,7 +1427,7 @@ pub mod WebKitDOMKeyboardEvent_h {
     use super::webkitdomdefines_h::{WebKitDOMUIEvent, WebKitDOMKeyboardEvent};
     use super::gtype_h::GType;
     use super::gtypes_h::{gchar, gboolean};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_keyboard_event_get_type() -> GType;
 
@@ -1463,7 +1463,7 @@ pub mod WebKitDOMUIEvent_h {
     use super::webkitdomdefines_h::{WebKitDOMEvent, WebKitDOMUIEvent};
     use super::gtype_h::GType;
     use super::gtypes_h::glong;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_ui_event_get_type() -> GType;
 
@@ -1481,7 +1481,7 @@ pub mod WebKitDOMMouseEvent_h {
     use super::webkitdomdefines_h::{WebKitDOMUIEvent, WebKitDOMMouseEvent};
     use super::gtype_h::GType;
     use super::gtypes_h::gushort;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_mouse_event_get_type() -> GType;
 
@@ -1500,7 +1500,7 @@ pub mod WebKitDOMNodeList_h {
     }
     use super::webkitdomdefines_h::{WebKitDOMObject, WebKitDOMNodeList, WebKitDOMNode};
     use super::gtypes_h::gulong;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_node_list_item(
             self_0: *mut WebKitDOMNodeList,
@@ -1524,7 +1524,7 @@ pub mod WebKitScriptWorld_h {
 
     pub type WebKitScriptWorld = _WebKitScriptWorld;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitScriptWorldPrivate;
     }
@@ -1545,7 +1545,7 @@ pub mod WebKitFrame_h {
     use super::gobject_h::GObject;
     use super::WebKitScriptWorld_h::WebKitScriptWorld;
     use super::JSCValue_h::JSCContext;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitFramePrivate;
 
@@ -1570,7 +1570,7 @@ pub mod WebKitWebPage_h {
     pub type WebKitWebPage = _WebKitWebPage;
     use super::gobject_h::GObject;
     use super::WebKitFrame_h::WebKitFrame;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitWebPagePrivate;
 
@@ -1593,7 +1593,7 @@ pub mod WebKitWebExtension_h {
 
     pub type WebKitWebExtension = _WebKitWebExtension;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitWebExtensionPrivate;
     }
@@ -1618,7 +1618,7 @@ pub mod lua_h {
     pub const LUA_TFUNCTION: std::ffi::c_int = 6 as std::ffi::c_int;
     use super::__stddef_ptrdiff_t_h::ptrdiff_t;
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type lua_State;
 
@@ -1715,7 +1715,7 @@ pub mod lauxlib_h {
     }
     use super::lua_h::{lua_CFunction, lua_State, lua_Integer};
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaL_typerror(
             L: *mut lua_State,
@@ -1770,7 +1770,7 @@ pub mod log_h {
 
     pub const LOG_LEVEL_fatal: log_level_t = 0;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn _log(lvl: log_level_t, _: *const gchar, _: *const gchar, _: ...);
     }
@@ -1857,7 +1857,7 @@ pub mod common_h {
 
     pub type common_t = _common_t;
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub static mut common: common_t;
     }
@@ -1877,7 +1877,7 @@ pub mod extension_h {
     use super::WebKitWebExtension_h::WebKitWebExtension;
     use super::ipc_h::ipc_endpoint_t;
     use super::WebKitScriptWorld_h::WebKitScriptWorld;
-    extern "C" {
+    unsafe extern "C" {
 
         pub static mut extension: extension_t;
     }
@@ -2547,7 +2547,7 @@ pub mod tokenize_h {
 
     pub const L_TK_UNKNOWN: luakit_token_t = 0;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn l_tokenize(_: *const gchar) -> luakit_token_t;
     }
@@ -2586,7 +2586,7 @@ pub mod luaclass_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::{gint, gchar, gpointer};
     use super::lauxlib_h::luaL_Reg;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_class_add_signal(
             _: *mut lua_State,
@@ -2669,7 +2669,7 @@ pub mod dom_element_h {
 }
 
 pub mod string_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn memcpy(
             _: *mut std::ffi::c_void,
@@ -2701,7 +2701,7 @@ pub mod string_h {
 pub mod gmem_h {
     use super::gtypes_h::gpointer;
     use super::glibconfig_h::gsize;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_free(mem: gpointer);
 
@@ -2735,7 +2735,7 @@ pub mod gstrfuncs_h {
     use super::string_h::{strlen, memcpy};
     use super::__stddef_size_t_h::size_t;
     use super::gmem_h::g_malloc;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_str_has_suffix(str: *const gchar, suffix: *const gchar) -> gboolean;
 
@@ -2753,7 +2753,7 @@ pub mod gstrfuncs_h {
 }
 
 pub mod gtestutils_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_strcmp0(
             str1: *const std::ffi::c_char,
@@ -2768,7 +2768,7 @@ pub mod WebKitDOMEventTarget_h {
     use super::gerror_h::GError;
     use super::gtypes_h::{gboolean, gpointer};
     use super::gclosure_h::GCallback;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_event_target_get_type() -> GType;
 
@@ -2798,7 +2798,7 @@ pub mod WebKitDOMEventTarget_h {
 pub mod util_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_callerinfo(_: *mut lua_State) -> *mut gchar;
     }
@@ -2807,7 +2807,7 @@ pub mod util_h {
 pub mod luautil_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::gint;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_dofunction_on_error(L: *mut lua_State) -> gint;
     }
@@ -2912,7 +2912,7 @@ pub mod luaobject_h {
     use super::luaclass_h::lua_class_t;
     use super::gtypes_h::{gint, gpointer, gchar};
     use super::tokenize_h::{luakit_token_t, L_TK_UNKNOWN};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_settype(L: *mut lua_State, lua_class: *mut lua_class_t) -> gint;
 
@@ -2952,7 +2952,7 @@ pub mod dom_document_h {
     use super::lua_h::lua_State;
     use super::webkitdomdefines_h::WebKitDOMDocument;
     use super::gtypes_h::gint;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_dom_document_from_webkit_dom_document(
             L: *mut lua_State,
@@ -2964,7 +2964,7 @@ pub mod dom_document_h {
 pub mod luauniq_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::{gchar, gpointer};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_uniq_setup(L: *mut lua_State, reg: *const gchar, mode: *const gchar);
 
@@ -3650,7 +3650,7 @@ unsafe extern "C" fn luaH_dom_element_gc(mut L: *mut lua_State) -> gint {
     }
     return luaH_object_gc(L);
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_dom_element_from_node(
     mut L: *mut lua_State,
@@ -3684,7 +3684,7 @@ pub unsafe extern "C" fn luaH_dom_element_from_node(
     );
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_to_dom_element(
     mut L: *mut lua_State,
@@ -3769,7 +3769,7 @@ unsafe extern "C" fn dom_element_selector(
     g_ptr_array_free(parts, TRUE);
     return sel;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn dom_element_js_ref(
     mut page: *mut page_t,
@@ -4521,7 +4521,7 @@ unsafe extern "C" fn event_listener_bubble_cb(
 ) {
     return event_listener_cb(elem, event, FALSE, element);
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_dom_element_add_dom_event(
     mut L: *mut lua_State,
@@ -4546,7 +4546,7 @@ pub unsafe extern "C" fn luaH_dom_element_add_dom_event(
     g_free(origin as gpointer);
     signal_add((*obj).dom_events, name, luaH_object_ref_item(L, oud, ud));
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_dom_element_remove_dom_event(
     mut L: *mut lua_State,
@@ -5759,7 +5759,7 @@ unsafe extern "C" fn luaH_dom_element_newindex(mut L: *mut lua_State) -> gint {
     }
     return luaH_object_property_signal(L, 1 as std::ffi::c_int, token);
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn dom_element_class_setup(mut L: *mut lua_State) {
     static mut dom_element_methods: [luaL_Reg; 4] = unsafe {

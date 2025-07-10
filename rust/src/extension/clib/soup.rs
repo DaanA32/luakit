@@ -44,7 +44,7 @@ pub mod garray_h {
 
     pub type GPtrArray = _GPtrArray;
     use super::gtypes_h::{gpointer, guint, gboolean};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_ptr_array_free(
             array: *mut GPtrArray,
@@ -77,7 +77,7 @@ pub mod gerror_h {
 pub mod ghash_h {
 
     pub type GHashTable = _GHashTable;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GHashTable;
     }
@@ -164,7 +164,7 @@ pub mod gregex_h {
     pub type GMatchInfo = _GMatchInfo;
     use super::gtypes_h::{gchar, gboolean};
     use super::gerror_h::GError;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GRegex;
 
@@ -190,7 +190,7 @@ pub mod gtree_h {
 
     pub type GTree = _GTree;
     use super::gtypes_h::{GCompareDataFunc, gpointer, GDestroyNotify};
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GTree;
 
@@ -230,7 +230,7 @@ pub mod guri_h {
     pub const G_URI_FLAGS_NONE: GUriFlags = 0;
     use super::gtypes_h::{gchar, gint};
     use super::gerror_h::GError;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GUri;
 
@@ -287,7 +287,7 @@ pub mod lua_h {
 
     pub const LUA_TTABLE: std::ffi::c_int = 5 as std::ffi::c_int;
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type lua_State;
 
@@ -388,7 +388,7 @@ pub mod lauxlib_h {
     }
     use super::lua_h::{lua_CFunction, lua_State};
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaL_typerror(
             L: *mut lua_State,
@@ -437,7 +437,7 @@ pub mod luaclass_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::{gint, gchar};
     use super::lauxlib_h::luaL_Reg;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_class_add_signal(
             _: *mut lua_State,
@@ -471,7 +471,7 @@ pub mod luaclass_h {
 }
 
 pub mod string_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn memcpy(
             _: *mut std::ffi::c_void,
@@ -486,7 +486,7 @@ pub mod string_h {
 pub mod gmem_h {
     use super::gtypes_h::gpointer;
     use super::glibconfig_h::gsize;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_free(mem: gpointer);
 
@@ -520,7 +520,7 @@ pub mod gstrfuncs_h {
     use super::string_h::{strlen, memcpy};
     use super::__stddef_size_t_h::size_t;
     use super::gmem_h::g_malloc;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_strdup(str: *const gchar) -> *mut gchar;
 
@@ -529,7 +529,7 @@ pub mod gstrfuncs_h {
 }
 
 pub mod gtestutils_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_strcmp0(
             str1: *const std::ffi::c_char,
@@ -1043,7 +1043,7 @@ unsafe extern "C" fn luaH_soup_class_add_signal(mut L: *mut lua_State) -> gint {
     );
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn soup_lib_setup(mut L: *mut lua_State) {
     soup_lib_setup_common();

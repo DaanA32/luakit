@@ -1,5 +1,5 @@
 use ::libc;
-use ::c2rust_bitfields;
+
 
 pub mod types_h {
 
@@ -65,7 +65,7 @@ pub mod gerror_h {
 pub mod gconvert_h {
 
     pub type GIConv = *mut _GIConv;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GIConv;
     }
@@ -74,7 +74,7 @@ pub mod gconvert_h {
 pub mod gdataset_h {
 
     pub type GData = _GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GData;
     }
@@ -198,7 +198,7 @@ pub mod gmain_h {
     }
     use super::gtypes_h::{gpointer, guint, gint, gboolean};
     use super::gslist_h::GSList;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GMainContext;
 
@@ -222,7 +222,7 @@ pub mod gstring_h {
 }
 
 pub mod giochannel_h {
-    #[derive(Copy, Clone, BitfieldStruct)]
+    #[derive(Copy, Clone)]
     #[repr(C)]
 
     pub struct _GIOChannel {
@@ -238,14 +238,14 @@ pub mod giochannel_h {
         pub encoded_read_buf: *mut GString,
         pub write_buf: *mut GString,
         pub partial_write_buf: [gchar; 6],
-        #[bitfield(name = "use_buffer", ty = "guint", bits = "0..=0")]
-        #[bitfield(name = "do_encode", ty = "guint", bits = "1..=1")]
-        #[bitfield(name = "close_on_unref", ty = "guint", bits = "2..=2")]
-        #[bitfield(name = "is_readable", ty = "guint", bits = "3..=3")]
-        #[bitfield(name = "is_writeable", ty = "guint", bits = "4..=4")]
-        #[bitfield(name = "is_seekable", ty = "guint", bits = "5..=5")]
+
+
+
+
+
+
         pub use_buffer_do_encode_close_on_unref_is_readable_is_writeable_is_seekable: [u8; 1],
-        #[bitfield(padding)]
+
         pub c2rust_padding: [u8; 1],
         pub reserved1: gpointer,
         pub reserved2: gpointer,
@@ -352,7 +352,7 @@ pub mod gvariant_h {
 
     pub type GVariant = _GVariant;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GVariant;
 
@@ -382,7 +382,7 @@ pub mod lua_h {
     >;
 
     pub const LUA_GLOBALSINDEX: std::ffi::c_int = -(10002 as std::ffi::c_int);
-    extern "C" {
+    unsafe extern "C" {
 
         pub type lua_State;
 
@@ -422,7 +422,7 @@ pub mod log_h {
 
     pub const LOG_LEVEL_fatal: log_level_t = 0;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn _log(lvl: log_level_t, _: *const gchar, _: *const gchar, _: ...);
     }
@@ -547,7 +547,7 @@ pub mod ipc_h {
     use super::glibconfig_h::gsize;
     use super::giochannel_h::GIOChannel;
     use super::gqueue_h::GQueue;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn ipc_endpoint_new(name: *const gchar) -> *mut ipc_endpoint_t;
 
@@ -572,7 +572,7 @@ pub mod WebKitScriptWorld_h {
 
     pub type WebKitScriptWorld = _WebKitScriptWorld;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitScriptWorldPrivate;
     }
@@ -591,7 +591,7 @@ pub mod WebKitWebExtension_h {
 
     pub type WebKitWebExtension = _WebKitWebExtension;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitWebExtensionPrivate;
     }
@@ -616,7 +616,7 @@ pub mod extension_h {
 pub mod stdlib_h {
 
     pub const EXIT_FAILURE: std::ffi::c_int = 1 as std::ffi::c_int;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn exit(_: std::ffi::c_int) -> !;
     }
@@ -624,7 +624,7 @@ pub mod stdlib_h {
 
 pub mod unistd_h {
     use super::types_h::__pid_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn getpid() -> __pid_t;
     }
@@ -632,7 +632,7 @@ pub mod unistd_h {
 
 pub mod gstrfuncs_h {
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_strdup_printf(format: *const gchar, _: ...) -> *mut gchar;
     }
@@ -641,7 +641,7 @@ pub mod gstrfuncs_h {
 pub mod util_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::gint;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_panic(L: *mut lua_State) -> gint;
     }
@@ -649,7 +649,7 @@ pub mod util_h {
 
 pub mod lauxlib_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaL_newstate() -> *mut lua_State;
     }
@@ -657,7 +657,7 @@ pub mod lauxlib_h {
 
 pub mod lualib_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaL_openlibs(L: *mut lua_State);
     }
@@ -665,7 +665,7 @@ pub mod lualib_h {
 
 pub mod luaobject_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_object_setup(L: *mut lua_State);
     }
@@ -673,7 +673,7 @@ pub mod luaobject_h {
 
 pub mod luah_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_fixups(L: *mut lua_State);
     }
@@ -682,7 +682,7 @@ pub mod luah_h {
 pub mod luauniq_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_uniq_setup(L: *mut lua_State, reg: *const gchar, mode: *const gchar);
     }
@@ -690,7 +690,7 @@ pub mod luauniq_h {
 
 pub mod extension_ipc_h {
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn web_extension_connect(socket_path: *const gchar) -> std::ffi::c_int;
     }
@@ -698,7 +698,7 @@ pub mod extension_ipc_h {
 
 pub mod luakit_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luakit_lib_setup(L: *mut lua_State);
     }
@@ -706,7 +706,7 @@ pub mod luakit_h {
 
 pub mod dom_document_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn dom_document_class_setup(_: *mut lua_State);
     }
@@ -714,7 +714,7 @@ pub mod dom_document_h {
 
 pub mod page_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn page_class_setup(_: *mut lua_State);
     }
@@ -722,7 +722,7 @@ pub mod page_h {
 
 pub mod dom_element_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn dom_element_class_setup(_: *mut lua_State);
     }
@@ -730,7 +730,7 @@ pub mod dom_element_h {
 
 pub mod soup_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn soup_lib_setup(L: *mut lua_State);
     }
@@ -738,7 +738,7 @@ pub mod soup_h {
 
 pub mod msg_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn msg_lib_setup(L: *mut lua_State);
     }
@@ -746,7 +746,7 @@ pub mod msg_h {
 
 pub mod clib_ipc_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn ipc_channel_class_setup(_: *mut lua_State);
     }
@@ -754,7 +754,7 @@ pub mod clib_ipc_h {
 
 pub mod timer_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn timer_class_setup(_: *mut lua_State);
     }
@@ -762,7 +762,7 @@ pub mod timer_h {
 
 pub mod regex_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn regex_class_setup(_: *mut lua_State);
     }
@@ -770,28 +770,28 @@ pub mod regex_h {
 
 pub mod utf8_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn utf8_lib_setup(_: *mut lua_State);
     }
 }
 
 pub mod scroll_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn web_scroll_init();
     }
 }
 
 pub mod luajs_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn web_luajs_init();
     }
 }
 
 pub mod script_world_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn web_script_world_init();
     }
@@ -880,12 +880,12 @@ use self::scroll_h::web_scroll_init;
 use self::luajs_h::web_luajs_init;
 use self::script_world_h::web_script_world_init;
 pub use self::__stddef_null_h::NULL;
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub static mut common: common_t = _common_t {
     L: 0 as *const lua_State as *mut lua_State,
 };
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub static mut extension: extension_t = _extension_t {
     ext: 0 as *const WebKitWebExtension as *mut WebKitWebExtension,
@@ -946,7 +946,7 @@ unsafe extern "C" fn web_lua_init(
         b"Lua initialized\0" as *const u8 as *const std::ffi::c_char,
     );
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn webkit_web_extension_initialize_with_user_data(
     mut ext: *mut WebKitWebExtension,

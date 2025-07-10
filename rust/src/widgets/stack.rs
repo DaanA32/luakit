@@ -30,7 +30,7 @@ pub mod gtypes_h {
 pub mod gdataset_h {
 
     pub type GData = _GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GData;
     }
@@ -39,7 +39,7 @@ pub mod gdataset_h {
 pub mod ghash_h {
 
     pub type GHashTable = _GHashTable;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GHashTable;
     }
@@ -48,7 +48,7 @@ pub mod ghash_h {
 pub mod gtree_h {
 
     pub type GTree = _GTree;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GTree;
     }
@@ -75,7 +75,7 @@ pub mod gtype_h {
     pub type GTypeInstance = _GTypeInstance;
     use super::glibconfig_h::gsize;
     use super::gtypes_h::gboolean;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_type_check_instance_cast(
             instance: *mut GTypeInstance,
@@ -110,7 +110,7 @@ pub mod gobject_h {
     use super::gtype_h::GTypeInstance;
     use super::gtypes_h::{guint, gpointer, gchar};
     use super::gdataset_h::GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_object_connect(
             object: gpointer,
@@ -132,7 +132,7 @@ pub mod lua_h {
 
     pub const LUA_TBOOLEAN: std::ffi::c_int = 1 as std::ffi::c_int;
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type lua_State;
 
@@ -751,7 +751,7 @@ pub mod luaclass_h {
     use super::signal_h::signal_t;
     use super::lua_h::lua_State;
     use super::gtypes_h::{gint, gchar, gpointer};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_checkudata(
             _: *mut lua_State,
@@ -866,7 +866,7 @@ pub mod widget_h {
     use super::gtkwidget_h::gtk_widget_get_type;
     use super::gtestutils_h::g_assertion_message_expr;
     use super::gmessages_h::G_LOG_DOMAIN;
-    extern "C" {
+    unsafe extern "C" {
 
         pub static mut widget_class: lua_class_t;
     }
@@ -885,7 +885,7 @@ pub mod gtkcssprovider_h {
 
     pub type GtkCssProviderPrivate = _GtkCssProviderPrivate;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkCssProviderPrivate;
     }
@@ -910,7 +910,7 @@ pub mod gtkwidget_h {
     use super::gobject_h::GInitiallyUnowned;
     use super::gtype_h::GType;
     use super::gtktypes_h::GtkWidget;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkWidgetPrivate;
 
@@ -940,7 +940,7 @@ pub mod gdktypes_h {
 
     pub type GdkWindow = _GdkWindow;
     use super::cairo_h::cairo_rectangle_int_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GdkWindow;
     }
@@ -1080,7 +1080,7 @@ pub mod gtkcontainer_h {
     pub type GtkContainerPrivate = _GtkContainerPrivate;
     use super::gtktypes_h::GtkWidget;
     use super::gtype_h::GType;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkContainerPrivate;
 
@@ -1103,7 +1103,7 @@ pub mod gtkstack_h {
     use super::gtype_h::GType;
     use super::gtktypes_h::GtkWidget;
     use super::gtypes_h::gboolean;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn gtk_stack_get_type() -> GType;
 
@@ -1125,7 +1125,7 @@ pub mod gmessages_h {
 }
 
 pub mod gtestutils_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_assertion_message_expr(
             domain: *const std::ffi::c_char,
@@ -1139,7 +1139,7 @@ pub mod gtestutils_h {
 
 pub mod lauxlib_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaL_typerror(
             L: *mut lua_State,
@@ -1188,7 +1188,7 @@ pub mod luaobject_h {
     };
     use super::gtypes_h::{gpointer, gint};
     use super::tokenize_h::{luakit_token_t, L_TK_UNKNOWN};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_object_property_signal(
             _: *mut lua_State,
@@ -1222,7 +1222,7 @@ pub mod common_h {
     use super::gtypes_h::{gboolean, gint};
     use super::lua_h::lua_State;
     use super::gdktypes_h::GdkRectangle;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn focus_cb(
             _: *mut GtkWidget,
@@ -1607,7 +1607,7 @@ unsafe extern "C" fn luaH_stack_newindex(
     }
     return luaH_object_property_signal(L, 1 as std::ffi::c_int, token);
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn widget_stack(
     mut UNUSED_L: *mut lua_State,

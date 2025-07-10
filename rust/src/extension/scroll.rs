@@ -1,5 +1,5 @@
 use ::libc;
-use ::c2rust_bitfields;
+
 
 pub mod glibconfig_h {
 
@@ -70,7 +70,7 @@ pub mod gerror_h {
 pub mod gconvert_h {
 
     pub type GIConv = *mut _GIConv;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GIConv;
     }
@@ -79,7 +79,7 @@ pub mod gconvert_h {
 pub mod gdataset_h {
 
     pub type GData = _GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GData;
     }
@@ -203,7 +203,7 @@ pub mod gmain_h {
     }
     use super::gtypes_h::{gpointer, guint, gint, gboolean};
     use super::gslist_h::GSList;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GMainContext;
 
@@ -227,7 +227,7 @@ pub mod gstring_h {
 }
 
 pub mod giochannel_h {
-    #[derive(Copy, Clone, BitfieldStruct)]
+    #[derive(Copy, Clone)]
     #[repr(C)]
 
     pub struct _GIOChannel {
@@ -243,14 +243,14 @@ pub mod giochannel_h {
         pub encoded_read_buf: *mut GString,
         pub write_buf: *mut GString,
         pub partial_write_buf: [gchar; 6],
-        #[bitfield(name = "use_buffer", ty = "guint", bits = "0..=0")]
-        #[bitfield(name = "do_encode", ty = "guint", bits = "1..=1")]
-        #[bitfield(name = "close_on_unref", ty = "guint", bits = "2..=2")]
-        #[bitfield(name = "is_readable", ty = "guint", bits = "3..=3")]
-        #[bitfield(name = "is_writeable", ty = "guint", bits = "4..=4")]
-        #[bitfield(name = "is_seekable", ty = "guint", bits = "5..=5")]
+
+
+
+
+
+
         pub use_buffer_do_encode_close_on_unref_is_readable_is_writeable_is_seekable: [u8; 1],
-        #[bitfield(padding)]
+
         pub c2rust_padding: [u8; 1],
         pub reserved1: gpointer,
         pub reserved2: gpointer,
@@ -391,7 +391,7 @@ pub mod gtype_h {
     pub type GTypeInstance = _GTypeInstance;
     use super::glibconfig_h::gsize;
     use super::gvalue_h::_GValue;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_type_check_instance_cast(
             instance: *mut GTypeInstance,
@@ -428,22 +428,22 @@ pub mod gvalue_h {
 }
 
 pub mod gclosure_h {
-    #[derive(Copy, Clone, BitfieldStruct)]
+    #[derive(Copy, Clone)]
     #[repr(C)]
 
     pub struct _GClosure {
-        #[bitfield(name = "ref_count", ty = "guint", bits = "0..=14")]
-        #[bitfield(name = "meta_marshal_nouse", ty = "guint", bits = "15..=15")]
-        #[bitfield(name = "n_guards", ty = "guint", bits = "16..=16")]
-        #[bitfield(name = "n_fnotifiers", ty = "guint", bits = "17..=18")]
-        #[bitfield(name = "n_inotifiers", ty = "guint", bits = "19..=26")]
-        #[bitfield(name = "in_inotify", ty = "guint", bits = "27..=27")]
-        #[bitfield(name = "floating", ty = "guint", bits = "28..=28")]
-        #[bitfield(name = "derivative_flag", ty = "guint", bits = "29..=29")]
-        #[bitfield(name = "in_marshal", ty = "guint", bits = "30..=30")]
-        #[bitfield(name = "is_invalid", ty = "guint", bits = "31..=31")]
+
+
+
+
+
+
+
+
+
+
         pub ref_count_meta_marshal_nouse_n_guards_n_fnotifiers_n_inotifiers_in_inotify_floating_derivative_flag_in_marshal_is_invalid: [u8; 4],
-        #[bitfield(padding)]
+
         pub c2rust_padding: [u8; 4],
         pub marshal: Option::<
             unsafe extern "C" fn(
@@ -490,7 +490,7 @@ pub mod gsignal_h {
     pub const G_CONNECT_DEFAULT: GConnectFlags = 0;
     use super::gtypes_h::{gpointer, gchar, gulong};
     use super::gclosure_h::{GCallback, GClosureNotify};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_signal_connect_data(
             instance: gpointer,
@@ -540,7 +540,7 @@ pub mod webkitdomdefines_h {
     use super::WebKitDOMDocument_h::_WebKitDOMDocument;
     use super::WebKitDOMElement_h::_WebKitDOMElement;
     use super::WebKitDOMEvent_h::_WebKitDOMEvent;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitDOMEventTarget;
     }
@@ -577,7 +577,7 @@ pub mod WebKitDOMDOMWindow_h {
     }
     use super::webkitdomdefines_h::{WebKitDOMObject, WebKitDOMDOMWindow};
     use super::gtypes_h::{gdouble, glong};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_dom_window_scroll_to(
             self_0: *mut WebKitDOMDOMWindow,
@@ -613,7 +613,7 @@ pub mod WebKitDOMDocument_h {
     use super::webkitdomdefines_h::{
         WebKitDOMNode, WebKitDOMDocument, WebKitDOMElement, WebKitDOMDOMWindow,
     };
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_document_get_document_element(
             self_0: *mut WebKitDOMDocument,
@@ -634,7 +634,7 @@ pub mod WebKitDOMElement_h {
     }
     use super::webkitdomdefines_h::{WebKitDOMNode, WebKitDOMElement};
     use super::gtypes_h::glong;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_element_get_scroll_width(
             self_0: *mut WebKitDOMElement,
@@ -669,7 +669,7 @@ pub mod WebKitScriptWorld_h {
 
     pub type WebKitScriptWorld = _WebKitScriptWorld;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitScriptWorldPrivate;
     }
@@ -690,7 +690,7 @@ pub mod WebKitWebPage_h {
     use super::gobject_h::GObject;
     use super::webkitdomdefines_h::WebKitDOMDocument;
     use super::glibconfig_h::guint64;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitWebPagePrivate;
 
@@ -717,7 +717,7 @@ pub mod WebKitWebExtension_h {
     use super::gobject_h::GObject;
     use super::glibconfig_h::guint64;
     use super::WebKitWebPage_h::WebKitWebPage;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitWebExtensionPrivate;
 
@@ -816,7 +816,7 @@ pub mod ipc_h {
     use super::garray_h::GPtrArray;
     use super::giochannel_h::GIOChannel;
     use super::gqueue_h::GQueue;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn ipc_send(
             ipc: *mut ipc_endpoint_t,
@@ -840,7 +840,7 @@ pub mod extension_h {
     use super::WebKitWebExtension_h::WebKitWebExtension;
     use super::ipc_h::ipc_endpoint_t;
     use super::WebKitScriptWorld_h::WebKitScriptWorld;
-    extern "C" {
+    unsafe extern "C" {
 
         pub static mut extension: extension_t;
     }
@@ -851,7 +851,7 @@ pub mod WebKitDOMEventTarget_h {
     use super::webkitdomdefines_h::WebKitDOMEventTarget;
     use super::gclosure_h::GCallback;
     use super::gtypes_h::{gboolean, gpointer};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_event_target_get_type() -> GType;
 
@@ -1149,7 +1149,7 @@ unsafe extern "C" fn web_page_created_cb(
         G_CONNECT_DEFAULT,
     );
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn web_scroll_to(
     mut page_id: guint64,
@@ -1162,7 +1162,7 @@ pub unsafe extern "C" fn web_scroll_to(
     webkit_dom_dom_window_scroll_to(window, scroll_x as gdouble, scroll_y as gdouble);
     window_scroll_cb(window, NULL as *mut WebKitDOMEvent, page);
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn web_scroll_init() {
     g_signal_connect_data(

@@ -53,7 +53,7 @@ pub mod gerror_h {
     pub type GError = _GError;
     use super::gquark_h::GQuark;
     use super::gtypes_h::{gint, gchar};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_error_free(error: *mut GError);
     }
@@ -62,7 +62,7 @@ pub mod gerror_h {
 pub mod gdataset_h {
 
     pub type GData = _GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GData;
     }
@@ -82,7 +82,7 @@ pub mod gfileutils_h {
 
     pub const G_FILE_TEST_IS_REGULAR: GFileTest = 1;
     use super::gtypes_h::{gchar, gboolean};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_file_test(filename: *const gchar, test: GFileTest) -> gboolean;
     }
@@ -91,7 +91,7 @@ pub mod gfileutils_h {
 pub mod ghash_h {
 
     pub type GHashTable = _GHashTable;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GHashTable;
     }
@@ -100,7 +100,7 @@ pub mod ghash_h {
 pub mod gtree_h {
 
     pub type GTree = _GTree;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GTree;
     }
@@ -127,7 +127,7 @@ pub mod gtype_h {
     pub type GTypeInstance = _GTypeInstance;
     use super::glibconfig_h::gsize;
     use super::gtypes_h::gboolean;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_type_check_instance_cast(
             instance: *mut GTypeInstance,
@@ -162,7 +162,7 @@ pub mod gobject_h {
     use super::gtype_h::GTypeInstance;
     use super::gtypes_h::{guint, gpointer, gchar};
     use super::gdataset_h::GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_object_connect(
             object: gpointer,
@@ -186,7 +186,7 @@ pub mod giotypes_h {
     use super::gcancellable_h::_GCancellable;
     use super::gobject_h::GObject;
     use super::gtypes_h::gpointer;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GAsyncResult;
     }
@@ -204,7 +204,7 @@ pub mod gcancellable_h {
     pub type GCancellablePrivate = _GCancellablePrivate;
     use super::gobject_h::GObject;
     use super::giotypes_h::GCancellable;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GCancellablePrivate;
 
@@ -240,7 +240,7 @@ pub mod cairo_h {
     }
 
     pub type cairo_rectangle_int_t = _cairo_rectangle_int;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _cairo;
 
@@ -302,7 +302,7 @@ pub mod gdktypes_h {
 
     pub type GdkWindow = _GdkWindow;
     use super::cairo_h::cairo_rectangle_int_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GdkWindow;
     }
@@ -432,7 +432,7 @@ pub mod gdk_pixbuf_core_h {
 
     pub type GdkPixbuf = _GdkPixbuf;
     use super::gerror_h::GError;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GdkPixbuf;
 
@@ -455,7 +455,7 @@ pub mod gdk_pixbuf_transform_h {
 
     pub const GDK_INTERP_NEAREST: GdkInterpType = 0;
     use super::gdk_pixbuf_core_h::GdkPixbuf;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn gdk_pixbuf_scale_simple(
             src: *const GdkPixbuf,
@@ -499,7 +499,7 @@ pub mod gtkwidget_h {
     use super::gtype_h::GType;
     use super::gtktypes_h::GtkWidget;
     use super::gtypes_h::gint;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkWidgetPrivate;
 
@@ -530,7 +530,7 @@ pub mod gtkmisc_h {
 
     pub type GtkMisc = _GtkMisc;
     use super::gtktypes_h::GtkWidget;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkMiscPrivate;
     }
@@ -555,7 +555,7 @@ pub mod gtkimage_h {
     use super::gtypes_h::gchar;
     use super::gtkenums_h::{GtkIconSize, GTK_ICON_SIZE_INVALID};
     use super::cairo_h::cairo_surface_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkImagePrivate;
 
@@ -593,7 +593,7 @@ pub mod gtkcssprovider_h {
 
     pub type GtkCssProvider = _GtkCssProvider;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkCssProviderPrivate;
     }
@@ -616,7 +616,7 @@ pub mod WebKitFaviconDatabase_h {
     use super::giotypes_h::{GCancellable, GAsyncReadyCallback, GAsyncResult};
     use super::gerror_h::GError;
     use super::cairo_h::cairo_surface_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitFaviconDatabasePrivate;
 
@@ -655,7 +655,7 @@ pub mod WebKitWebContext_h {
     pub type WebKitWebContext = _WebKitWebContext;
     use super::gobject_h::GObject;
     use super::WebKitFaviconDatabase_h::WebKitFaviconDatabase;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitWebContextPrivate;
 
@@ -676,7 +676,7 @@ pub mod lua_h {
     pub const LUA_TNIL: std::ffi::c_int = 0 as std::ffi::c_int;
     use super::__stddef_ptrdiff_t_h::ptrdiff_t;
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type lua_State;
 
@@ -716,7 +716,7 @@ pub mod log_h {
 
     pub const LOG_LEVEL_fatal: log_level_t = 0;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn _log(lvl: log_level_t, _: *const gchar, _: *const gchar, _: ...);
     }
@@ -1315,7 +1315,7 @@ pub mod luaclass_h {
     use super::signal_h::signal_t;
     use super::lua_h::lua_State;
     use super::gtypes_h::{gint, gchar, gpointer};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_checkudata(
             _: *mut lua_State,
@@ -1423,14 +1423,14 @@ pub mod widget_h {
     use super::gtkwidget_h::gtk_widget_get_type;
     use super::gtestutils_h::g_assertion_message_expr;
     use super::gmessages_h::G_LOG_DOMAIN;
-    extern "C" {
+    unsafe extern "C" {
 
         pub static mut widget_class: lua_class_t;
     }
 }
 
 pub mod string_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn strrchr(
             _: *const std::ffi::c_char,
@@ -1443,7 +1443,7 @@ pub mod string_h {
 
 pub mod gmem_h {
     use super::gtypes_h::gpointer;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_free(mem: gpointer);
     }
@@ -1451,7 +1451,7 @@ pub mod gmem_h {
 
 pub mod gstrfuncs_h {
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_strdup_printf(format: *const gchar, _: ...) -> *mut gchar;
     }
@@ -1463,7 +1463,7 @@ pub mod gmessages_h {
 }
 
 pub mod gtestutils_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_assertion_message_expr(
             domain: *const std::ffi::c_char,
@@ -1479,7 +1479,7 @@ pub mod gdkcairo_h {
     use super::gdk_pixbuf_core_h::GdkPixbuf;
     use super::gdktypes_h::GdkWindow;
     use super::cairo_h::cairo_surface_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn gdk_cairo_surface_create_from_pixbuf(
             pixbuf: *const GdkPixbuf,
@@ -1492,7 +1492,7 @@ pub mod gdkcairo_h {
 pub mod lauxlib_h {
     use super::lua_h::{lua_State, lua_Integer};
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaL_argerror(
             L: *mut lua_State,
@@ -1523,7 +1523,7 @@ pub mod luaobject_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::gint;
     use super::tokenize_h::{luakit_token_t, L_TK_UNKNOWN};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_object_property_signal(
             _: *mut lua_State,
@@ -1540,7 +1540,7 @@ pub mod common_h {
     use super::gtypes_h::{gboolean, gint};
     use super::lua_h::lua_State;
     use super::gdktypes_h::GdkRectangle;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn focus_cb(
             _: *mut GtkWidget,
@@ -1596,7 +1596,7 @@ pub mod common_h {
 
 pub mod web_context_h {
     use super::WebKitWebContext_h::WebKitWebContext;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn web_context_get() -> *mut WebKitWebContext;
     }
@@ -1604,7 +1604,7 @@ pub mod web_context_h {
 
 pub mod resource_h {
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn resource_find_file(path: *const gchar) -> *mut gchar;
     }
@@ -2051,7 +2051,7 @@ unsafe extern "C" fn luaH_image_scale(mut L: *mut lua_State) -> gint {
     g_object_unref(scaled_pixbuf as gpointer);
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_image_set_favicon_for_uri_finished(
     mut fdb: *mut WebKitFaviconDatabase,
@@ -2301,7 +2301,7 @@ unsafe extern "C" fn luaH_image_newindex(
     }
     return luaH_object_property_signal(L, 1 as std::ffi::c_int, token);
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn widget_image(
     mut UNUSED_L: *mut lua_State,

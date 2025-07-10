@@ -32,7 +32,7 @@ pub mod gtypes_h {
 pub mod gdataset_h {
 
     pub type GData = _GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GData;
     }
@@ -41,7 +41,7 @@ pub mod gdataset_h {
 pub mod gtree_h {
 
     pub type GTree = _GTree;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GTree;
     }
@@ -67,7 +67,7 @@ pub mod gtype_h {
 
     pub type GTypeInstance = _GTypeInstance;
     use super::glibconfig_h::gsize;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_type_check_instance_cast(
             instance: *mut GTypeInstance,
@@ -97,7 +97,7 @@ pub mod gobject_h {
     use super::gtype_h::GTypeInstance;
     use super::gtypes_h::{guint, gpointer, gchar};
     use super::gdataset_h::GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_object_connect(
             object: gpointer,
@@ -119,7 +119,7 @@ pub mod lua_h {
 
     pub const LUA_TTABLE: std::ffi::c_int = 5 as std::ffi::c_int;
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type lua_State;
 
@@ -780,7 +780,7 @@ pub mod gtkcssprovider_h {
 
     pub type GtkCssProviderPrivate = _GtkCssProviderPrivate;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkCssProviderPrivate;
     }
@@ -807,7 +807,7 @@ pub mod gtkwidget_h {
     pub type GtkWidgetPrivate = _GtkWidgetPrivate;
     use super::gobject_h::GInitiallyUnowned;
     use super::gtktypes_h::GtkWidget;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkWidgetPrivate;
 
@@ -835,7 +835,7 @@ pub mod gdktypes_h {
 
     pub type GdkWindow = _GdkWindow;
     use super::cairo_h::cairo_rectangle_int_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GdkWindow;
     }
@@ -974,7 +974,7 @@ pub mod gtkadjustment_h {
     use super::gobject_h::GInitiallyUnowned;
     use super::gtktypes_h::GtkAdjustment;
     use super::gtypes_h::gdouble;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkAdjustmentPrivate;
 
@@ -999,7 +999,7 @@ pub mod gtkbin_h {
 
     pub type GtkBinPrivate = _GtkBinPrivate;
     use super::gtkcontainer_h::GtkContainer;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkBinPrivate;
     }
@@ -1018,7 +1018,7 @@ pub mod gtkcontainer_h {
 
     pub type GtkContainerPrivate = _GtkContainerPrivate;
     use super::gtktypes_h::GtkWidget;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkContainerPrivate;
     }
@@ -1049,7 +1049,7 @@ pub mod gtkscrolledwindow_h {
     use super::gtkbin_h::GtkBin;
     use super::gtype_h::GType;
     use super::gtktypes_h::{GtkAdjustment, GtkWidget};
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkScrolledWindowPrivate;
 
@@ -1083,7 +1083,7 @@ pub mod gtkscrolledwindow_h {
 }
 
 pub mod string_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn strcmp(
             _: *const std::ffi::c_char,
@@ -1094,7 +1094,7 @@ pub mod string_h {
 
 pub mod lauxlib_h {
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaL_typerror(
             L: *mut lua_State,
@@ -1114,7 +1114,7 @@ pub mod luaobject_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::gint;
     use super::tokenize_h::{luakit_token_t, L_TK_UNKNOWN};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_object_property_signal(
             _: *mut lua_State,
@@ -1153,7 +1153,7 @@ pub mod common_h {
     use super::gtypes_h::{gboolean, gint};
     use super::lua_h::lua_State;
     use super::gdktypes_h::GdkRectangle;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn focus_cb(
             _: *mut GtkWidget,
@@ -1370,7 +1370,7 @@ unsafe extern "C" fn gtk_policy_from_string(
         *out = GTK_POLICY_AUTOMATIC;
     } else if strcmp(str, b"never\0" as *const u8 as *const std::ffi::c_char) == 0 {
         *out = GTK_POLICY_NEVER;
-    } else if strcmp(str, b"external\0" as *const u8 as *const std::ffi::c_char) == 0 {
+    } else if strcmp(str, b"unsafe external\0" as *const u8 as *const std::ffi::c_char) == 0 {
         *out = GTK_POLICY_EXTERNAL;
     } else {
         return 1 as std::ffi::c_int
@@ -1383,11 +1383,11 @@ unsafe extern "C" fn string_from_gtk_policy(mut policy: GtkPolicyType) -> *const
         0 => return b"always\0" as *const u8 as *const std::ffi::c_char,
         1 => return b"auto\0" as *const u8 as *const std::ffi::c_char,
         2 => return b"never\0" as *const u8 as *const std::ffi::c_char,
-        3 => return b"external\0" as *const u8 as *const std::ffi::c_char,
+        3 => return b"unsafe external\0" as *const u8 as *const std::ffi::c_char,
         _ => return NULL as *const gchar,
     };
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_get_scrollbars(
     mut L: *mut lua_State,
@@ -1428,7 +1428,7 @@ pub unsafe extern "C" fn luaH_widget_get_scrollbars(
     lua_rawset(L, -(3 as std::ffi::c_int));
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_set_scrollbars(
     mut L: *mut lua_State,
@@ -1499,7 +1499,7 @@ pub unsafe extern "C" fn luaH_widget_set_scrollbars(
     );
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_scrolled_get_scroll(
     mut L: *mut lua_State,
@@ -1564,7 +1564,7 @@ pub unsafe extern "C" fn luaH_scrolled_get_scroll(
     lua_rawset(L, -(3 as std::ffi::c_int));
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_scrolled_set_scroll(
     mut L: *mut lua_State,
@@ -1726,7 +1726,7 @@ unsafe extern "C" fn luaH_scrolled_newindex(
     }
     return luaH_object_property_signal(L, 1 as std::ffi::c_int, token);
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn widget_scrolled(
     mut UNUSED_L: *mut lua_State,

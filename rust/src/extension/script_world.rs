@@ -1,5 +1,5 @@
 use ::libc;
-use ::c2rust_bitfields;
+
 
 pub mod glibconfig_h {
 
@@ -60,7 +60,7 @@ pub mod gerror_h {
 pub mod gconvert_h {
 
     pub type GIConv = *mut _GIConv;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GIConv;
     }
@@ -69,7 +69,7 @@ pub mod gconvert_h {
 pub mod gdataset_h {
 
     pub type GData = _GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GData;
     }
@@ -193,7 +193,7 @@ pub mod gmain_h {
     }
     use super::gtypes_h::{gpointer, guint, gint, gboolean};
     use super::gslist_h::GSList;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GMainContext;
 
@@ -217,7 +217,7 @@ pub mod gstring_h {
 }
 
 pub mod giochannel_h {
-    #[derive(Copy, Clone, BitfieldStruct)]
+    #[derive(Copy, Clone)]
     #[repr(C)]
 
     pub struct _GIOChannel {
@@ -233,14 +233,14 @@ pub mod giochannel_h {
         pub encoded_read_buf: *mut GString,
         pub write_buf: *mut GString,
         pub partial_write_buf: [gchar; 6],
-        #[bitfield(name = "use_buffer", ty = "guint", bits = "0..=0")]
-        #[bitfield(name = "do_encode", ty = "guint", bits = "1..=1")]
-        #[bitfield(name = "close_on_unref", ty = "guint", bits = "2..=2")]
-        #[bitfield(name = "is_readable", ty = "guint", bits = "3..=3")]
-        #[bitfield(name = "is_writeable", ty = "guint", bits = "4..=4")]
-        #[bitfield(name = "is_seekable", ty = "guint", bits = "5..=5")]
+
+
+
+
+
+
         pub use_buffer_do_encode_close_on_unref_is_readable_is_writeable_is_seekable: [u8; 1],
-        #[bitfield(padding)]
+
         pub c2rust_padding: [u8; 1],
         pub reserved1: gpointer,
         pub reserved2: gpointer,
@@ -409,7 +409,7 @@ pub mod WebKitScriptWorld_h {
 
     pub type WebKitScriptWorld = _WebKitScriptWorld;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitScriptWorldPrivate;
 
@@ -430,7 +430,7 @@ pub mod WebKitWebExtension_h {
 
     pub type WebKitWebExtension = _WebKitWebExtension;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitWebExtensionPrivate;
     }
@@ -521,7 +521,7 @@ pub mod extension_h {
     use super::WebKitWebExtension_h::WebKitWebExtension;
     use super::ipc_h::ipc_endpoint_t;
     use super::WebKitScriptWorld_h::WebKitScriptWorld;
-    extern "C" {
+    unsafe extern "C" {
 
         pub static mut extension: extension_t;
     }
@@ -569,7 +569,7 @@ pub use self::ipc_h::{
     IPC_ENDPOINT_DISCONNECTED, _ipc_endpoint_t, ipc_endpoint_t,
 };
 pub use self::extension_h::{_extension_t, extension_t, extension};
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn web_script_world_init() {
     extension.script_world = webkit_script_world_new();

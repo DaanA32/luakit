@@ -1,5 +1,5 @@
 use ::libc;
-use ::c2rust_bitfields;
+
 
 pub mod __stddef_ptrdiff_t_h {
 
@@ -74,7 +74,7 @@ pub mod gerror_h {
 pub mod gconvert_h {
 
     pub type GIConv = *mut _GIConv;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GIConv;
     }
@@ -83,7 +83,7 @@ pub mod gconvert_h {
 pub mod gdataset_h {
 
     pub type GData = _GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GData;
     }
@@ -207,7 +207,7 @@ pub mod gmain_h {
     }
     use super::gtypes_h::{gpointer, guint, gint, gboolean};
     use super::gslist_h::GSList;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GMainContext;
 
@@ -231,7 +231,7 @@ pub mod gstring_h {
 }
 
 pub mod giochannel_h {
-    #[derive(Copy, Clone, BitfieldStruct)]
+    #[derive(Copy, Clone)]
     #[repr(C)]
 
     pub struct _GIOChannel {
@@ -247,14 +247,14 @@ pub mod giochannel_h {
         pub encoded_read_buf: *mut GString,
         pub write_buf: *mut GString,
         pub partial_write_buf: [gchar; 6],
-        #[bitfield(name = "use_buffer", ty = "guint", bits = "0..=0")]
-        #[bitfield(name = "do_encode", ty = "guint", bits = "1..=1")]
-        #[bitfield(name = "close_on_unref", ty = "guint", bits = "2..=2")]
-        #[bitfield(name = "is_readable", ty = "guint", bits = "3..=3")]
-        #[bitfield(name = "is_writeable", ty = "guint", bits = "4..=4")]
-        #[bitfield(name = "is_seekable", ty = "guint", bits = "5..=5")]
+
+
+
+
+
+
         pub use_buffer_do_encode_close_on_unref_is_readable_is_writeable_is_seekable: [u8; 1],
-        #[bitfield(padding)]
+
         pub c2rust_padding: [u8; 1],
         pub reserved1: gpointer,
         pub reserved2: gpointer,
@@ -375,7 +375,7 @@ pub mod gqueue_h {
 pub mod gtree_h {
 
     pub type GTree = _GTree;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GTree;
     }
@@ -390,7 +390,7 @@ pub mod lua_h {
     pub const LUA_TNIL: std::ffi::c_int = 0 as std::ffi::c_int;
     use super::__stddef_ptrdiff_t_h::ptrdiff_t;
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type lua_State;
 
@@ -490,7 +490,7 @@ pub mod ipc_h {
     use super::giochannel_h::GIOChannel;
     use super::gqueue_h::GQueue;
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn ipc_send_lua(
             ipc: *mut ipc_endpoint_t,
@@ -553,7 +553,7 @@ pub mod WebKitScriptWorld_h {
 
     pub type WebKitScriptWorld = _WebKitScriptWorld;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitScriptWorldPrivate;
     }
@@ -572,7 +572,7 @@ pub mod WebKitWebPage_h {
 
     pub type WebKitWebPage = _WebKitWebPage;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitWebPagePrivate;
     }
@@ -593,7 +593,7 @@ pub mod WebKitWebExtension_h {
     use super::gobject_h::GObject;
     use super::glibconfig_h::guint64;
     use super::WebKitWebPage_h::WebKitWebPage;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _WebKitWebExtensionPrivate;
 
@@ -618,7 +618,7 @@ pub mod extension_h {
     use super::WebKitWebExtension_h::WebKitWebExtension;
     use super::ipc_h::ipc_endpoint_t;
     use super::WebKitScriptWorld_h::WebKitScriptWorld;
-    extern "C" {
+    unsafe extern "C" {
 
         pub static mut extension: extension_t;
     }
@@ -643,7 +643,7 @@ pub mod clib_ipc_h {
     use super::signal_h::signal_t;
     use super::lua_h::lua_State;
     use super::gtypes_h::gint;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_check_ipc_channel(
             L: *mut lua_State,
@@ -655,7 +655,7 @@ pub mod clib_ipc_h {
 pub mod lauxlib_h {
     use super::lua_h::lua_State;
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaL_checklstring(
             L: *mut lua_State,
@@ -668,7 +668,7 @@ pub mod lauxlib_h {
 pub mod luaobject_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::{gint, gchar};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_object_emit_signal(
             L: *mut lua_State,
@@ -684,7 +684,7 @@ pub mod page_h {
     use super::lua_h::lua_State;
     use super::WebKitWebPage_h::WebKitWebPage;
     use super::gtypes_h::gint;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_page_from_web_page(
             L: *mut lua_State,
@@ -697,7 +697,7 @@ pub mod luaserialize_h {
     use super::lua_h::lua_State;
     use super::glibconfig_h::guint8;
     use super::gtypes_h::guint;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn lua_deserialize_range(
             L: *mut lua_State,
@@ -779,7 +779,7 @@ pub const REG_KEY: [std::ffi::c_char; 28] = unsafe {
         &[std::ffi::c_char; 28],
     >(b"luakit.registry.ipc_channel\0")
 };
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn ipc_channel_send(mut L: *mut lua_State) -> gint {
     let mut ipc_channel = luaH_check_ipc_channel(L, 1 as std::ffi::c_int);
@@ -794,7 +794,7 @@ pub unsafe extern "C" fn ipc_channel_send(mut L: *mut lua_State) -> gint {
     );
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn ipc_channel_recv(
     mut L: *mut lua_State,

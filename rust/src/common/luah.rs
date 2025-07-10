@@ -329,3 +329,16 @@ pub unsafe extern "C" fn luaH_checkboolean(mut L: *mut lua_State, mut n: gint) -
     }
     return lua_toboolean(L, n);
 }
+pub unsafe extern "C" fn luaH_rawfield(
+    mut L: *mut lua_State,
+    mut idx: gint,
+    mut field: *const gchar,
+) -> gint {
+    lua_pushstring(L, field);
+    lua_rawget(L, idx);
+    let mut type_0 = lua_type(L, -(1 as std::ffi::c_int));
+    if type_0 == LUA_TNIL {
+        lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
+    }
+    return type_0;
+}

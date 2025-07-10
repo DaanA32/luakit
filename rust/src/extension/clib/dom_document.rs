@@ -51,7 +51,7 @@ pub mod garray_h {
 
     pub type GPtrArray = _GPtrArray;
     use super::gtypes_h::{gpointer, guint, gboolean};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_ptr_array_free(
             array: *mut GPtrArray,
@@ -84,7 +84,7 @@ pub mod gerror_h {
 pub mod gdataset_h {
 
     pub type GData = _GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GData;
     }
@@ -93,7 +93,7 @@ pub mod gdataset_h {
 pub mod ghash_h {
 
     pub type GHashTable = _GHashTable;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GHashTable;
     }
@@ -103,7 +103,7 @@ pub mod gtree_h {
 
     pub type GTree = _GTree;
     use super::gtypes_h::{GCompareDataFunc, gpointer, GDestroyNotify};
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GTree;
 
@@ -137,7 +137,7 @@ pub mod gtype_h {
     pub type GTypeInstance = _GTypeInstance;
     use super::glibconfig_h::gsize;
     use super::gtypes_h::gboolean;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_type_check_instance_cast(
             instance: *mut GTypeInstance,
@@ -167,7 +167,7 @@ pub mod gobject_h {
     use super::gtype_h::GTypeInstance;
     use super::gtypes_h::{guint, gpointer};
     use super::gdataset_h::GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_object_weak_ref(
             object: *mut GObject,
@@ -229,7 +229,7 @@ pub mod WebKitDOMDOMWindow_h {
     }
     use super::webkitdomdefines_h::{WebKitDOMObject, WebKitDOMDOMWindow};
     use super::gtypes_h::glong;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_dom_window_get_inner_height(
             self_0: *mut WebKitDOMDOMWindow,
@@ -263,7 +263,7 @@ pub mod WebKitDOMDocument_h {
     use super::gtype_h::GType;
     use super::gtypes_h::{gchar, glong};
     use super::gerror_h::GError;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_document_get_type() -> GType;
 
@@ -300,7 +300,7 @@ pub mod WebKitDOMElement_h {
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
     use super::gerror_h::GError;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_element_get_type() -> GType;
 
@@ -324,7 +324,7 @@ pub mod WebKitDOMHTMLElement_h {
     use super::gtype_h::GType;
     use super::gtypes_h::gchar;
     use super::gerror_h::GError;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn webkit_dom_html_element_get_type() -> GType;
 
@@ -353,7 +353,7 @@ pub mod lua_h {
     pub const LUA_TTABLE: std::ffi::c_int = 5 as std::ffi::c_int;
     use super::__stddef_ptrdiff_t_h::ptrdiff_t;
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type lua_State;
 
@@ -416,7 +416,7 @@ pub mod lauxlib_h {
     }
     use super::lua_h::{lua_CFunction, lua_State, lua_Number};
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaL_argerror(
             L: *mut lua_State,
@@ -453,7 +453,7 @@ pub mod common_h {
 
     pub type common_t = _common_t;
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub static mut common: common_t;
     }
@@ -1068,7 +1068,7 @@ pub mod tokenize_h {
 
     pub const L_TK_UNKNOWN: luakit_token_t = 0;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn l_tokenize(_: *const gchar) -> luakit_token_t;
     }
@@ -1107,7 +1107,7 @@ pub mod luaclass_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::{gint, gchar, gpointer};
     use super::lauxlib_h::luaL_Reg;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_class_add_signal(
             _: *mut lua_State,
@@ -1167,7 +1167,7 @@ pub mod dom_document_h {
 }
 
 pub mod string_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn memset(
             _: *mut std::ffi::c_void,
@@ -1179,14 +1179,14 @@ pub mod string_h {
 
 pub mod gmem_h {
     use super::gtypes_h::gpointer;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_free(mem: gpointer);
     }
 }
 
 pub mod gtestutils_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_strcmp0(
             str1: *const std::ffi::c_char,
@@ -1199,7 +1199,7 @@ pub mod luaobject_h {
     use super::lua_h::lua_State;
     use super::luaclass_h::lua_class_t;
     use super::gtypes_h::{gint, gchar};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_settype(L: *mut lua_State, lua_class: *mut lua_class_t) -> gint;
 
@@ -1229,7 +1229,7 @@ pub mod dom_element_h {
     use super::lua_h::lua_State;
     use super::webkitdomdefines_h::WebKitDOMElement;
     use super::gtypes_h::gint;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_dom_element_from_node(
             L: *mut lua_State,
@@ -1241,7 +1241,7 @@ pub mod dom_element_h {
 pub mod luauniq_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::{gchar, gpointer};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_uniq_setup(L: *mut lua_State, reg: *const gchar, mode: *const gchar);
 
@@ -1545,7 +1545,7 @@ unsafe extern "C" fn webkit_dom_document_destroy_cb(
     (*document).document = NULL as *mut WebKitDOMDocument;
     luaH_uniq_del_ptr(common.L, REG_KEY.as_ptr(), doc as gpointer);
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_dom_document_from_webkit_dom_document(
     mut L: *mut lua_State,
@@ -1749,7 +1749,7 @@ unsafe extern "C" fn luaH_dom_document_index(mut L: *mut lua_State) -> gint {
         _ => return 0 as std::ffi::c_int,
     };
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn dom_document_class_setup(mut L: *mut lua_State) {
     static mut dom_document_methods: [luaL_Reg; 4] = unsafe {

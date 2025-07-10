@@ -1,5 +1,5 @@
 use ::libc;
-use ::c2rust_bitfields;
+
 
 pub mod __stddef_ptrdiff_t_h {
 
@@ -58,7 +58,7 @@ pub mod gtypes_h {
 pub mod gdataset_h {
 
     pub type GData = _GData;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GData;
     }
@@ -76,7 +76,7 @@ pub mod glist_h {
 
     pub type GList = _GList;
     use super::gtypes_h::gpointer;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_list_free(list: *mut GList);
     }
@@ -85,7 +85,7 @@ pub mod glist_h {
 pub mod ghash_h {
 
     pub type GHashTable = _GHashTable;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GHashTable;
     }
@@ -109,7 +109,7 @@ pub mod gunicode_h {
     pub type gunichar = guint32;
     use super::glibconfig_h::{guint32, gssize};
     use super::gtypes_h::{gchar, glong, gboolean};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_utf8_get_char(p: *const gchar) -> gunichar;
 
@@ -136,7 +136,7 @@ pub mod gstring_h {
     pub type GString = _GString;
     use super::gtypes_h::{gchar, gboolean};
     use super::glibconfig_h::gsize;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_string_sized_new(dfl_size: gsize) -> *mut GString;
 
@@ -155,7 +155,7 @@ pub mod gstring_h {
 pub mod gtree_h {
 
     pub type GTree = _GTree;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GTree;
     }
@@ -185,7 +185,7 @@ pub mod gtype_h {
     use super::glibconfig_h::gsize;
     use super::gvalue_h::_GValue;
     use super::gtypes_h::gboolean;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_type_check_instance_cast(
             instance: *mut GTypeInstance,
@@ -224,7 +224,7 @@ pub mod gvalue_h {
     use super::gtype_h::{GType, GValue};
     use super::gtypes_h::{gint, guint, glong, gulong, gfloat, gdouble, gpointer};
     use super::glibconfig_h::{gint64, guint64};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_value_init(value: *mut GValue, g_type: GType) -> *mut GValue;
 
@@ -348,7 +348,7 @@ pub mod gobject_h {
     use super::gslist_h::GSList;
     use super::gparam_h::GParamSpec;
     use super::glibconfig_h::gsize;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_object_get(object: gpointer, first_property_name: *const gchar, _: ...);
 
@@ -372,7 +372,7 @@ pub mod cairo_h {
     pub type cairo_rectangle_int_t = _cairo_rectangle_int;
 
     pub type cairo_region_t = _cairo_region;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _cairo_region;
     }
@@ -519,7 +519,7 @@ pub mod gdktypes_h {
     pub const GDK_CURRENT_TIME: std::ffi::c_long = 0 as std::ffi::c_long;
     use super::cairo_h::cairo_rectangle_int_t;
     use super::gdkseat_h::_GdkSeat;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GdkAtom;
 
@@ -544,7 +544,7 @@ pub mod gdkseat_h {
     }
     use super::gobject_h::GObject;
     use super::gdktypes_h::{GdkSeat, GdkDevice};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn gdk_seat_get_keyboard(seat: *mut GdkSeat) -> *mut GdkDevice;
     }
@@ -757,7 +757,7 @@ pub mod gdkevents_h {
     pub type GdkEventSequence = _GdkEventSequence;
 
     pub type GdkEventTouch = _GdkEventTouch;
-    #[derive(Copy, Clone, BitfieldStruct)]
+    #[derive(Copy, Clone)]
     #[repr(C)]
 
     pub struct _GdkEventScroll {
@@ -774,9 +774,9 @@ pub mod gdkevents_h {
         pub y_root: gdouble,
         pub delta_x: gdouble,
         pub delta_y: gdouble,
-        #[bitfield(name = "is_stop", ty = "guint", bits = "0..=0")]
+
         pub is_stop: [u8; 1],
-        #[bitfield(padding)]
+
         pub c2rust_padding: [u8; 7],
     }
 
@@ -793,7 +793,7 @@ pub mod gdkevents_h {
     pub const GDK_SCROLL_UP: GdkScrollDirection = 0;
 
     pub type GdkEventScroll = _GdkEventScroll;
-    #[derive(Copy, Clone, BitfieldStruct)]
+    #[derive(Copy, Clone)]
     #[repr(C)]
 
     pub struct _GdkEventKey {
@@ -807,9 +807,9 @@ pub mod gdkevents_h {
         pub string: *mut gchar,
         pub hardware_keycode: guint16,
         pub group: guint8,
-        #[bitfield(name = "is_modifier", ty = "guint", bits = "0..=0")]
+
         pub is_modifier: [u8; 1],
-        #[bitfield(padding)]
+
         pub c2rust_padding: [u8; 4],
     }
 
@@ -1171,7 +1171,7 @@ pub mod gdkevents_h {
     use super::glibconfig_h::{gint8, guint32, gint16, guint16, guint8};
     use super::cairo_h::cairo_region_t;
     use super::gtypes_h::{gint, gdouble, guint, gboolean, gchar, gshort};
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GdkEventSequence;
 
@@ -1201,7 +1201,7 @@ pub mod gdkkeys_h {
     use super::gtypes_h::{guint, gint, gboolean, gchar};
     use super::gdktypes_h::{GdkDisplay, GdkKeymap};
     use super::glibconfig_h::guint32;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn gdk_keymap_get_for_display(display: *mut GdkDisplay) -> *mut GdkKeymap;
 
@@ -1249,7 +1249,7 @@ pub mod gtkwidget_h {
     use super::gtypes_h::{gboolean, gint, gchar};
     use super::gdktypes_h::GdkWindow;
     use super::gtkenums_h::{GtkAlign, GTK_ALIGN_FILL};
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkWidgetPrivate;
 
@@ -1331,7 +1331,7 @@ pub mod gtkwindow_h {
     use super::gtype_h::GType;
     use super::gtktypes_h::{GtkWindow, GtkWidget};
     use super::gtypes_h::gboolean;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkWindowPrivate;
 
@@ -1358,7 +1358,7 @@ pub mod gtkbin_h {
     use super::gtkcontainer_h::GtkContainer;
     use super::gtype_h::GType;
     use super::gtktypes_h::GtkWidget;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkBinPrivate;
 
@@ -1386,7 +1386,7 @@ pub mod gtkcontainer_h {
     use super::gobject_h::GObjectClass;
     use super::gtypes_h::{guint, gchar};
     use super::gparam_h::GParamSpec;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkContainerPrivate;
 
@@ -1436,7 +1436,7 @@ pub mod gtkentry_h {
     pub type GtkEntry = _GtkEntry;
     use super::gtktypes_h::GtkWidget;
     use super::gtype_h::GType;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkEntryPrivate;
 
@@ -1459,7 +1459,7 @@ pub mod gtkcssprovider_h {
 
     pub type GtkCssProvider = _GtkCssProvider;
     use super::gobject_h::GObject;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type _GtkCssProviderPrivate;
     }
@@ -1480,7 +1480,7 @@ pub mod lua_h {
     pub const LUA_TTABLE: std::ffi::c_int = 5 as std::ffi::c_int;
     use super::__stddef_ptrdiff_t_h::ptrdiff_t;
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub type lua_State;
 
@@ -1550,7 +1550,7 @@ pub mod log_h {
 
     pub const LOG_LEVEL_fatal: log_level_t = 0;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn _log(lvl: log_level_t, _: *const gchar, _: *const gchar, _: ...);
     }
@@ -2116,7 +2116,7 @@ pub mod tokenize_h {
 
     pub const L_TK_UNKNOWN: luakit_token_t = 0;
     use super::gtypes_h::gchar;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn l_tokenize(_: *const gchar) -> luakit_token_t;
     }
@@ -2154,7 +2154,7 @@ pub mod luaclass_h {
     use super::signal_h::signal_t;
     use super::lua_h::lua_State;
     use super::gtypes_h::{gint, gchar, gpointer};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_checkudata(
             _: *mut lua_State,
@@ -2174,7 +2174,7 @@ pub mod common_h {
 
     pub type common_t = _common_t;
     use super::lua_h::lua_State;
-    extern "C" {
+    unsafe extern "C" {
 
         pub static mut common: common_t;
     }
@@ -2297,14 +2297,14 @@ pub mod widget_h {
     use super::gtestutils_h::g_assertion_message_expr;
     use super::gmessages_h::G_LOG_DOMAIN;
     use super::__stddef_null_h::NULL;
-    extern "C" {
+    unsafe extern "C" {
 
         pub static mut widget_class: lua_class_t;
     }
 }
 
 pub mod string_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn strcmp(
             _: *const std::ffi::c_char,
@@ -2316,7 +2316,7 @@ pub mod string_h {
 pub mod gmem_h {
     use super::gtypes_h::gpointer;
     use super::glibconfig_h::gsize;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_free(mem: gpointer);
 
@@ -2330,7 +2330,7 @@ pub mod gmessages_h {
 }
 
 pub mod gtestutils_h {
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_assertion_message_expr(
             domain: *const std::ffi::c_char,
@@ -2344,7 +2344,7 @@ pub mod gtestutils_h {
 
 pub mod gsignal_h {
     use super::gtypes_h::{gpointer, gchar};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn g_signal_emit_by_name(
             instance: gpointer,
@@ -2356,7 +2356,7 @@ pub mod gsignal_h {
 
 pub mod gdkwindow_h {
     use super::gdktypes_h::{GdkWindow, GdkEventMask};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn gdk_window_set_events(window: *mut GdkWindow, event_mask: GdkEventMask);
     }
@@ -2364,7 +2364,7 @@ pub mod gdkwindow_h {
 
 pub mod gdkdisplay_h {
     use super::gdktypes_h::{GdkDisplay, GdkSeat};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn gdk_display_get_default() -> *mut GdkDisplay;
 
@@ -2375,7 +2375,7 @@ pub mod gdkdisplay_h {
 pub mod lauxlib_h {
     use super::lua_h::lua_State;
     use super::__stddef_size_t_h::size_t;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaL_typerror(
             L: *mut lua_State,
@@ -2436,7 +2436,7 @@ pub mod luaobject_h {
         lua_pushlightuserdata, lua_remove,
     };
     use super::gtypes_h::{gint, gpointer, gchar};
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_object_decref(L: *mut lua_State, tud: gint, oud: gpointer);
 
@@ -2488,7 +2488,7 @@ pub mod luah_h {
 pub mod luakit_luah_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::guint;
-    extern "C" {
+    unsafe extern "C" {
 
         pub fn luaH_modifier_table_push(_: *mut lua_State, _: guint);
 
@@ -2763,7 +2763,7 @@ use self::luakit_luah_h::{luaH_modifier_table_push, luaH_keystr_push};
 pub use self::gmacros_h::{FALSE, TRUE};
 pub use self::__stddef_null_h::NULL;
 pub use self::gdkkeysyms_h::GDK_KEY_VoidSymbol;
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn key_press_cb(
     mut UNUSED_win: *mut GtkWidget,
@@ -2790,7 +2790,7 @@ pub unsafe extern "C" fn key_press_cb(
     lua_settop(L, -(ret + 1 as std::ffi::c_int) - 1 as std::ffi::c_int);
     return catch;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn button_cb(
     mut UNUSED_win: *mut GtkWidget,
@@ -2839,7 +2839,7 @@ pub unsafe extern "C" fn button_cb(
     lua_settop(L, -(ret + 1 as std::ffi::c_int) - 1 as std::ffi::c_int);
     return catch;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn scroll_cb(
     mut UNUSED_wid: *mut GtkWidget,
@@ -2897,7 +2897,7 @@ pub unsafe extern "C" fn scroll_cb(
     lua_settop(L, -(ret + 1 as std::ffi::c_int) - 1 as std::ffi::c_int);
     return ret;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn mouse_cb(
     mut UNUSED_win: *mut GtkWidget,
@@ -2940,7 +2940,7 @@ pub unsafe extern "C" fn mouse_cb(
     lua_settop(L, -(ret + 1 as std::ffi::c_int) - 1 as std::ffi::c_int);
     return catch;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn focus_cb(
     mut UNUSED_win: *mut GtkWidget,
@@ -2974,7 +2974,7 @@ pub unsafe extern "C" fn focus_cb(
     lua_settop(L, -(ret + 1 as std::ffi::c_int) - 1 as std::ffi::c_int);
     return FALSE;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn add_cb(
     mut UNUSED_c: *mut GtkContainer,
@@ -3000,7 +3000,7 @@ pub unsafe extern "C" fn add_cb(
     );
     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn resize_cb(
     mut UNUSED_win: *mut GtkWidget,
@@ -3027,7 +3027,7 @@ pub unsafe extern "C" fn resize_cb(
     );
     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn remove_cb(
     mut UNUSED_c: *mut GtkContainer,
@@ -3053,7 +3053,7 @@ pub unsafe extern "C" fn remove_cb(
     );
     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn parent_set_cb(
     mut widget: *mut GtkWidget,
@@ -3098,7 +3098,7 @@ pub unsafe extern "C" fn parent_set_cb(
     );
     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn destroy_cb(
     mut UNUSED_win: *mut GtkWidget,
@@ -3132,12 +3132,12 @@ pub unsafe extern "C" fn destroy_cb(
     (*w).widget = NULL as *mut GtkWidget;
     luaH_object_unref(L, (*w).ref_0);
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn true_cb() -> gboolean {
     return TRUE;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_set_child(
     mut L: *mut lua_State,
@@ -3180,7 +3180,7 @@ pub unsafe extern "C" fn luaH_widget_set_child(
     }
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_get_child(
     mut L: *mut lua_State,
@@ -3203,7 +3203,7 @@ pub unsafe extern "C" fn luaH_widget_get_child(
     luaH_object_push(L, (*child).ref_0);
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_remove(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
@@ -3226,7 +3226,7 @@ pub unsafe extern "C" fn luaH_widget_remove(mut L: *mut lua_State) -> gint {
     );
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_get_children(
     mut L: *mut lua_State,
@@ -3277,7 +3277,7 @@ pub unsafe extern "C" fn luaH_widget_get_children(
     g_list_free(children);
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_replace(mut L: *mut lua_State) -> gint {
     let mut och = luaH_checkwidget(L, 1 as std::ffi::c_int);
@@ -3373,21 +3373,21 @@ pub unsafe extern "C" fn luaH_widget_replace(mut L: *mut lua_State) -> gint {
     g_free(values as gpointer);
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_show(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     gtk_widget_show((*w).widget);
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_hide(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     gtk_widget_hide((*w).widget);
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_send_key(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
@@ -3559,7 +3559,7 @@ pub unsafe extern "C" fn luaH_widget_send_key(mut L: *mut lua_State) -> gint {
     g_free(keys as gpointer);
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_set_visible(
     mut L: *mut lua_State,
@@ -3575,7 +3575,7 @@ pub unsafe extern "C" fn luaH_widget_set_visible(
     }
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_get_min_size(
     mut L: *mut lua_State,
@@ -3609,7 +3609,7 @@ pub unsafe extern "C" fn luaH_widget_get_min_size(
     lua_rawset(L, -(3 as std::ffi::c_int));
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_set_min_size(
     mut L: *mut lua_State,
@@ -3646,7 +3646,7 @@ pub unsafe extern "C" fn luaH_widget_set_min_size(
     gtk_widget_set_size_request((*w).widget, width, height);
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_get_align(
     mut L: *mut lua_State,
@@ -3689,7 +3689,7 @@ pub unsafe extern "C" fn luaH_widget_get_align(
     lua_rawset(L, -(3 as std::ffi::c_int));
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_set_align(
     mut L: *mut lua_State,
@@ -3796,7 +3796,7 @@ pub unsafe extern "C" fn luaH_widget_set_align(
     );
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_set_tooltip(
     mut L: *mut lua_State,
@@ -3813,7 +3813,7 @@ pub unsafe extern "C" fn luaH_widget_set_tooltip(
     );
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_get_tooltip(
     mut L: *mut lua_State,
@@ -3822,7 +3822,7 @@ pub unsafe extern "C" fn luaH_widget_get_tooltip(
     lua_pushstring(L, gtk_widget_get_tooltip_markup((*w).widget));
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_get_parent(
     mut L: *mut lua_State,
@@ -3847,7 +3847,7 @@ pub unsafe extern "C" fn luaH_widget_get_parent(
     luaH_object_push(L, (*parent).ref_0);
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_get_focused(
     mut L: *mut lua_State,
@@ -3868,7 +3868,7 @@ pub unsafe extern "C" fn luaH_widget_get_focused(
     lua_pushboolean(L, focused);
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_get_visible(
     mut L: *mut lua_State,
@@ -3877,7 +3877,7 @@ pub unsafe extern "C" fn luaH_widget_get_visible(
     lua_pushboolean(L, gtk_widget_get_visible((*w).widget));
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_get_width(
     mut L: *mut lua_State,
@@ -3886,7 +3886,7 @@ pub unsafe extern "C" fn luaH_widget_get_width(
     lua_pushnumber(L, gtk_widget_get_allocated_width((*w).widget) as lua_Number);
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_get_height(
     mut L: *mut lua_State,
@@ -3895,7 +3895,7 @@ pub unsafe extern "C" fn luaH_widget_get_height(
     lua_pushnumber(L, gtk_widget_get_allocated_height((*w).widget) as lua_Number);
     return 1 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_focus(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
@@ -3923,7 +3923,7 @@ pub unsafe extern "C" fn luaH_widget_focus(mut L: *mut lua_State) -> gint {
     }
     return 0 as std::ffi::c_int;
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luaH_widget_destroy(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);

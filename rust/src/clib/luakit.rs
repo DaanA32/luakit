@@ -19,8 +19,11 @@ use crate::common::clib::luakit::*;
 use crate::common::common;
 use crate::common::luaclass::*;
 use crate::common::luah::*;
+use crate::common::lualib::lualib_h::*;
+use crate::common::lualib::*;
 use crate::common::luaobject::*;
 use crate::common::luauniq::*;
+use crate::common::resource::*;
 use crate::common::tokenize::*;
 use crate::globalconf::*;
 use crate::log::*;
@@ -40,11 +43,11 @@ use crate::clib::sqlite3::*;
 use crate::clib::stylesheet::*;
 use crate::clib::web_module::*;
 use crate::clib::widget::*;
-use crate::common::luaclass::luaH_typename;
+use crate::common::luaclass::*;
 use crate::common::luah::*;
 use crate::common::luaobject::*;
 use crate::common::luautil::*;
-use crate::common::luayield::luaH_yield;
+use crate::common::luayield::*;
 use crate::common::util::*;
 use crate::common::*;
 use crate::globalconf::*;
@@ -67,12 +70,8 @@ use webkit2gtk::{
 };
 
 use crate::{
-    clib::widget::{widget_class, widget_t},
     common::{
-        clib::luakit::{
-            luaH_luakit_idle_add, luaH_luakit_idle_remove, luaH_luakit_uri_decode, luaH_object_ref,
-            luaH_object_unref,
-        },
+        clib::luakit::{luaH_luakit_idle_add, luaH_luakit_idle_remove, luaH_luakit_uri_decode},
         luaclass::{
             lua_class_property_array_t, lua_class_t, lua_object_t, luaH_checkudata,
             luaH_class_add_signal, luaH_class_emit_signal, luaH_class_remove_signal, luaH_openlib,
@@ -80,7 +79,7 @@ use crate::{
             signal_h::{signal_new, signal_t},
         },
         lualib::luaH_dofunction,
-        luaobject::luaH_object_push,
+        luaobject::*,
         tokenize::{L_TK_PRIMARY, L_TK_SECONDARY, l_tokenize, luakit_token_t},
     },
     globalconf::globalconf,
@@ -88,6 +87,7 @@ use crate::{
     ipc::ipc_remove_socket_file,
     log::{_log, LOG_LEVEL_fatal, LOG_LEVEL_verbose, log_get_verbosity},
     web_context::web_context_get,
+    widgets::*,
 };
 
 pub use self::luakit_h::proc_callback_data_t;
@@ -544,7 +544,7 @@ unsafe extern "C-unwind" fn luaH_parse_website_data_types_table(
     if !(lua_type(L, idx) == 5 as std::ffi::c_int) {
         luaL_argerror(L, idx, b"table\0" as *const u8 as *const std::ffi::c_char);
     }
-    let mut len: size_t = lua_objlen(L, idx);
+    let mut len: size_t = lua_len(L, idx);
     let mut i: size_t = 1 as std::ffi::c_int as size_t;
     while i <= len {
         lua_rawgeti(L, idx, i as i64);

@@ -79,7 +79,7 @@ unsafe extern "C-unwind" fn download_new(mut L: *mut lua_State) -> *mut download
     lua_createtable(L, 0, 0);
     lua_createtable(L, 0, 0);
     lua_setmetatable(L, -(2 as std::ffi::c_int));
-    lua_setfenv(L, -(2 as std::ffi::c_int));
+    // TODO: lua_setfenv(L, -(2 as std::ffi::c_int));
     lua_pushvalue(L, -(1 as std::ffi::c_int));
     luaH_class_emit_signal(
         L,
@@ -248,7 +248,7 @@ unsafe extern "C-unwind" fn finished_cb(
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn luaH_download_new(mut L: *mut lua_State) -> gint {
     if !(lua_type(L, 2 as std::ffi::c_int) == 5 as std::ffi::c_int) {
-        luaL_typerror(
+        luaL_argerror(
             L,
             2 as std::ffi::c_int,
             b"table\0" as *const u8 as *const std::ffi::c_char,
