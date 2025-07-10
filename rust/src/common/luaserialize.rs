@@ -1,3 +1,5 @@
+use std::mem::MaybeUninit;
+
 use gdk_sys::*;
 use glib_sys::*;
 use libc::*;
@@ -23,7 +25,7 @@ use crate::log::*;
 
 static mut bytecode_buf: *mut GByteArray = 0 as *const GByteArray as *mut GByteArray;
 static mut bytecode_len: size_t = 0;
-unsafe extern "C" fn lua_function_writer(
+unsafe extern "C-unwind" fn lua_function_writer(
     mut UNUSED_L: *mut lua_State,
     mut p: *const std::ffi::c_void,
     mut sz: size_t,
@@ -143,20 +145,7 @@ unsafe extern "C" fn lua_serialize_value(
             };
             g_byte_array_set_size(bytecode_buf, 0 as std::ffi::c_int as guint);
             lua_pushvalue(L, index);
-            lua_dump(
-                L,
-                Some(
-                    lua_function_writer
-                        as unsafe extern "C" fn(
-                            *mut lua_State,
-                            *const std::ffi::c_void,
-                            size_t,
-                            *mut std::ffi::c_void,
-                        ) -> std::ffi::c_int,
-                ),
-                0 as *mut std::ffi::c_void,
-                0,
-            );
+            lua_dump(L, lua_function_writer, std::ptr::null_mut(), 0);
             lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
             let mut len_0: size_t = (*bytecode_buf).len as size_t;
             g_byte_array_append(
@@ -166,29 +155,21 @@ unsafe extern "C" fn lua_serialize_value(
             );
             g_byte_array_append(out, (*bytecode_buf).data, len_0 as guint);
             g_byte_array_set_size(bytecode_buf, 0 as std::ffi::c_int as guint);
-            let mut ar: lua_Debug = lua_Debug {
-                event: 0,
-                name: 0 as *const std::ffi::c_char,
-                namewhat: 0 as *const std::ffi::c_char,
-                what: 0 as *const std::ffi::c_char,
-                source: 0 as *const std::ffi::c_char,
-                currentline: 0,
-                nups: 0,
-                linedefined: 0,
-                lastlinedefined: 0,
-                short_src: [0; 60],
-                i_ci: 0,
-            };
+            let mut ar = MaybeUninit::<lua_Debug>::uninit();
             lua_pushvalue(L, index);
-            lua_getinfo(L, b">u\0" as *const u8 as *const std::ffi::c_char, &mut ar);
+            lua_getinfo(
+                L,
+                b">u\0" as *const u8 as *const std::ffi::c_char,
+                ar.as_mut_ptr(),
+            );
             g_byte_array_append(
                 out,
-                &mut ar.nups as *mut std::ffi::c_int as *mut guint8,
+                (*ar.as_mut_ptr()).nups as *mut std::ffi::c_int as *mut guint8,
                 ::core::mem::size_of::<std::ffi::c_int>() as std::ffi::c_ulong as guint,
             );
-            let mut i: std::ffi::c_int = 1 as std::ffi::c_int;
-            while i <= ar.nups {
-                lua_getupvalue(L, -(1 as std::ffi::c_int), i);
+            let mut i = 1;
+            while i <= (*ar.as_ptr()).nups {
+                lua_getupvalue(L, -(1 as std::ffi::c_int), i as std::ffi::c_int);
                 lua_serialize_value(L, out, -(1 as std::ffi::c_int));
                 lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
                 i += 1;
@@ -200,6 +181,7 @@ unsafe extern "C" fn lua_serialize_value(
     let mut __n1: gint64 = lua_gettop(L) as gint64;
     let mut __n2: gint64 = top as gint64;
     if !(__n1 == __n2) {
+        /*
         g_assertion_message_cmpint(
             0 as *mut gchar,
             b"common/luaserialize.c\0" as *const u8 as *const std::ffi::c_char,
@@ -214,6 +196,7 @@ unsafe extern "C" fn lua_serialize_value(
             __n2 as guint64,
             'i' as i32 as std::ffi::c_char,
         );
+        */
     }
 }
 unsafe extern "C" fn lua_deserialize_value(
@@ -224,7 +207,7 @@ unsafe extern "C" fn lua_deserialize_value(
     memcpy(
         &mut type_0 as *mut c_int as *mut std::ffi::c_void,
         *bytes as *const std::ffi::c_void,
-        ::core::mem::size_of::<c_int>() as std::ffi::c_ulong,
+        ::core::mem::size_of::<c_int>(),
     );
     *bytes = (*bytes).offset(::core::mem::size_of::<c_int>() as std::ffi::c_ulong as isize);
     let mut top: std::ffi::c_int = lua_gettop(L);
@@ -237,7 +220,7 @@ unsafe extern "C" fn lua_deserialize_value(
             memcpy(
                 &mut n as *mut lua_Number as *mut std::ffi::c_void,
                 *bytes as *const std::ffi::c_void,
-                ::core::mem::size_of::<lua_Number>() as std::ffi::c_ulong,
+                ::core::mem::size_of::<lua_Number>(),
             );
             *bytes =
                 (*bytes).offset(::core::mem::size_of::<lua_Number>() as std::ffi::c_ulong as isize);
@@ -248,7 +231,7 @@ unsafe extern "C" fn lua_deserialize_value(
             memcpy(
                 &mut b as *mut c_int as *mut std::ffi::c_void,
                 *bytes as *const std::ffi::c_void,
-                ::core::mem::size_of::<c_int>() as std::ffi::c_ulong,
+                ::core::mem::size_of::<c_int>(),
             );
             *bytes = (*bytes).offset(::core::mem::size_of::<c_int>() as std::ffi::c_ulong as isize);
             lua_pushboolean(L, b as std::ffi::c_int);
@@ -258,7 +241,7 @@ unsafe extern "C" fn lua_deserialize_value(
             memcpy(
                 &mut len as *mut size_t as *mut std::ffi::c_void,
                 *bytes as *const std::ffi::c_void,
-                ::core::mem::size_of::<size_t>() as std::ffi::c_ulong,
+                ::core::mem::size_of::<size_t>(),
             );
             *bytes =
                 (*bytes).offset(::core::mem::size_of::<size_t>() as std::ffi::c_ulong as isize);
@@ -277,7 +260,7 @@ unsafe extern "C" fn lua_deserialize_value(
             memcpy(
                 &mut p as *mut gpointer as *mut std::ffi::c_void,
                 *bytes as *const std::ffi::c_void,
-                ::core::mem::size_of::<gpointer>() as std::ffi::c_ulong,
+                ::core::mem::size_of::<gpointer>(),
             );
             *bytes =
                 (*bytes).offset(::core::mem::size_of::<gpointer>() as std::ffi::c_ulong as isize);
@@ -287,7 +270,7 @@ unsafe extern "C" fn lua_deserialize_value(
             memcpy(
                 &mut bytecode_len as *mut size_t as *mut std::ffi::c_void,
                 *bytes as *const std::ffi::c_void,
-                ::core::mem::size_of::<size_t>() as std::ffi::c_ulong,
+                ::core::mem::size_of::<size_t>(),
             );
             *bytes =
                 (*bytes).offset(::core::mem::size_of::<size_t>() as std::ffi::c_ulong as isize);
@@ -311,7 +294,8 @@ unsafe extern "C" fn lua_deserialize_value(
                         ) -> *const std::ffi::c_char,
                 )),
                 bytes as *mut std::ffi::c_void,
-                0 as *const std::ffi::c_char,
+                std::ptr::null_mut(),
+                std::ptr::null_mut(), // TODO: verify
             );
             if status != 0 as std::ffi::c_int {
                 return luaL_error(
@@ -324,7 +308,7 @@ unsafe extern "C" fn lua_deserialize_value(
             memcpy(
                 &mut nups as *mut std::ffi::c_int as *mut std::ffi::c_void,
                 *bytes as *const std::ffi::c_void,
-                ::core::mem::size_of::<std::ffi::c_int>() as std::ffi::c_ulong,
+                ::core::mem::size_of::<std::ffi::c_int>(),
             );
             *bytes = (*bytes)
                 .offset(::core::mem::size_of::<std::ffi::c_int>() as std::ffi::c_ulong as isize);

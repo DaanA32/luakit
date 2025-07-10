@@ -1,6 +1,23 @@
+use gdk_sys::*;
 use glib_sys::*;
-use libc::size_t;
+use libc::getenv;
 use mlua_sys::*;
+
+use crate::clib::luakit::*;
+use crate::clib::msg::*;
+use crate::clib::soup::*;
+use crate::clib::sqlite3::*;
+use crate::clib::stylesheet::*;
+use crate::clib::web_module::*;
+use crate::clib::widget::*;
+use crate::common::luaclass::luaH_typename;
+use crate::common::luah::*;
+use crate::common::luautil::*;
+use crate::common::util::*;
+use crate::common::*;
+use crate::globalconf::*;
+use crate::gtypes::*;
+use crate::log::*;
 
 use crate::{
     common::{
@@ -103,7 +120,7 @@ pub unsafe extern "C-unwind" fn luaH_object_incref(
     let mut p: gpointer = lua_topointer(L, oud) as gpointer;
     if p.is_null() {
         lua_remove(L, oud);
-        return 0 as *mut std::ffi::c_void;
+        return std::ptr::null_mut();
     }
     lua_pushlightuserdata(L, p);
     lua_pushvalue(
@@ -502,7 +519,7 @@ pub unsafe extern "C-unwind" fn luaH_object_add_signal_simple(mut L: *mut lua_St
     luaH_object_add_signal(
         L,
         1 as std::ffi::c_int,
-        luaL_checklstring(L, 2 as std::ffi::c_int, 0 as *mut size_t),
+        luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut()),
         3 as std::ffi::c_int,
     );
     return 0 as std::ffi::c_int;
@@ -512,7 +529,7 @@ pub unsafe extern "C-unwind" fn luaH_object_remove_signal_simple(mut L: *mut lua
     luaH_object_remove_signal(
         L,
         1 as std::ffi::c_int,
-        luaL_checklstring(L, 2 as std::ffi::c_int, 0 as *mut size_t),
+        luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut()),
         3 as std::ffi::c_int,
     );
     return 0 as std::ffi::c_int;
@@ -522,7 +539,7 @@ pub unsafe extern "C-unwind" fn luaH_object_remove_signals_simple(mut L: *mut lu
     luaH_object_remove_signals(
         L,
         1 as std::ffi::c_int,
-        luaL_checklstring(L, 2 as std::ffi::c_int, 0 as *mut size_t),
+        luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut()),
     );
     return 0 as std::ffi::c_int;
 }
@@ -569,7 +586,7 @@ pub unsafe extern "C-unwind" fn luaH_object_emit_signal_simple(mut L: *mut lua_S
     return luaH_object_emit_signal(
         L,
         1 as std::ffi::c_int,
-        luaL_checklstring(L, 2 as std::ffi::c_int, 0 as *mut size_t),
+        luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut()),
         lua_gettop(L) - 2 as std::ffi::c_int,
         -(1 as std::ffi::c_int),
     );
@@ -601,4 +618,28 @@ pub unsafe extern "C-unwind" fn luaH_object_gc(mut L: *mut lua_State) -> gint {
         signal_destroy((*item).signals);
     }
     return 0 as std::ffi::c_int;
+}
+
+pub unsafe extern "C" fn luaH_object_ref_class(
+    mut L: *mut lua_State,
+    mut oud: gint,
+    mut class: *mut lua_class_t,
+) -> gpointer {
+    luaH_checkudata(L, oud, class);
+    return luaH_object_ref(L, oud);
+}
+
+pub unsafe extern "C" fn luaH_object_ref(mut L: *mut lua_State, mut oud: gint) -> gpointer {
+    luaH_object_registry_push(L);
+    let mut p: gpointer = luaH_object_incref(
+        L,
+        -(1 as std::ffi::c_int),
+        if oud < 0 as std::ffi::c_int {
+            oud - 1 as std::ffi::c_int
+        } else {
+            oud
+        },
+    );
+    lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
+    return p;
 }

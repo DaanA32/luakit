@@ -1,6 +1,7 @@
+use core::intrinsics::AtomicOrdering;
 use gdk_sys::*;
 use glib_sys::*;
-use libc::getenv;
+use libc::*;
 use mlua_sys::*;
 
 use crate::clib::luakit::*;
@@ -13,105 +14,15 @@ use crate::clib::widget::*;
 use crate::common::luaclass::luaH_typename;
 use crate::common::luah::*;
 use crate::common::luaobject::*;
+use crate::common::luaserialize::*;
 use crate::common::luautil::*;
 use crate::common::util::*;
 use crate::common::*;
 use crate::globalconf::*;
 use crate::gtypes::*;
+use crate::ipc::ipc_h::*;
 use crate::ipc::*;
 use crate::log::*;
-
-pub mod ipc_h {
-    use gdk_sys::*;
-    use glib_sys::*;
-    use libc::getenv;
-    use mlua_sys::*;
-
-    use crate::clib::luakit::*;
-    use crate::clib::msg::*;
-    use crate::clib::soup::*;
-    use crate::clib::sqlite3::*;
-    use crate::clib::stylesheet::*;
-    use crate::clib::web_module::*;
-    use crate::clib::widget::*;
-    use crate::common::luaclass::luaH_typename;
-    use crate::common::luah::*;
-    use crate::common::luaobject::*;
-    use crate::common::luautil::*;
-    use crate::common::util::*;
-    use crate::common::*;
-    use crate::globalconf::*;
-    use crate::gtypes::*;
-    use crate::log::*;
-
-    pub type ipc_type_t = std::ffi::c_uint;
-    pub const IPC_TYPE_crash: ipc_type_t = 128;
-    pub const IPC_TYPE_page_created: ipc_type_t = 64;
-    pub const IPC_TYPE_log: ipc_type_t = 32;
-    pub const IPC_TYPE_eval_js: ipc_type_t = 16;
-    pub const IPC_TYPE_extension_init: ipc_type_t = 8;
-    pub const IPC_TYPE_scroll: ipc_type_t = 4;
-    pub const IPC_TYPE_lua_ipc: ipc_type_t = 2;
-    pub const IPC_TYPE_lua_require_module: ipc_type_t = 1;
-    #[derive(Copy, Clone)]
-    #[repr(C)]
-    pub struct _ipc_header_t {
-        pub length: guint,
-        pub type_0: ipc_type_t,
-    }
-    pub type ipc_header_t = _ipc_header_t;
-    #[derive(Copy, Clone)]
-    #[repr(C)]
-    pub struct _ipc_recv_state_t {
-        pub watch_in_id: guint,
-        pub watch_hup_id: guint,
-        pub queued_ipcs: *mut GPtrArray,
-        pub hdr: ipc_header_t,
-        pub payload: gpointer,
-        pub bytes_read: gsize,
-        pub hdr_done: gboolean,
-    }
-    pub type ipc_recv_state_t = _ipc_recv_state_t;
-    pub type ipc_endpoint_status_t = std::ffi::c_uint;
-    pub const IPC_ENDPOINT_FREED: ipc_endpoint_status_t = 2;
-    pub const IPC_ENDPOINT_CONNECTED: ipc_endpoint_status_t = 1;
-    pub const IPC_ENDPOINT_DISCONNECTED: ipc_endpoint_status_t = 0;
-    #[derive(Copy, Clone)]
-    #[repr(C)]
-    pub struct _ipc_endpoint_t {
-        pub name: *mut gchar,
-        pub status: ipc_endpoint_status_t,
-        pub channel: *mut GIOChannel,
-        pub queue: *mut GQueue,
-        pub recv_state: ipc_recv_state_t,
-        pub refcount: gint,
-        pub creation_notified: gboolean,
-    }
-    pub type ipc_endpoint_t = _ipc_endpoint_t;
-    #[inline]
-    pub unsafe extern "C-unwind" fn ipc_type_name(
-        mut type_0: ipc_type_t,
-    ) -> *const std::ffi::c_char {
-        match type_0 as std::ffi::c_uint {
-            1 => return b"lua_require_module\0" as *const u8 as *const std::ffi::c_char,
-            2 => return b"lua_ipc\0" as *const u8 as *const std::ffi::c_char,
-            4 => return b"scroll\0" as *const u8 as *const std::ffi::c_char,
-            8 => return b"extension_init\0" as *const u8 as *const std::ffi::c_char,
-            16 => return b"eval_js\0" as *const u8 as *const std::ffi::c_char,
-            32 => return b"log\0" as *const u8 as *const std::ffi::c_char,
-            64 => return b"page_created\0" as *const u8 as *const std::ffi::c_char,
-            128 => return b"crash\0" as *const u8 as *const std::ffi::c_char,
-            _ => return b"UNKNOWN\0" as *const u8 as *const std::ffi::c_char,
-        };
-    }
-}
-pub use self::ipc_h::{
-    _ipc_endpoint_t, _ipc_header_t, _ipc_recv_state_t, IPC_ENDPOINT_CONNECTED,
-    IPC_ENDPOINT_DISCONNECTED, IPC_ENDPOINT_FREED, IPC_TYPE_crash, IPC_TYPE_eval_js,
-    IPC_TYPE_extension_init, IPC_TYPE_log, IPC_TYPE_lua_ipc, IPC_TYPE_lua_require_module,
-    IPC_TYPE_page_created, IPC_TYPE_scroll, ipc_endpoint_status_t, ipc_endpoint_t, ipc_header_t,
-    ipc_recv_state_t, ipc_type_name, ipc_type_t,
-};
 
 static mut send_thread: *mut GThread = 0 as *const GThread as *mut GThread;
 static mut send_queue: *mut GAsyncQueue = 0 as *const GAsyncQueue as *mut GAsyncQueue;
@@ -141,28 +52,28 @@ unsafe extern "C-unwind" fn ipc_dispatch(
     }
     match header.type_0 as std::ffi::c_uint {
         1 => {
-            ipc_recv_lua_require_module(ipc, payload as *const std::ffi::c_void, header.length);
+            ipc_recv_lua_require_module(ipc, payload as *mut std::ffi::c_void, header.length);
         }
         2 => {
-            ipc_recv_lua_ipc(ipc, payload as *const std::ffi::c_void, header.length);
+            ipc_recv_lua_ipc(ipc, payload as *const ipc_lua_ipc_t, header.length);
         }
         4 => {
-            ipc_recv_scroll(ipc, payload as *const std::ffi::c_void, header.length);
+            ipc_recv_scroll(ipc, payload as *mut ipc_scroll_t, header.length);
         }
         8 => {
-            ipc_recv_extension_init(ipc, payload as *const std::ffi::c_void, header.length);
+            ipc_recv_extension_init(ipc, payload as *mut std::ffi::c_void, header.length);
         }
         16 => {
-            ipc_recv_eval_js(ipc, payload as *const std::ffi::c_void, header.length);
+            ipc_recv_eval_js(ipc, payload as *const guint8, header.length);
         }
         32 => {
-            ipc_recv_log(ipc, payload as *const std::ffi::c_void, header.length);
+            ipc_recv_log(ipc, payload as *const guint8, header.length);
         }
         64 => {
-            ipc_recv_page_created(ipc, payload as *const std::ffi::c_void, header.length);
+            ipc_recv_page_created(ipc, payload as *const ipc_page_created_t, header.length);
         }
         128 => {
-            ipc_recv_crash(ipc, payload as *const std::ffi::c_void, header.length);
+            ipc_recv_crash(ipc, payload as *mut std::ffi::c_void, header.length);
         }
         _ => {
             _log(
@@ -175,7 +86,7 @@ unsafe extern "C-unwind" fn ipc_dispatch(
         }
     };
 }
-unsafe extern "C-unwind" fn ipc_send_thread(mut UNUSED_user_data: gpointer) -> gpointer {
+unsafe extern "C" fn ipc_send_thread(mut UNUSED_user_data: gpointer) -> gpointer {
     while 0 as std::ffi::c_int == 0 {
         let mut out: *mut queued_ipc_t = g_async_queue_pop(send_queue) as *mut queued_ipc_t;
         let mut ipc: *mut ipc_endpoint_t = (*out).ipc;
@@ -189,7 +100,7 @@ unsafe extern "C-unwind" fn ipc_send_thread(mut UNUSED_user_data: gpointer) -> g
                 (*ipc).channel,
                 header as *mut gchar,
                 ::core::mem::size_of::<ipc_header_t>() as std::ffi::c_ulong as gssize,
-                0 as *mut gsize,
+                std::ptr::null_mut(),
                 0 as *mut *mut GError,
             );
         }
@@ -200,8 +111,8 @@ unsafe extern "C-unwind" fn ipc_send_thread(mut UNUSED_user_data: gpointer) -> g
             g_io_channel_write_chars(
                 (*ipc).channel,
                 data as *mut gchar,
-                (*header).length as gssize,
-                0 as *mut gsize,
+                (*header).length as ssize_t,
+                std::ptr::null_mut(),
                 0 as *mut *mut GError,
             );
         }
@@ -232,7 +143,7 @@ pub unsafe extern "C-unwind" fn ipc_send(
         send_queue = g_async_queue_new();
         send_thread = g_thread_new(
             b"send_thread\0" as *const u8 as *const std::ffi::c_char,
-            Some(ipc_send_thread as unsafe extern "C-unwind" fn(gpointer) -> gpointer),
+            Some(ipc_send_thread),
             0 as *mut std::ffi::c_void,
         );
     }
@@ -261,17 +172,16 @@ pub unsafe extern "C-unwind" fn ipc_send(
             b"(header->length == 0) == (data == NULL)\0" as *const u8 as *const std::ffi::c_char,
         );
     }
-    let mut msg: *mut queued_ipc_t = g_malloc(
-        (::core::mem::size_of::<queued_ipc_t>() as std::ffi::c_ulong)
-            .wrapping_add((*header).length as std::ffi::c_ulong),
-    ) as *mut queued_ipc_t;
+    let mut msg: *mut queued_ipc_t =
+        g_malloc((::core::mem::size_of::<queued_ipc_t>()).wrapping_add((*header).length as usize))
+            as *mut queued_ipc_t;
     (*msg).ipc = ipc;
     (*msg).header = *header;
     if (*header).length != 0 {
         memcpy(
             ((*msg).payload).as_mut_ptr() as *mut std::ffi::c_void,
             data,
-            (*header).length as std::ffi::c_ulong,
+            (*header).length as usize,
         );
     }
     if !((*ipc).channel).is_null() {
@@ -296,19 +206,19 @@ unsafe extern "C-unwind" fn ipc_recv_and_dispatch_or_enqueue(mut ipc: *mut ipc_e
     }
     let mut state: *mut ipc_recv_state_t = &mut (*ipc).recv_state;
     let mut channel: *mut GIOChannel = (*ipc).channel;
-    let mut buf: *mut gchar = (if (*state).hdr_done != 0 {
+    let mut buf: *mut u8 = (if (*state).hdr_done != 0 {
         (*state).payload
     } else {
         &mut (*state).hdr as *mut ipc_header_t as *mut std::ffi::c_void
     })
-    .offset((*state).bytes_read as isize) as *mut gchar;
-    let mut remaining: gsize = (if (*state).hdr_done != 0 {
-        (*state).hdr.length as std::ffi::c_ulong
+    .offset((*state).bytes_read as isize) as *mut u8;
+    let mut remaining: usize = (if (*state).hdr_done != 0 {
+        (*state).hdr.length as usize
     } else {
-        ::core::mem::size_of::<ipc_header_t>() as std::ffi::c_ulong
+        ::core::mem::size_of::<ipc_header_t>()
     })
-    .wrapping_sub((*state).bytes_read);
-    let mut bytes_read: gsize = 0;
+    .wrapping_sub((*state).bytes_read as usize);
+    let mut bytes_read = 0;
     let mut error: *mut GError = 0 as *mut GError;
     match g_io_channel_read_chars(channel, buf, remaining, &mut bytes_read, &mut error)
         as std::ffi::c_uint
@@ -327,7 +237,7 @@ unsafe extern "C-unwind" fn ipc_recv_and_dispatch_or_enqueue(mut ipc: *mut ipc_e
                 (*ipc).refcount;
             } else {
             };
-            ::core::intrinsics::atomic_xsub_seqcst(
+            ::core::intrinsics::atomic_xsub::<_, { AtomicOrdering::SeqCst }>(
                 &mut (*ipc).refcount as *mut gint,
                 1 as std::ffi::c_int,
             );
@@ -368,15 +278,15 @@ unsafe extern "C-unwind" fn ipc_recv_and_dispatch_or_enqueue(mut ipc: *mut ipc_e
             );
         }
     }
-    (*state).bytes_read = ((*state).bytes_read).wrapping_add(bytes_read);
+    (*state).bytes_read = ((*state).bytes_read).wrapping_add(bytes_read as u64);
     remaining = remaining.wrapping_sub(bytes_read);
-    if remaining > 0 as std::ffi::c_int as gsize {
+    if remaining > 0 {
         return;
     }
     if (*state).hdr_done == 0 {
         (*state).hdr_done = (0 as std::ffi::c_int == 0) as std::ffi::c_int;
         (*state).bytes_read = 0 as std::ffi::c_int as gsize;
-        (*state).payload = g_malloc((*state).hdr.length as gsize);
+        (*state).payload = g_malloc((*state).hdr.length as usize);
         ipc_recv_and_dispatch_or_enqueue(ipc);
         return;
     }
@@ -451,8 +361,7 @@ pub unsafe extern "C-unwind" fn ipc_send_lua(
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn ipc_endpoint_new(mut name: *const gchar) -> *mut ipc_endpoint_t {
     let mut ipc: *mut ipc_endpoint_t =
-        g_slice_alloc0(::core::mem::size_of::<ipc_endpoint_t>() as std::ffi::c_ulong)
-            as *mut ipc_endpoint_t;
+        g_slice_alloc0(::core::mem::size_of::<ipc_endpoint_t>()) as *mut ipc_endpoint_t;
     (*ipc).name = name as *mut gchar;
     (*ipc).queue = g_queue_new();
     (*ipc).status = IPC_ENDPOINT_DISCONNECTED;
@@ -471,8 +380,9 @@ pub unsafe extern "C-unwind" fn ipc_endpoint_incref(mut ipc: *mut ipc_endpoint_t
                 (*ipc).refcount;
             } else {
             };
-            *&mut gaig_temp =
-                ::core::intrinsics::atomic_load_seqcst(&mut (*ipc).refcount as *mut gint);
+            *&mut gaig_temp = ::core::intrinsics::atomic_load::<_, { AtomicOrdering::SeqCst }>(
+                &mut (*ipc).refcount as *mut gint,
+            );
             gaig_temp
         });
         if old < 1 as std::ffi::c_int {
@@ -484,7 +394,11 @@ pub unsafe extern "C-unwind" fn ipc_endpoint_incref(mut ipc: *mut ipc_endpoint_t
                 (*ipc).refcount;
             } else {
             };
-            let fresh0 = ::core::intrinsics::atomic_cxchg_seqcst_seqcst(
+            let fresh0 = core::intrinsics::atomic_cxchg::<
+                _,
+                { AtomicOrdering::SeqCst },
+                { AtomicOrdering::SeqCst },
+            >(
                 &mut (*ipc).refcount as *mut gint,
                 *(&mut gaicae_oldval as *mut gint as *mut std::ffi::c_void as *mut gint),
                 old + 1 as std::ffi::c_int,
@@ -508,7 +422,10 @@ unsafe extern "C-unwind" fn ipc_endpoint_incref_no_check(mut ipc: *mut ipc_endpo
         (*ipc).refcount;
     } else {
     };
-    ::core::intrinsics::atomic_xadd_seqcst(&mut (*ipc).refcount, 1 as std::ffi::c_int);
+    ::core::intrinsics::atomic_xadd::<_, { AtomicOrdering::SeqCst }>(
+        &mut (*ipc).refcount,
+        1 as std::ffi::c_int,
+    );
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn ipc_endpoint_decref(mut ipc: *mut ipc_endpoint_t) {
@@ -518,7 +435,7 @@ pub unsafe extern "C-unwind" fn ipc_endpoint_decref(mut ipc: *mut ipc_endpoint_t
             (*ipc).refcount;
         } else {
         };
-        (::core::intrinsics::atomic_xsub_seqcst(
+        (::core::intrinsics::atomic_xsub::<_, { AtomicOrdering::SeqCst }>(
             &mut (*ipc).refcount as *mut gint,
             1 as std::ffi::c_int,
         ) == 1 as std::ffi::c_int) as std::ffi::c_int
@@ -540,7 +457,7 @@ pub unsafe extern "C-unwind" fn ipc_endpoint_decref(mut ipc: *mut ipc_endpoint_t
     }
     (*ipc).status = IPC_ENDPOINT_FREED;
     g_slice_free1(
-        ::core::mem::size_of::<ipc_endpoint_t>() as std::ffi::c_ulong,
+        ::core::mem::size_of::<ipc_endpoint_t>() as size_t,
         ipc as gpointer,
     );
 }
@@ -632,7 +549,10 @@ pub unsafe extern "C-unwind" fn ipc_endpoint_connect_to_socket(
         (*ipc).channel;
     } else {
     };
-    ::core::intrinsics::atomic_store_seqcst(gaps_temp_atomic, *&mut gaps_temp_newval);
+    ::core::intrinsics::atomic_store::<_, { AtomicOrdering::SeqCst }>(
+        gaps_temp_atomic,
+        *&mut gaps_temp_newval,
+    );
     (*ipc).status = IPC_ENDPOINT_CONNECTED;
     if endpoints.is_null() {
         endpoints = g_ptr_array_sized_new(1 as std::ffi::c_int as guint);

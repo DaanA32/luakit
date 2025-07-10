@@ -104,33 +104,22 @@ pub unsafe extern "C" fn luaH_dump_stack(mut L: *mut lua_State) {
                 );
             }
             3 => {
-                g_fprintf(
-                    stderr,
-                    b"%d: number: %g\n\0" as *const u8 as *const std::ffi::c_char,
-                    i,
-                    lua_tonumber(L, i),
-                );
+                eprintln!("{}: number: {}", i, lua_tonumber(L, i),);
             }
             0 => {
-                g_fprintf(
-                    stderr,
-                    b"%d: nil\n\0" as *const u8 as *const std::ffi::c_char,
-                    i,
-                );
+                eprintln!("{}: nil", i);
             }
             7 => {
-                g_fprintf(
-                    stderr,
-                    b"%d: <%s>\t\t%p\n\0" as *const u8 as *const std::ffi::c_char,
+                eprintln!(
+                    "{}: <{:?}>\t\t{:?}",
                     i,
                     luaH_typename(L, i),
                     lua_topointer(L, i),
                 );
             }
             5 => {
-                g_fprintf(
-                    stderr,
-                    b"%d: table\t#%zu\t%p\n\0" as *const u8 as *const std::ffi::c_char,
+                eprintln!(
+                    "{}: table\t#{:?}\t{:?}",
                     i,
                     lua_objlen(L, i),
                     lua_topointer(L, i),
@@ -138,12 +127,11 @@ pub unsafe extern "C" fn luaH_dump_stack(mut L: *mut lua_State) {
                 luaH_dump_table_keys(L, i);
             }
             _ => {
-                g_fprintf(
-                    stderr,
-                    b"%d: %s\t#%d\t%p\n\0" as *const u8 as *const std::ffi::c_char,
+                eprintln!(
+                    "{}: {}\t#{:?}\t{:?}",
                     i,
                     lua_typename(L, t),
-                    lua_objlen(L, i) as gint,
+                    lua_objlen(L, i),
                     lua_topointer(L, i),
                 );
             }
@@ -151,10 +139,7 @@ pub unsafe extern "C" fn luaH_dump_stack(mut L: *mut lua_State) {
         i -= 1;
         i;
     }
-    g_fprintf(
-        stderr,
-        b"------- Lua stack dump end ------\n\0" as *const u8 as *const std::ffi::c_char,
-    );
+    eprintln!("------- Lua stack dump end ------",);
 }
 
 pub unsafe extern "C" fn luaH_dofunction(
@@ -171,7 +156,7 @@ pub unsafe extern "C" fn luaH_dofunction(
             LOG_LEVEL_error,
             b"./common/lualib.h\0" as *const u8 as *const std::ffi::c_char,
             b"%s\0" as *const u8 as *const std::ffi::c_char,
-            lua_tolstring(L, -(1 as std::ffi::c_int), NULL as *mut size_t),
+            lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null_mut()),
         );
         lua_settop(L, -(2 as std::ffi::c_int) - 1 as std::ffi::c_int);
         return FALSE;

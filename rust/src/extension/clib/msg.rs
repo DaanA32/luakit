@@ -1,18 +1,18 @@
 use ::libc;
-#[c2rust::header_src = "/usr/lib/clang/20/include/__stddef_size_t.h:21"]
+
 pub mod __stddef_size_t_h {
-    #[c2rust::src_loc = "18:1"]
+
     pub type size_t = std::ffi::c_ulong;
 }
-#[c2rust::header_src = "/usr/include/luajit-2.1/lua.h:21"]
+
 pub mod lua_h {
-    #[c2rust::src_loc = "53:1"]
+
     pub type lua_CFunction = Option::<
         unsafe extern "C" fn(*mut lua_State) -> std::ffi::c_int,
     >;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "360:8"]
+
     pub struct lua_Debug {
         pub event: std::ffi::c_int,
         pub name: *const std::ffi::c_char,
@@ -26,60 +26,60 @@ pub mod lua_h {
         pub short_src: [std::ffi::c_char; 60],
         pub i_ci: std::ffi::c_int,
     }
-    #[c2rust::src_loc = "36:9"]
+
     pub const LUA_REGISTRYINDEX: std::ffi::c_int = -(10000 as std::ffi::c_int);
-    #[c2rust::src_loc = "38:9"]
+
     pub const LUA_GLOBALSINDEX: std::ffi::c_int = -(10002 as std::ffi::c_int);
-    #[c2rust::src_loc = "78:9"]
+
     pub const LUA_TNUMBER: std::ffi::c_int = 3 as std::ffi::c_int;
     use super::__stddef_size_t_h::size_t;
     extern "C" {
-        #[c2rust::src_loc = "51:16"]
+
         pub type lua_State;
-        #[c2rust::src_loc = "121:1"]
+
         pub fn lua_gettop(L: *mut lua_State) -> std::ffi::c_int;
-        #[c2rust::src_loc = "122:1"]
+
         pub fn lua_settop(L: *mut lua_State, idx: std::ffi::c_int);
-        #[c2rust::src_loc = "123:1"]
+
         pub fn lua_pushvalue(L: *mut lua_State, idx: std::ffi::c_int);
-        #[c2rust::src_loc = "124:1"]
+
         pub fn lua_remove(L: *mut lua_State, idx: std::ffi::c_int);
-        #[c2rust::src_loc = "125:1"]
+
         pub fn lua_insert(L: *mut lua_State, idx: std::ffi::c_int);
-        #[c2rust::src_loc = "140:1"]
+
         pub fn lua_type(L: *mut lua_State, idx: std::ffi::c_int) -> std::ffi::c_int;
-        #[c2rust::src_loc = "150:1"]
+
         pub fn lua_tolstring(
             L: *mut lua_State,
             idx: std::ffi::c_int,
             len: *mut size_t,
         ) -> *const std::ffi::c_char;
-        #[c2rust::src_loc = "164:1"]
+
         pub fn lua_pushlstring(L: *mut lua_State, s: *const std::ffi::c_char, l: size_t);
-        #[c2rust::src_loc = "171:1"]
+
         pub fn lua_pushlightuserdata(L: *mut lua_State, p: *mut std::ffi::c_void);
-        #[c2rust::src_loc = "179:1"]
+
         pub fn lua_getfield(
             L: *mut lua_State,
             idx: std::ffi::c_int,
             k: *const std::ffi::c_char,
         );
-        #[c2rust::src_loc = "180:1"]
+
         pub fn lua_rawget(L: *mut lua_State, idx: std::ffi::c_int);
-        #[c2rust::src_loc = "203:1"]
+
         pub fn lua_pcall(
             L: *mut lua_State,
             nargs: std::ffi::c_int,
             nresults: std::ffi::c_int,
             errfunc: std::ffi::c_int,
         ) -> std::ffi::c_int;
-        #[c2rust::src_loc = "335:1"]
+
         pub fn lua_getstack(
             L: *mut lua_State,
             level: std::ffi::c_int,
             ar: *mut lua_Debug,
         ) -> std::ffi::c_int;
-        #[c2rust::src_loc = "336:1"]
+
         pub fn lua_getinfo(
             L: *mut lua_State,
             what: *const std::ffi::c_char,
@@ -87,27 +87,27 @@ pub mod lua_h {
         ) -> std::ffi::c_int;
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gtypes.h:22"]
+
 pub mod gtypes_h {
-    #[c2rust::src_loc = "109:1"]
+
     pub type gpointer = *mut std::ffi::c_void;
-    #[c2rust::src_loc = "55:1"]
+
     pub type gint = std::ffi::c_int;
-    #[c2rust::src_loc = "52:1"]
+
     pub type gchar = std::ffi::c_char;
 }
-#[c2rust::header_src = "/usr/include/luajit-2.1/lauxlib.h:22"]
+
 pub mod lauxlib_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "21:16"]
+
     pub struct luaL_Reg {
         pub name: *const std::ffi::c_char,
         pub func: lua_CFunction,
     }
     use super::lua_h::{lua_CFunction, lua_State};
     extern "C" {
-        #[c2rust::src_loc = "53:1"]
+
         pub fn luaL_error(
             L: *mut lua_State,
             fmt: *const std::ffi::c_char,
@@ -115,35 +115,35 @@ pub mod lauxlib_h {
         ) -> std::ffi::c_int;
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/log.h:22"]
+
 pub mod log_h {
-    #[c2rust::src_loc = "36:9"]
+
     pub type log_level_t = std::ffi::c_uint;
-    #[c2rust::src_loc = "36:16"]
+
     pub const LOG_LEVEL_debug: log_level_t = 5;
-    #[c2rust::src_loc = "36:16"]
+
     pub const LOG_LEVEL_verbose: log_level_t = 4;
-    #[c2rust::src_loc = "36:16"]
+
     pub const LOG_LEVEL_info: log_level_t = 3;
-    #[c2rust::src_loc = "36:16"]
+
     pub const LOG_LEVEL_warn: log_level_t = 2;
-    #[c2rust::src_loc = "36:16"]
+
     pub const LOG_LEVEL_error: log_level_t = 1;
-    #[c2rust::src_loc = "36:16"]
+
     pub const LOG_LEVEL_fatal: log_level_t = 0;
     use super::gtypes_h::gchar;
     extern "C" {
-        #[c2rust::src_loc = "54:1"]
+
         pub fn _log(lvl: log_level_t, _: *const gchar, _: *const gchar, _: ...);
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/luaclass.h:22"]
+
 pub mod luaclass_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::gchar;
     use super::lauxlib_h::luaL_Reg;
     extern "C" {
-        #[c2rust::src_loc = "74:1"]
+
         pub fn luaH_openlib(
             _: *mut lua_State,
             _: *const gchar,
@@ -152,10 +152,10 @@ pub mod luaclass_h {
         );
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/luaobject.h:22"]
+
 pub mod luaobject_h {
     #[inline]
-    #[c2rust::src_loc = "88:1"]
+
     pub unsafe extern "C" fn luaH_object_registry_push(mut L: *mut lua_State) {
         lua_pushlstring(
             L,
@@ -169,7 +169,7 @@ pub mod luaobject_h {
         lua_rawget(L, LUA_REGISTRYINDEX);
     }
     #[inline]
-    #[c2rust::src_loc = "99:1"]
+
     pub unsafe extern "C" fn luaH_object_ref(
         mut L: *mut lua_State,
         mut oud: gint,
@@ -184,7 +184,7 @@ pub mod luaobject_h {
         return p;
     }
     #[inline]
-    #[c2rust::src_loc = "132:1"]
+
     pub unsafe extern "C" fn luaH_object_push(
         mut L: *mut lua_State,
         mut p: gpointer,
@@ -201,19 +201,19 @@ pub mod luaobject_h {
     };
     use super::gtypes_h::{gint, gpointer};
     extern "C" {
-        #[c2rust::src_loc = "40:1"]
+
         pub fn luaH_object_incref(L: *mut lua_State, tud: gint, oud: gint) -> gpointer;
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/clib/msg.h:22"]
+
 pub mod msg_h {
-    #[c2rust::src_loc = "34:17"]
+
     pub static mut string_format_ref: gpointer = 0 as *const std::ffi::c_void
         as *mut std::ffi::c_void;
-    #[c2rust::src_loc = "35:17"]
+
     pub static mut tostring_ref: gpointer = 0 as *const std::ffi::c_void
         as *mut std::ffi::c_void;
-    #[c2rust::src_loc = "37:1"]
+
     pub unsafe extern "C" fn luaH_msg_string_from_args(
         mut L: *mut lua_State,
     ) -> *const gchar {
@@ -247,7 +247,7 @@ pub mod msg_h {
         }
         return lua_tolstring(L, -(1 as std::ffi::c_int), NULL as *mut size_t);
     }
-    #[c2rust::src_loc = "60:1"]
+
     pub unsafe extern "C" fn luaH_msg(
         mut L: *mut lua_State,
         mut lvl: log_level_t,
@@ -282,27 +282,27 @@ pub mod msg_h {
         );
         return 0 as std::ffi::c_int;
     }
-    #[c2rust::src_loc = "79:1"]
+
     pub unsafe extern "C" fn luaH_msg_debug(mut L: *mut lua_State) -> gint {
         return luaH_msg(L, LOG_LEVEL_debug);
     }
-    #[c2rust::src_loc = "79:1"]
+
     pub unsafe extern "C" fn luaH_msg_verbose(mut L: *mut lua_State) -> gint {
         return luaH_msg(L, LOG_LEVEL_verbose);
     }
-    #[c2rust::src_loc = "79:1"]
+
     pub unsafe extern "C" fn luaH_msg_info(mut L: *mut lua_State) -> gint {
         return luaH_msg(L, LOG_LEVEL_info);
     }
-    #[c2rust::src_loc = "79:1"]
+
     pub unsafe extern "C" fn luaH_msg_warn(mut L: *mut lua_State) -> gint {
         return luaH_msg(L, LOG_LEVEL_warn);
     }
-    #[c2rust::src_loc = "79:1"]
+
     pub unsafe extern "C" fn luaH_msg_error(mut L: *mut lua_State) -> gint {
         return luaH_msg(L, LOG_LEVEL_error);
     }
-    #[c2rust::src_loc = "79:1"]
+
     pub unsafe extern "C" fn luaH_msg_fatal(mut L: *mut lua_State) -> gint {
         return luaH_msg(L, LOG_LEVEL_fatal);
     }
@@ -320,9 +320,9 @@ pub mod msg_h {
         LOG_LEVEL_warn, LOG_LEVEL_error, LOG_LEVEL_fatal,
     };
 }
-#[c2rust::header_src = "/usr/lib/clang/20/include/__stddef_null.h:22"]
+
 pub mod __stddef_null_h {
-    #[c2rust::src_loc = "26:9"]
+
     pub const NULL: std::ffi::c_int = 0 as std::ffi::c_int;
 }
 pub use self::__stddef_size_t_h::size_t;
@@ -348,7 +348,7 @@ pub use self::msg_h::{
 };
 pub use self::__stddef_null_h::NULL;
 #[no_mangle]
-#[c2rust::src_loc = "24:1"]
+
 pub unsafe extern "C" fn msg_lib_setup(mut L: *mut lua_State) {
     static mut msg_lib: [luaL_Reg; 7] = unsafe {
         [

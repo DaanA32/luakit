@@ -1,4 +1,4 @@
-pub mod box;
+pub mod r#box;
 pub mod common;
 pub mod drawing_area;
 pub mod entry;

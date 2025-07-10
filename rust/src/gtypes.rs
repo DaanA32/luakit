@@ -11,7 +11,6 @@ pub type gfloat = std::ffi::c_float;
 pub type gdouble = std::ffi::c_double;
 pub type gconstpointer = *const std::ffi::c_void;
 pub type GEqualFunc = Option<unsafe extern "C" fn(gconstpointer, gconstpointer) -> gboolean>;
-pub type GDestroyNotify = Option<unsafe extern "C" fn(gpointer) -> ()>;
 pub type GHashFunc = Option<unsafe extern "C" fn(gconstpointer) -> guint>;
 pub type guint8 = std::ffi::c_uchar;
 pub type gint32 = std::ffi::c_int;

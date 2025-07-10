@@ -1,87 +1,87 @@
 use ::libc;
 use ::c2rust_bitfields;
-#[c2rust::header_src = "/usr/lib/clang/20/include/__stddef_ptrdiff_t.h:19"]
+
 pub mod __stddef_ptrdiff_t_h {
-    #[c2rust::src_loc = "18:1"]
+
     pub type ptrdiff_t = std::ffi::c_long;
 }
-#[c2rust::header_src = "/usr/lib/clang/20/include/__stddef_size_t.h:19"]
+
 pub mod __stddef_size_t_h {
-    #[c2rust::src_loc = "18:1"]
+
     pub type size_t = std::ffi::c_ulong;
 }
-#[c2rust::header_src = "/usr/lib/glib-2.0/include/glibconfig.h:19"]
+
 pub mod glibconfig_h {
-    #[c2rust::src_loc = "46:1"]
+
     pub type guint8 = std::ffi::c_uchar;
-    #[c2rust::src_loc = "57:1"]
+
     pub type guint32 = std::ffi::c_uint;
-    #[c2rust::src_loc = "66:1"]
+
     pub type gint64 = std::ffi::c_long;
-    #[c2rust::src_loc = "67:1"]
+
     pub type guint64 = std::ffi::c_ulong;
-    #[c2rust::src_loc = "83:1"]
+
     pub type gsize = std::ffi::c_ulong;
 }
-#[c2rust::header_src = "/usr/include/bits/types.h:19"]
+
 pub mod types_h {
-    #[c2rust::src_loc = "154:1"]
+
     pub type __pid_t = std::ffi::c_int;
-    #[c2rust::src_loc = "210:1"]
+
     pub type __socklen_t = std::ffi::c_uint;
 }
-#[c2rust::header_src = "/usr/include/time.h:19"]
+
 pub mod time_h {
-    #[c2rust::src_loc = "54:1"]
+
     pub type pid_t = __pid_t;
     use super::types_h::__pid_t;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gtypes.h:19"]
+
 pub mod gtypes_h {
-    #[c2rust::src_loc = "52:1"]
+
     pub type gchar = std::ffi::c_char;
-    #[c2rust::src_loc = "54:1"]
+
     pub type glong = std::ffi::c_long;
-    #[c2rust::src_loc = "55:1"]
+
     pub type gint = std::ffi::c_int;
-    #[c2rust::src_loc = "56:1"]
+
     pub type gboolean = gint;
-    #[c2rust::src_loc = "60:1"]
+
     pub type gulong = std::ffi::c_ulong;
-    #[c2rust::src_loc = "61:1"]
+
     pub type guint = std::ffi::c_uint;
-    #[c2rust::src_loc = "63:1"]
+
     pub type gfloat = std::ffi::c_float;
-    #[c2rust::src_loc = "64:1"]
+
     pub type gdouble = std::ffi::c_double;
-    #[c2rust::src_loc = "109:1"]
+
     pub type gpointer = *mut std::ffi::c_void;
-    #[c2rust::src_loc = "141:1"]
+
     pub type GFunc = Option::<unsafe extern "C" fn(gpointer, gpointer) -> ()>;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/garray.h:19"]
+
 pub mod garray_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "55:8"]
+
     pub struct _GPtrArray {
         pub pdata: *mut gpointer,
         pub len: guint,
     }
-    #[c2rust::src_loc = "41:1"]
+
     pub type GPtrArray = _GPtrArray;
     use super::gtypes_h::{gpointer, guint, gboolean, GFunc};
     extern "C" {
-        #[c2rust::src_loc = "171:1"]
+
         pub fn g_ptr_array_sized_new(reserved_size: guint) -> *mut GPtrArray;
-        #[c2rust::src_loc = "188:1"]
+
         pub fn g_ptr_array_free(
             array: *mut GPtrArray,
             free_segment: gboolean,
         ) -> *mut gpointer;
-        #[c2rust::src_loc = "223:1"]
+
         pub fn g_ptr_array_add(array: *mut GPtrArray, data: gpointer);
-        #[c2rust::src_loc = "252:1"]
+
         pub fn g_ptr_array_foreach(
             array: *mut GPtrArray,
             func: GFunc,
@@ -89,93 +89,93 @@ pub mod garray_h {
         );
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gquark.h:19"]
+
 pub mod gquark_h {
-    #[c2rust::src_loc = "38:1"]
+
     pub type GQuark = guint32;
     use super::glibconfig_h::guint32;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gerror.h:19"]
+
 pub mod gerror_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "45:8"]
+
     pub struct _GError {
         pub domain: GQuark,
         pub code: gint,
         pub message: *mut gchar,
     }
-    #[c2rust::src_loc = "43:1"]
+
     pub type GError = _GError;
     use super::gquark_h::GQuark;
     use super::gtypes_h::{gint, gchar};
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gconvert.h:19"]
+
 pub mod gconvert_h {
-    #[c2rust::src_loc = "85:1"]
+
     pub type GIConv = *mut _GIConv;
     extern "C" {
-        #[c2rust::src_loc = "85:16"]
+
         pub type _GIConv;
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gdataset.h:19"]
+
 pub mod gdataset_h {
-    #[c2rust::src_loc = "38:1"]
+
     pub type GData = _GData;
     extern "C" {
-        #[c2rust::src_loc = "38:16"]
+
         pub type _GData;
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/glist.h:19"]
+
 pub mod glist_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "41:8"]
+
     pub struct _GList {
         pub data: gpointer,
         pub next: *mut GList,
         pub prev: *mut GList,
     }
-    #[c2rust::src_loc = "39:1"]
+
     pub type GList = _GList;
     use super::gtypes_h::gpointer;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gslist.h:19"]
+
 pub mod gslist_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "41:8"]
+
     pub struct _GSList {
         pub data: gpointer,
         pub next: *mut GSList,
     }
-    #[c2rust::src_loc = "39:1"]
+
     pub type GSList = _GSList;
     use super::gtypes_h::gpointer;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gmain.h:19"]
+
 pub mod gmain_h {
-    #[c2rust::src_loc = "33:9"]
+
     pub type GIOCondition = std::ffi::c_uint;
-    #[c2rust::src_loc = "40:3"]
+
     pub const G_IO_NVAL: GIOCondition = 32;
-    #[c2rust::src_loc = "39:3"]
+
     pub const G_IO_HUP: GIOCondition = 16;
-    #[c2rust::src_loc = "38:3"]
+
     pub const G_IO_ERR: GIOCondition = 8;
-    #[c2rust::src_loc = "37:3"]
+
     pub const G_IO_PRI: GIOCondition = 2;
-    #[c2rust::src_loc = "36:3"]
+
     pub const G_IO_OUT: GIOCondition = 4;
-    #[c2rust::src_loc = "35:3"]
+
     pub const G_IO_IN: GIOCondition = 1;
-    #[c2rust::src_loc = "70:1"]
+
     pub type GMainContext = _GMainContext;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "266:8"]
+
     pub struct _GSource {
         pub callback_data: gpointer,
         pub callback_funcs: *mut GSourceCallbackFuncs,
@@ -191,15 +191,15 @@ pub mod gmain_h {
         pub name: *mut std::ffi::c_char,
         pub priv_0: *mut GSourcePrivate,
     }
-    #[c2rust::src_loc = "87:1"]
+
     pub type GSourcePrivate = _GSourcePrivate;
-    #[c2rust::src_loc = "86:1"]
+
     pub type GSource = _GSource;
-    #[c2rust::src_loc = "157:1"]
+
     pub type GSourceFuncs = _GSourceFuncs;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "398:8"]
+
     pub struct _GSourceFuncs {
         pub prepare: GSourceFuncsPrepareFunc,
         pub check: GSourceFuncsCheckFunc,
@@ -208,31 +208,31 @@ pub mod gmain_h {
         pub closure_callback: GSourceFunc,
         pub closure_marshal: GSourceDummyMarshal,
     }
-    #[c2rust::src_loc = "307:1"]
+
     pub type GSourceDummyMarshal = Option::<unsafe extern "C" fn() -> ()>;
-    #[c2rust::src_loc = "199:1"]
+
     pub type GSourceFunc = Option::<unsafe extern "C" fn(gpointer) -> gboolean>;
-    #[c2rust::src_loc = "396:1"]
+
     pub type GSourceFuncsFinalizeFunc = Option::<
         unsafe extern "C" fn(*mut GSource) -> (),
     >;
-    #[c2rust::src_loc = "379:1"]
+
     pub type GSourceFuncsDispatchFunc = Option::<
         unsafe extern "C" fn(*mut GSource, GSourceFunc, gpointer) -> gboolean,
     >;
-    #[c2rust::src_loc = "354:1"]
+
     pub type GSourceFuncsCheckFunc = Option::<
         unsafe extern "C" fn(*mut GSource) -> gboolean,
     >;
-    #[c2rust::src_loc = "333:1"]
+
     pub type GSourceFuncsPrepareFunc = Option::<
         unsafe extern "C" fn(*mut GSource, *mut gint) -> gboolean,
     >;
-    #[c2rust::src_loc = "99:1"]
+
     pub type GSourceCallbackFuncs = _GSourceCallbackFuncs;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "291:8"]
+
     pub struct _GSourceCallbackFuncs {
         pub ref_0: Option::<unsafe extern "C" fn(gpointer) -> ()>,
         pub unref: Option::<unsafe extern "C" fn(gpointer) -> ()>,
@@ -248,32 +248,32 @@ pub mod gmain_h {
     use super::gtypes_h::{gpointer, guint, gint, gboolean};
     use super::gslist_h::GSList;
     extern "C" {
-        #[c2rust::src_loc = "70:16"]
+
         pub type _GMainContext;
-        #[c2rust::src_loc = "87:16"]
+
         pub type _GSourcePrivate;
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gstring.h:19"]
+
 pub mod gstring_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "45:8"]
+
     pub struct _GString {
         pub str_0: *mut gchar,
         pub len: gsize,
         pub allocated_len: gsize,
     }
-    #[c2rust::src_loc = "43:1"]
+
     pub type GString = _GString;
     use super::gtypes_h::gchar;
     use super::glibconfig_h::gsize;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/giochannel.h:19"]
+
 pub mod giochannel_h {
     #[derive(Copy, Clone, BitfieldStruct)]
     #[repr(C)]
-    #[c2rust::src_loc = "100:8"]
+
     pub struct _GIOChannel {
         pub ref_count: gint,
         pub funcs: *mut GIOFuncs,
@@ -299,11 +299,11 @@ pub mod giochannel_h {
         pub reserved1: gpointer,
         pub reserved2: gpointer,
     }
-    #[c2rust::src_loc = "44:1"]
+
     pub type GIOFuncs = _GIOFuncs;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "134:8"]
+
     pub struct _GIOFuncs {
         pub io_read: Option::<
             unsafe extern "C" fn(
@@ -347,47 +347,47 @@ pub mod giochannel_h {
         >,
         pub io_get_flags: Option::<unsafe extern "C" fn(*mut GIOChannel) -> GIOFlags>,
     }
-    #[c2rust::src_loc = "43:1"]
+
     pub type GIOChannel = _GIOChannel;
-    #[c2rust::src_loc = "86:9"]
+
     pub type GIOFlags = std::ffi::c_uint;
-    #[c2rust::src_loc = "97:3"]
+
     pub const G_IO_FLAG_SET_MASK: GIOFlags = 3;
-    #[c2rust::src_loc = "96:3"]
+
     pub const G_IO_FLAG_GET_MASK: GIOFlags = 31;
-    #[c2rust::src_loc = "95:3"]
+
     pub const G_IO_FLAG_MASK: GIOFlags = 31;
-    #[c2rust::src_loc = "94:3"]
+
     pub const G_IO_FLAG_IS_SEEKABLE: GIOFlags = 16;
-    #[c2rust::src_loc = "93:3"]
+
     pub const G_IO_FLAG_IS_WRITEABLE: GIOFlags = 8;
-    #[c2rust::src_loc = "92:3"]
+
     pub const G_IO_FLAG_IS_WRITABLE: GIOFlags = 8;
-    #[c2rust::src_loc = "91:3"]
+
     pub const G_IO_FLAG_IS_READABLE: GIOFlags = 4;
-    #[c2rust::src_loc = "90:3"]
+
     pub const G_IO_FLAG_NONBLOCK: GIOFlags = 2;
-    #[c2rust::src_loc = "89:3"]
+
     pub const G_IO_FLAG_APPEND: GIOFlags = 1;
-    #[c2rust::src_loc = "88:3"]
+
     pub const G_IO_FLAG_NONE: GIOFlags = 0;
-    #[c2rust::src_loc = "71:9"]
+
     pub type GIOStatus = std::ffi::c_uint;
-    #[c2rust::src_loc = "76:3"]
+
     pub const G_IO_STATUS_AGAIN: GIOStatus = 3;
-    #[c2rust::src_loc = "75:3"]
+
     pub const G_IO_STATUS_EOF: GIOStatus = 2;
-    #[c2rust::src_loc = "74:3"]
+
     pub const G_IO_STATUS_NORMAL: GIOStatus = 1;
-    #[c2rust::src_loc = "73:3"]
+
     pub const G_IO_STATUS_ERROR: GIOStatus = 0;
-    #[c2rust::src_loc = "79:9"]
+
     pub type GSeekType = std::ffi::c_uint;
-    #[c2rust::src_loc = "83:3"]
+
     pub const G_SEEK_END: GSeekType = 2;
-    #[c2rust::src_loc = "82:3"]
+
     pub const G_SEEK_SET: GSeekType = 1;
-    #[c2rust::src_loc = "81:3"]
+
     pub const G_SEEK_CUR: GSeekType = 0;
     use super::gtypes_h::{gint, gchar, guint, gpointer};
     use super::gconvert_h::GIConv;
@@ -396,58 +396,58 @@ pub mod giochannel_h {
     use super::gerror_h::GError;
     use super::gmain_h::{GSource, GIOCondition};
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gqueue.h:19"]
+
 pub mod gqueue_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "49:8"]
+
     pub struct _GQueue {
         pub head: *mut GList,
         pub tail: *mut GList,
         pub length: guint,
     }
-    #[c2rust::src_loc = "38:1"]
+
     pub type GQueue = _GQueue;
     use super::glist_h::GList;
     use super::gtypes_h::guint;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/gobject/gtype.h:19"]
+
 pub mod gtype_h {
-    #[c2rust::src_loc = "427:1"]
+
     pub type GType = gsize;
-    #[c2rust::src_loc = "431:1"]
+
     pub type GValue = _GValue;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "451:8"]
+
     pub struct _GTypeClass {
         pub g_type: GType,
     }
-    #[c2rust::src_loc = "434:1"]
+
     pub type GTypeClass = _GTypeClass;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "461:8"]
+
     pub struct _GTypeInstance {
         pub g_class: *mut GTypeClass,
     }
-    #[c2rust::src_loc = "436:1"]
+
     pub type GTypeInstance = _GTypeInstance;
     use super::glibconfig_h::gsize;
     use super::gvalue_h::_GValue;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/gobject/gvalue.h:19"]
+
 pub mod gvalue_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "113:8"]
+
     pub struct _GValue {
         pub g_type: GType,
         pub data: [C2RustUnnamed; 2],
     }
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "119:3"]
+
     pub union C2RustUnnamed {
         pub v_int: gint,
         pub v_uint: guint,
@@ -463,11 +463,11 @@ pub mod gvalue_h {
     use super::gtypes_h::{gint, guint, glong, gulong, gfloat, gdouble, gpointer};
     use super::glibconfig_h::{gint64, guint64};
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/gobject/gclosure.h:19"]
+
 pub mod gclosure_h {
     #[derive(Copy, Clone, BitfieldStruct)]
     #[repr(C)]
-    #[c2rust::src_loc = "173:8"]
+
     pub struct _GClosure {
         #[bitfield(name = "ref_count", ty = "guint", bits = "0..=14")]
         #[bitfield(name = "meta_marshal_nouse", ty = "guint", bits = "15..=15")]
@@ -495,40 +495,40 @@ pub mod gclosure_h {
         pub data: gpointer,
         pub notifiers: *mut GClosureNotifyData,
     }
-    #[c2rust::src_loc = "78:1"]
+
     pub type GClosureNotifyData = _GClosureNotifyData;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "167:8"]
+
     pub struct _GClosureNotifyData {
         pub data: gpointer,
         pub notify: GClosureNotify,
     }
-    #[c2rust::src_loc = "101:1"]
+
     pub type GClosureNotify = Option::<
         unsafe extern "C" fn(gpointer, *mut GClosure) -> (),
     >;
-    #[c2rust::src_loc = "77:1"]
+
     pub type GClosure = _GClosure;
-    #[c2rust::src_loc = "92:1"]
+
     pub type GCallback = Option::<unsafe extern "C" fn() -> ()>;
     use super::gtypes_h::{guint, gpointer};
     use super::gtype_h::GValue;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/gobject/gsignal.h:19"]
+
 pub mod gsignal_h {
-    #[c2rust::src_loc = "195:9"]
+
     pub type GConnectFlags = std::ffi::c_uint;
-    #[c2rust::src_loc = "199:3"]
+
     pub const G_CONNECT_SWAPPED: GConnectFlags = 2;
-    #[c2rust::src_loc = "198:3"]
+
     pub const G_CONNECT_AFTER: GConnectFlags = 1;
-    #[c2rust::src_loc = "197:3"]
+
     pub const G_CONNECT_DEFAULT: GConnectFlags = 0;
     use super::gtypes_h::{gpointer, gchar, gulong};
     use super::gclosure_h::{GCallback, GClosureNotify};
     extern "C" {
-        #[c2rust::src_loc = "433:1"]
+
         pub fn g_signal_connect_data(
             instance: gpointer,
             detailed_signal: *const gchar,
@@ -539,258 +539,258 @@ pub mod gsignal_h {
         ) -> gulong;
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/gobject/gobject.h:19"]
+
 pub mod gobject_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "252:9"]
+
     pub struct _GObject {
         pub g_type_instance: GTypeInstance,
         pub ref_count: guint,
         pub qdata: *mut GData,
     }
-    #[c2rust::src_loc = "192:1"]
+
     pub type GObject = _GObject;
     use super::gtype_h::GTypeInstance;
     use super::gtypes_h::{guint, gpointer};
     use super::gdataset_h::GData;
     extern "C" {
-        #[c2rust::src_loc = "514:1"]
+
         pub fn g_object_unref(object: gpointer);
     }
 }
-#[c2rust::header_src = "/usr/include/webkitgtk-4.1/jsc/JSCContext.h:19"]
+
 pub mod JSCContext_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "53:1"]
+
     pub struct _JSCContext {
         pub parent: GObject,
         pub priv_0: *mut JSCContextPrivate,
     }
-    #[c2rust::src_loc = "53:1"]
+
     pub type JSCContextPrivate = _JSCContextPrivate;
     use super::gobject_h::GObject;
     extern "C" {
-        #[c2rust::src_loc = "53:1"]
+
         pub type _JSCContextPrivate;
     }
 }
-#[c2rust::header_src = "/usr/include/webkitgtk-4.1/jsc/JSCValue.h:19"]
+
 pub mod JSCValue_h {
-    #[c2rust::src_loc = "51:1"]
+
     pub type JSCContext = _JSCContext;
     use super::JSCContext_h::_JSCContext;
 }
-#[c2rust::header_src = "/usr/include/bits/socket.h:24"]
+
 pub mod socket_h {
-    #[c2rust::src_loc = "33:1"]
+
     pub type socklen_t = __socklen_t;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "184:39"]
+
     pub struct sockaddr {
         pub sa_family: sa_family_t,
         pub sa_data: [std::ffi::c_char; 14],
     }
-    #[c2rust::src_loc = "42:9"]
+
     pub const PF_LOCAL: std::ffi::c_int = 1 as std::ffi::c_int;
-    #[c2rust::src_loc = "43:9"]
+
     pub const PF_UNIX: std::ffi::c_int = 1 as std::ffi::c_int;
-    #[c2rust::src_loc = "95:9"]
+
     pub const AF_UNIX: std::ffi::c_int = 1 as std::ffi::c_int;
     use super::types_h::__socklen_t;
     use super::sockaddr_h::sa_family_t;
 }
-#[c2rust::header_src = "/usr/include/bits/socket_type.h:24"]
+
 pub mod socket_type_h {
-    #[c2rust::src_loc = "24:1"]
+
     pub type __socket_type = std::ffi::c_uint;
-    #[c2rust::src_loc = "52:3"]
+
     pub const SOCK_NONBLOCK: __socket_type = 2048;
-    #[c2rust::src_loc = "49:3"]
+
     pub const SOCK_CLOEXEC: __socket_type = 524288;
-    #[c2rust::src_loc = "41:3"]
+
     pub const SOCK_PACKET: __socket_type = 10;
-    #[c2rust::src_loc = "39:3"]
+
     pub const SOCK_DCCP: __socket_type = 6;
-    #[c2rust::src_loc = "36:3"]
+
     pub const SOCK_SEQPACKET: __socket_type = 5;
-    #[c2rust::src_loc = "34:3"]
+
     pub const SOCK_RDM: __socket_type = 4;
-    #[c2rust::src_loc = "32:3"]
+
     pub const SOCK_RAW: __socket_type = 3;
-    #[c2rust::src_loc = "29:3"]
+
     pub const SOCK_DGRAM: __socket_type = 2;
-    #[c2rust::src_loc = "26:3"]
+
     pub const SOCK_STREAM: __socket_type = 1;
-    #[c2rust::src_loc = "28:9"]
+
     pub const SOCK_STREAM_0: std::ffi::c_int = SOCK_STREAM as std::ffi::c_int;
 }
-#[c2rust::header_src = "/usr/include/bits/sockaddr.h:24"]
+
 pub mod sockaddr_h {
-    #[c2rust::src_loc = "28:1"]
+
     pub type sa_family_t = std::ffi::c_ushort;
 }
-#[c2rust::header_src = "/usr/include/sys/un.h:26"]
+
 pub mod un_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "29:39"]
+
     pub struct sockaddr_un {
         pub sun_family: sa_family_t,
         pub sun_path: [std::ffi::c_char; 108],
     }
     use super::sockaddr_h::sa_family_t;
 }
-#[c2rust::header_src = "/usr/include/webkitgtk-4.1/webkit/WebKitScriptWorld.h:28"]
+
 pub mod WebKitScriptWorld_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "52:1"]
+
     pub struct _WebKitScriptWorld {
         pub parent: GObject,
         pub priv_0: *mut WebKitScriptWorldPrivate,
     }
-    #[c2rust::src_loc = "41:1"]
+
     pub type WebKitScriptWorldPrivate = _WebKitScriptWorldPrivate;
-    #[c2rust::src_loc = "39:1"]
+
     pub type WebKitScriptWorld = _WebKitScriptWorld;
     use super::gobject_h::GObject;
     extern "C" {
-        #[c2rust::src_loc = "41:16"]
+
         pub type _WebKitScriptWorldPrivate;
-        #[c2rust::src_loc = "54:1"]
+
         pub fn webkit_script_world_get_default() -> *mut WebKitScriptWorld;
     }
 }
-#[c2rust::header_src = "/usr/include/webkitgtk-4.1/webkit/WebKitFrame.h:28"]
+
 pub mod WebKitFrame_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "52:1"]
+
     pub struct _WebKitFrame {
         pub parent: GObject,
         pub priv_0: *mut WebKitFramePrivate,
     }
-    #[c2rust::src_loc = "46:1"]
+
     pub type WebKitFramePrivate = _WebKitFramePrivate;
-    #[c2rust::src_loc = "44:1"]
+
     pub type WebKitFrame = _WebKitFrame;
     use super::gobject_h::GObject;
     use super::WebKitScriptWorld_h::WebKitScriptWorld;
     use super::JSCValue_h::JSCContext;
     extern "C" {
-        #[c2rust::src_loc = "46:16"]
+
         pub type _WebKitFramePrivate;
-        #[c2rust::src_loc = "73:1"]
+
         pub fn webkit_frame_get_js_context_for_script_world(
             frame: *mut WebKitFrame,
             world: *mut WebKitScriptWorld,
         ) -> *mut JSCContext;
     }
 }
-#[c2rust::header_src = "/usr/include/webkitgtk-4.1/webkit/WebKitWebPage.h:28"]
+
 pub mod WebKitWebPage_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "53:1"]
+
     pub struct _WebKitWebPage {
         pub parent: GObject,
         pub priv_0: *mut WebKitWebPagePrivate,
     }
-    #[c2rust::src_loc = "47:1"]
+
     pub type WebKitWebPagePrivate = _WebKitWebPagePrivate;
-    #[c2rust::src_loc = "45:1"]
+
     pub type WebKitWebPage = _WebKitWebPage;
     use super::gobject_h::GObject;
     use super::glibconfig_h::guint64;
     use super::WebKitFrame_h::WebKitFrame;
     extern "C" {
-        #[c2rust::src_loc = "47:16"]
+
         pub type _WebKitWebPagePrivate;
-        #[c2rust::src_loc = "80:1"]
+
         pub fn webkit_web_page_get_id(web_page: *mut WebKitWebPage) -> guint64;
-        #[c2rust::src_loc = "86:1"]
+
         pub fn webkit_web_page_get_main_frame(
             web_page: *mut WebKitWebPage,
         ) -> *mut WebKitFrame;
     }
 }
-#[c2rust::header_src = "/usr/include/webkitgtk-4.1/webkit/WebKitWebExtension.h:28"]
+
 pub mod WebKitWebExtension_h {
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "49:1"]
+
     pub struct _WebKitWebExtension {
         pub parent: GObject,
         pub priv_0: *mut WebKitWebExtensionPrivate,
     }
-    #[c2rust::src_loc = "43:1"]
+
     pub type WebKitWebExtensionPrivate = _WebKitWebExtensionPrivate;
-    #[c2rust::src_loc = "41:1"]
+
     pub type WebKitWebExtension = _WebKitWebExtension;
     use super::gobject_h::GObject;
     use super::glibconfig_h::guint64;
     use super::WebKitWebPage_h::WebKitWebPage;
     extern "C" {
-        #[c2rust::src_loc = "43:16"]
+
         pub type _WebKitWebExtensionPrivate;
-        #[c2rust::src_loc = "75:1"]
+
         pub fn webkit_web_extension_get_page(
             extension_0: *mut WebKitWebExtension,
             page_id: guint64,
         ) -> *mut WebKitWebPage;
     }
 }
-#[c2rust::header_src = "/usr/include/luajit-2.1/lua.h:28"]
+
 pub mod lua_h {
-    #[c2rust::src_loc = "53:1"]
+
     pub type lua_CFunction = Option::<
         unsafe extern "C" fn(*mut lua_State) -> std::ffi::c_int,
     >;
-    #[c2rust::src_loc = "104:1"]
+
     pub type lua_Integer = ptrdiff_t;
-    #[c2rust::src_loc = "38:9"]
+
     pub const LUA_GLOBALSINDEX: std::ffi::c_int = -(10002 as std::ffi::c_int);
     use super::__stddef_ptrdiff_t_h::ptrdiff_t;
     use super::__stddef_size_t_h::size_t;
     extern "C" {
-        #[c2rust::src_loc = "51:16"]
+
         pub type lua_State;
-        #[c2rust::src_loc = "121:1"]
+
         pub fn lua_gettop(L: *mut lua_State) -> std::ffi::c_int;
-        #[c2rust::src_loc = "122:1"]
+
         pub fn lua_settop(L: *mut lua_State, idx: std::ffi::c_int);
-        #[c2rust::src_loc = "124:1"]
+
         pub fn lua_remove(L: *mut lua_State, idx: std::ffi::c_int);
-        #[c2rust::src_loc = "125:1"]
+
         pub fn lua_insert(L: *mut lua_State, idx: std::ffi::c_int);
-        #[c2rust::src_loc = "148:1"]
+
         pub fn lua_tointeger(L: *mut lua_State, idx: std::ffi::c_int) -> lua_Integer;
-        #[c2rust::src_loc = "149:1"]
+
         pub fn lua_toboolean(L: *mut lua_State, idx: std::ffi::c_int) -> std::ffi::c_int;
-        #[c2rust::src_loc = "150:1"]
+
         pub fn lua_tolstring(
             L: *mut lua_State,
             idx: std::ffi::c_int,
             len: *mut size_t,
         ) -> *const std::ffi::c_char;
-        #[c2rust::src_loc = "165:1"]
+
         pub fn lua_pushstring(L: *mut lua_State, s: *const std::ffi::c_char);
-        #[c2rust::src_loc = "169:1"]
+
         pub fn lua_pushcclosure(
             L: *mut lua_State,
             fn_0: lua_CFunction,
             n: std::ffi::c_int,
         );
-        #[c2rust::src_loc = "179:1"]
+
         pub fn lua_getfield(
             L: *mut lua_State,
             idx: std::ffi::c_int,
             k: *const std::ffi::c_char,
         );
-        #[c2rust::src_loc = "203:1"]
+
         pub fn lua_pcall(
             L: *mut lua_State,
             nargs: std::ffi::c_int,
@@ -799,85 +799,85 @@ pub mod lua_h {
         ) -> std::ffi::c_int;
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/log.h:28"]
+
 pub mod log_h {
-    #[c2rust::src_loc = "36:9"]
+
     pub type log_level_t = std::ffi::c_uint;
-    #[c2rust::src_loc = "36:16"]
+
     pub const LOG_LEVEL_debug: log_level_t = 5;
-    #[c2rust::src_loc = "36:16"]
+
     pub const LOG_LEVEL_verbose: log_level_t = 4;
-    #[c2rust::src_loc = "36:16"]
+
     pub const LOG_LEVEL_info: log_level_t = 3;
-    #[c2rust::src_loc = "36:16"]
+
     pub const LOG_LEVEL_warn: log_level_t = 2;
-    #[c2rust::src_loc = "36:16"]
+
     pub const LOG_LEVEL_error: log_level_t = 1;
-    #[c2rust::src_loc = "36:16"]
+
     pub const LOG_LEVEL_fatal: log_level_t = 0;
     use super::gtypes_h::gchar;
     extern "C" {
-        #[c2rust::src_loc = "54:1"]
+
         pub fn _log(lvl: log_level_t, _: *const gchar, _: *const gchar, _: ...);
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/ipc.h:28"]
+
 pub mod ipc_h {
-    #[c2rust::src_loc = "41:9"]
+
     pub type ipc_type_t = std::ffi::c_uint;
-    #[c2rust::src_loc = "41:16"]
+
     pub const IPC_TYPE_crash: ipc_type_t = 128;
-    #[c2rust::src_loc = "41:16"]
+
     pub const IPC_TYPE_page_created: ipc_type_t = 64;
-    #[c2rust::src_loc = "41:16"]
+
     pub const IPC_TYPE_log: ipc_type_t = 32;
-    #[c2rust::src_loc = "41:16"]
+
     pub const IPC_TYPE_eval_js: ipc_type_t = 16;
-    #[c2rust::src_loc = "41:16"]
+
     pub const IPC_TYPE_extension_init: ipc_type_t = 8;
-    #[c2rust::src_loc = "41:16"]
+
     pub const IPC_TYPE_scroll: ipc_type_t = 4;
-    #[c2rust::src_loc = "41:16"]
+
     pub const IPC_TYPE_lua_ipc: ipc_type_t = 2;
-    #[c2rust::src_loc = "41:16"]
+
     pub const IPC_TYPE_lua_require_module: ipc_type_t = 1;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "47:16"]
+
     pub struct _ipc_header_t {
         pub length: guint,
         pub type_0: ipc_type_t,
     }
-    #[c2rust::src_loc = "47:1"]
+
     pub type ipc_header_t = _ipc_header_t;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "56:16"]
+
     pub struct _ipc_lua_require_module_t {
         pub module_name: [gchar; 0],
     }
-    #[c2rust::src_loc = "56:1"]
+
     pub type ipc_lua_require_module_t = _ipc_lua_require_module_t;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "60:16"]
+
     pub struct _ipc_lua_ipc_t {
         pub arg: [gchar; 0],
     }
-    #[c2rust::src_loc = "60:1"]
+
     pub type ipc_lua_ipc_t = _ipc_lua_ipc_t;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "76:16"]
+
     pub struct _ipc_page_created_t {
         pub page_id: guint64,
         pub pid: pid_t,
     }
-    #[c2rust::src_loc = "76:1"]
+
     pub type ipc_page_created_t = _ipc_page_created_t;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "94:16"]
+
     pub struct _ipc_recv_state_t {
         pub watch_in_id: guint,
         pub watch_hup_id: guint,
@@ -887,19 +887,19 @@ pub mod ipc_h {
         pub bytes_read: gsize,
         pub hdr_done: gboolean,
     }
-    #[c2rust::src_loc = "94:1"]
+
     pub type ipc_recv_state_t = _ipc_recv_state_t;
-    #[c2rust::src_loc = "104:9"]
+
     pub type ipc_endpoint_status_t = std::ffi::c_uint;
-    #[c2rust::src_loc = "107:5"]
+
     pub const IPC_ENDPOINT_FREED: ipc_endpoint_status_t = 2;
-    #[c2rust::src_loc = "106:5"]
+
     pub const IPC_ENDPOINT_CONNECTED: ipc_endpoint_status_t = 1;
-    #[c2rust::src_loc = "105:5"]
+
     pub const IPC_ENDPOINT_DISCONNECTED: ipc_endpoint_status_t = 0;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "110:16"]
+
     pub struct _ipc_endpoint_t {
         pub name: *mut gchar,
         pub status: ipc_endpoint_status_t,
@@ -909,7 +909,7 @@ pub mod ipc_h {
         pub refcount: gint,
         pub creation_notified: gboolean,
     }
-    #[c2rust::src_loc = "110:1"]
+
     pub type ipc_endpoint_t = _ipc_endpoint_t;
     use super::gtypes_h::{guint, gchar, gpointer, gboolean, gint};
     use super::glibconfig_h::{guint64, gsize};
@@ -919,12 +919,12 @@ pub mod ipc_h {
     use super::gqueue_h::GQueue;
     use super::lua_h::lua_State;
     extern "C" {
-        #[c2rust::src_loc = "128:1"]
+
         pub fn ipc_endpoint_connect_to_socket(
             ipc: *mut ipc_endpoint_t,
             sock: std::ffi::c_int,
         );
-        #[c2rust::src_loc = "137:1"]
+
         pub fn ipc_send_lua(
             ipc: *mut ipc_endpoint_t,
             type_0: ipc_type_t,
@@ -932,7 +932,7 @@ pub mod ipc_h {
             start: gint,
             end: gint,
         );
-        #[c2rust::src_loc = "138:1"]
+
         pub fn ipc_send(
             ipc: *mut ipc_endpoint_t,
             header: *const ipc_header_t,
@@ -940,13 +940,13 @@ pub mod ipc_h {
         );
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/extension/extension.h:28"]
+
 pub mod extension_h {
-    #[c2rust::src_loc = "35:1"]
+
     pub type extension_t = _extension_t;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "35:16"]
+
     pub struct _extension_t {
         pub ext: *mut WebKitWebExtension,
         pub ipc: *mut ipc_endpoint_t,
@@ -956,61 +956,61 @@ pub mod extension_h {
     use super::ipc_h::ipc_endpoint_t;
     use super::WebKitScriptWorld_h::WebKitScriptWorld;
     extern "C" {
-        #[c2rust::src_loc = "44:20"]
+
         pub static mut extension: extension_t;
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/common.h:28"]
+
 pub mod common_h {
-    #[c2rust::src_loc = "24:1"]
+
     pub type common_t = _common_t;
     #[derive(Copy, Clone)]
     #[repr(C)]
-    #[c2rust::src_loc = "24:16"]
+
     pub struct _common_t {
         pub L: *mut lua_State,
     }
     use super::lua_h::lua_State;
     extern "C" {
-        #[c2rust::src_loc = "29:17"]
+
         pub static mut common: common_t;
     }
 }
-#[c2rust::header_src = "/usr/include/string.h:19"]
+
 pub mod string_h {
     extern "C" {
-        #[c2rust::src_loc = "61:14"]
+
         pub fn memset(
             _: *mut std::ffi::c_void,
             _: std::ffi::c_int,
             _: std::ffi::c_ulong,
         ) -> *mut std::ffi::c_void;
-        #[c2rust::src_loc = "141:14"]
+
         pub fn strcpy(
             _: *mut std::ffi::c_char,
             _: *const std::ffi::c_char,
         ) -> *mut std::ffi::c_char;
-        #[c2rust::src_loc = "407:15"]
+
         pub fn strlen(_: *const std::ffi::c_char) -> std::ffi::c_ulong;
     }
 }
-#[c2rust::header_src = "/usr/include/signal.h:19"]
+
 pub mod signal_h {
     extern "C" {
-        #[c2rust::src_loc = "123:1"]
+
         pub fn raise(__sig: std::ffi::c_int) -> std::ffi::c_int;
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gmessages.h:19"]
+
 pub mod gmessages_h {
-    #[c2rust::src_loc = "320:9"]
+
     pub const G_LOG_DOMAIN: std::ffi::c_int = 0 as std::ffi::c_int;
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gtestutils.h:19"]
+
 pub mod gtestutils_h {
     use super::glibconfig_h::guint64;
     extern "C" {
-        #[c2rust::src_loc = "650:1"]
+
         pub fn g_assertion_message_cmpint(
             domain: *const std::ffi::c_char,
             file: *const std::ffi::c_char,
@@ -1024,16 +1024,16 @@ pub mod gtestutils_h {
         );
     }
 }
-#[c2rust::header_src = "/usr/include/stdio.h:21"]
+
 pub mod stdio_h {
     extern "C" {
-        #[c2rust::src_loc = "868:1"]
+
         pub fn perror(__s: *const std::ffi::c_char);
     }
 }
-#[c2rust::header_src = "/usr/include/assert.h:23"]
+
 pub mod assert_h {
-    #[c2rust::src_loc = "137:12"]
+
     pub const __ASSERT_FUNCTION: [std::ffi::c_char; 92] = unsafe {
         *::core::mem::transmute::<
             &[u8; 92],
@@ -1043,7 +1043,7 @@ pub mod assert_h {
         )
     };
     extern "C" {
-        #[c2rust::src_loc = "67:1"]
+
         pub fn __assert_fail(
             __assertion: *const std::ffi::c_char,
             __file: *const std::ffi::c_char,
@@ -1052,17 +1052,17 @@ pub mod assert_h {
         ) -> !;
     }
 }
-#[c2rust::header_src = "/usr/include/sys/socket.h:24"]
+
 pub mod sys_socket_h {
     use super::socket_h::{sockaddr, socklen_t};
     extern "C" {
-        #[c2rust::src_loc = "102:1"]
+
         pub fn socket(
             __domain: std::ffi::c_int,
             __type: std::ffi::c_int,
             __protocol: std::ffi::c_int,
         ) -> std::ffi::c_int;
-        #[c2rust::src_loc = "126:1"]
+
         pub fn connect(
             __fd: std::ffi::c_int,
             __addr: *const sockaddr,
@@ -1070,40 +1070,40 @@ pub mod sys_socket_h {
         ) -> std::ffi::c_int;
     }
 }
-#[c2rust::header_src = "/usr/include/unistd.h:28"]
+
 pub mod unistd_h {
     use super::types_h::__pid_t;
     extern "C" {
-        #[c2rust::src_loc = "358:1"]
+
         pub fn close(__fd: std::ffi::c_int) -> std::ffi::c_int;
-        #[c2rust::src_loc = "650:1"]
+
         pub fn getpid() -> __pid_t;
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/extension/clib/luakit.h:29"]
+
 pub mod luakit_h {
     use super::lua_h::lua_State;
     extern "C" {
-        #[c2rust::src_loc = "28:1"]
+
         pub fn luakit_lib_emit_pending_signals(L: *mut lua_State);
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/extension/scroll.h:31"]
+
 pub mod scroll_h {
     use super::glibconfig_h::guint64;
     use super::gtypes_h::gint;
     extern "C" {
-        #[c2rust::src_loc = "24:1"]
+
         pub fn web_scroll_to(page_id: guint64, scroll_x: gint, scroll_y: gint);
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/luajs.h:33"]
+
 pub mod luajs_h {
     use super::lua_h::lua_State;
     use super::JSCValue_h::JSCContext;
     use super::gtypes_h::guint;
     extern "C" {
-        #[c2rust::src_loc = "27:1"]
+
         pub fn luajs_eval_js(
             L: *mut lua_State,
             ctx: *mut JSCContext,
@@ -1114,13 +1114,13 @@ pub mod luajs_h {
         ) -> std::ffi::c_int;
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/luaserialize.h:34"]
+
 pub mod luaserialize_h {
     use super::lua_h::lua_State;
     use super::glibconfig_h::guint8;
     use super::gtypes_h::guint;
     extern "C" {
-        #[c2rust::src_loc = "26:1"]
+
         pub fn lua_deserialize_range(
             L: *mut lua_State,
             in_0: *const guint8,
@@ -1128,19 +1128,19 @@ pub mod luaserialize_h {
         ) -> std::ffi::c_int;
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/luautil.h:35"]
+
 pub mod luautil_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::gint;
     extern "C" {
-        #[c2rust::src_loc = "26:1"]
+
         pub fn luaH_dofunction_on_error(L: *mut lua_State) -> gint;
     }
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/lualib.h:35"]
+
 pub mod lualib_h {
     #[inline]
-    #[c2rust::src_loc = "101:1"]
+
     pub unsafe extern "C" fn luaH_dofunction(
         mut L: *mut lua_State,
         mut nargs: gint,
@@ -1180,30 +1180,30 @@ pub mod lualib_h {
     use super::__stddef_size_t_h::size_t;
     use super::gmacros_h::{FALSE, TRUE};
 }
-#[c2rust::header_src = "/home/daana/git/luakit/common/clib/ipc.h:35"]
+
 pub mod clib_ipc_h {
     use super::lua_h::lua_State;
     use super::gtypes_h::{gchar, guint};
     extern "C" {
-        #[c2rust::src_loc = "37:1"]
+
         pub fn ipc_channel_recv(L: *mut lua_State, arg: *const gchar, arglen: guint);
     }
 }
-#[c2rust::header_src = "/usr/include/glib-2.0/glib/gmacros.h:19"]
+
 pub mod gmacros_h {
-    #[c2rust::src_loc = "931:9"]
+
     pub const FALSE: std::ffi::c_int = 0 as std::ffi::c_int;
-    #[c2rust::src_loc = "935:9"]
+
     pub const TRUE: std::ffi::c_int = (FALSE == 0) as std::ffi::c_int;
 }
-#[c2rust::header_src = "/usr/lib/clang/20/include/__stddef_null.h:19"]
+
 pub mod __stddef_null_h {
-    #[c2rust::src_loc = "26:9"]
+
     pub const NULL: std::ffi::c_int = 0 as std::ffi::c_int;
 }
-#[c2rust::header_src = "/usr/include/bits/signum-generic.h:19"]
+
 pub mod signum_generic_h {
-    #[c2rust::src_loc = "59:9"]
+
     pub const SIGKILL: std::ffi::c_int = 9 as std::ffi::c_int;
 }
 pub use self::__stddef_ptrdiff_t_h::ptrdiff_t;
@@ -1317,10 +1317,10 @@ use self::clib_ipc_h::ipc_channel_recv;
 pub use self::gmacros_h::{FALSE, TRUE};
 pub use self::__stddef_null_h::NULL;
 pub use self::signum_generic_h::SIGKILL;
-#[c2rust::src_loc = "37:19"]
+
 static mut queued_page_ipc: *mut GPtrArray = 0 as *const GPtrArray as *mut GPtrArray;
 #[no_mangle]
-#[c2rust::src_loc = "39:1"]
+
 pub unsafe extern "C" fn ipc_recv_page_created(
     mut ipc: *mut ipc_endpoint_t,
     UNUSED_msg: gpointer,
@@ -1336,7 +1336,7 @@ pub unsafe extern "C" fn ipc_recv_page_created(
     );
 }
 #[no_mangle]
-#[c2rust::src_loc = "40:1"]
+
 pub unsafe extern "C" fn ipc_recv_log(
     mut ipc: *mut ipc_endpoint_t,
     UNUSED_msg: gpointer,
@@ -1352,7 +1352,7 @@ pub unsafe extern "C" fn ipc_recv_log(
     );
 }
 #[no_mangle]
-#[c2rust::src_loc = "42:1"]
+
 pub unsafe extern "C" fn ipc_recv_lua_require_module(
     mut UNUSED_ipc: *mut ipc_endpoint_t,
     mut msg: *const ipc_lua_require_module_t,
@@ -1386,7 +1386,7 @@ pub unsafe extern "C" fn ipc_recv_lua_require_module(
     luaH_dofunction(common.L, 1 as std::ffi::c_int, 0 as std::ffi::c_int);
 }
 #[no_mangle]
-#[c2rust::src_loc = "54:1"]
+
 pub unsafe extern "C" fn ipc_recv_lua_ipc(
     mut UNUSED_ipc: *mut ipc_endpoint_t,
     mut msg: *const ipc_lua_ipc_t,
@@ -1395,7 +1395,7 @@ pub unsafe extern "C" fn ipc_recv_lua_ipc(
     ipc_channel_recv(common.L, ((*msg).arg).as_ptr(), length);
 }
 #[no_mangle]
-#[c2rust::src_loc = "60:1"]
+
 pub unsafe extern "C" fn ipc_recv_extension_init(
     mut UNUSED_ipc: *mut ipc_endpoint_t,
     mut UNUSED_msg: gpointer,
@@ -1405,7 +1405,7 @@ pub unsafe extern "C" fn ipc_recv_extension_init(
     luakit_lib_emit_pending_signals(common.L);
 }
 #[no_mangle]
-#[c2rust::src_loc = "67:1"]
+
 pub unsafe extern "C" fn ipc_recv_scroll(
     mut UNUSED_ipc: *mut ipc_endpoint_t,
     mut msg: *const guint8,
@@ -1439,7 +1439,7 @@ pub unsafe extern "C" fn ipc_recv_scroll(
     lua_settop(L, -(3 as std::ffi::c_int) - 1 as std::ffi::c_int);
 }
 #[no_mangle]
-#[c2rust::src_loc = "83:1"]
+
 pub unsafe extern "C" fn ipc_recv_eval_js(
     mut UNUSED_ipc: *mut ipc_endpoint_t,
     mut msg: *const guint8,
@@ -1505,7 +1505,7 @@ pub unsafe extern "C" fn ipc_recv_eval_js(
     lua_settop(L, top);
 }
 #[no_mangle]
-#[c2rust::src_loc = "115:1"]
+
 pub unsafe extern "C" fn ipc_recv_crash(
     mut UNUSED_ipc: *mut ipc_endpoint_t,
     mut UNUSED_msg: *const guint8,
@@ -1513,7 +1513,7 @@ pub unsafe extern "C" fn ipc_recv_crash(
 ) {
     raise(SIGKILL);
 }
-#[c2rust::src_loc = "121:1"]
+
 unsafe extern "C" fn emit_page_created_ipc(
     mut web_page: *mut WebKitWebPage,
     mut UNUSED_user_data: gpointer,
@@ -1540,7 +1540,7 @@ unsafe extern "C" fn emit_page_created_ipc(
     );
 }
 #[no_mangle]
-#[c2rust::src_loc = "133:1"]
+
 pub unsafe extern "C" fn emit_pending_page_creation_ipc() {
     if !queued_page_ipc.is_null() {
         g_ptr_array_foreach(
@@ -1560,7 +1560,7 @@ pub unsafe extern "C" fn emit_pending_page_creation_ipc() {
         queued_page_ipc = NULL as *mut GPtrArray;
     }
 }
-#[c2rust::src_loc = "143:1"]
+
 unsafe extern "C" fn web_page_created_cb(
     mut UNUSED_ext: *mut WebKitWebExtension,
     mut web_page: *mut WebKitWebPage,
@@ -1573,7 +1573,7 @@ unsafe extern "C" fn web_page_created_cb(
     };
 }
 #[no_mangle]
-#[c2rust::src_loc = "153:1"]
+
 pub unsafe extern "C" fn web_extension_connect(
     mut socket_path: *const gchar,
 ) -> std::ffi::c_int {

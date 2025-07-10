@@ -21,7 +21,7 @@ use crate::gtypes::*;
 use webkit2gtk::{ffi::*, glib::gobject_ffi::*};
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ipc_channel_send(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn ipc_channel_send(mut L: *mut lua_State) -> gint {
     let mut ipc_channel: *mut ipc_channel_t = luaH_check_ipc_channel(L, 1 as std::ffi::c_int);
     let mut page_id: guint64 = 0 as std::ffi::c_int as guint64;
     let mut ipc: *mut ipc_endpoint_t = 0 as *mut ipc_endpoint_t;
@@ -71,7 +71,7 @@ pub unsafe extern "C" fn ipc_channel_send(mut L: *mut lua_State) -> gint {
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ipc_channel_recv(
+pub unsafe extern "C-unwind" fn ipc_channel_recv(
     mut L: *mut lua_State,
     mut arg: *const gchar,
     mut arglen: guint,

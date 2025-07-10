@@ -81,7 +81,7 @@ pub unsafe extern "C" fn luaH_resume(mut L: *mut lua_State, mut nret: gint) -> g
     luaH_object_push(L, unlock_ref);
     luaH_dofunction(L, 0 as std::ffi::c_int, 0 as std::ffi::c_int);
     let mut top: gint = lua_gettop(L) - nret;
-    let mut ret: gint = lua_resume(L, nret);
+    let mut ret: gint = lua_resume(L, std::ptr::null_mut(), nret, std::ptr::null_mut());
     if ret == 0 as std::ffi::c_int || ret == 1 as std::ffi::c_int {
         return (0 as std::ffi::c_int == 0) as std::ffi::c_int;
     }

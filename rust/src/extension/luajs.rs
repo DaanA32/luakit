@@ -1,7 +1,9 @@
 use gdk_sys::*;
 use glib_sys::*;
+use javascriptcore_rs_sys::*;
 use libc::*;
 use mlua_sys::*;
+use webkit2gtk::glib::gobject_ffi::*;
 
 use crate::clib::luakit::*;
 use crate::clib::msg::*;
@@ -20,6 +22,7 @@ use crate::common::*;
 use crate::globalconf::*;
 use crate::gtypes::*;
 use crate::log::*;
+use crate::luah::*;
 
 #[derive(Copy, Clone)]
 #[repr(C)]

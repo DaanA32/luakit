@@ -1,12 +1,25 @@
+use gdk_sys::*;
+use glib_sys::*;
+use libc::*;
+use mlua_sys::*;
 use std::mem::MaybeUninit;
 
-use ::libc;
-use mlua_sys::{
-    lua_Debug, lua_Integer, lua_State, lua_checkstack, lua_concat, lua_createtable, lua_getfield,
-    lua_getinfo, lua_getstack, lua_isstring, lua_pushfstring, lua_pushlstring, lua_pushstring,
-    lua_rawgeti, lua_rawlen, lua_rawseti, lua_setfield, lua_settop, lua_tolstring, lua_type,
-    lua_typename,
-};
+use crate::clib::luakit::*;
+use crate::clib::msg::*;
+use crate::clib::soup::*;
+use crate::clib::sqlite3::*;
+use crate::clib::stylesheet::*;
+use crate::clib::web_module::*;
+use crate::clib::widget::*;
+use crate::common::luaclass::*;
+use crate::common::luah::*;
+use crate::common::lualib::*;
+use crate::common::luaobject::*;
+use crate::common::util::*;
+use crate::common::*;
+use crate::globalconf::*;
+use crate::gtypes::*;
+use crate::log::*;
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn luaH_traceback(
@@ -30,8 +43,8 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
         );
         max_level = level;
         let mut cur_pad: gint = snprintf(
-            0 as *mut std::ffi::c_char,
-            0 as std::ffi::c_int as std::ffi::c_ulong,
+            std::ptr::null_mut(),
+            0,
             b"%s:%d\0" as *const u8 as *const std::ffi::c_char,
             if !(g_strstr_len(
                 (*ar.as_ptr()).source,
@@ -59,8 +72,8 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
     }
     let mut tb: *mut GString = g_string_new(b"\0" as *const u8 as *const std::ffi::c_char);
     let mut level_pad: gint = snprintf(
-        0 as *mut std::ffi::c_char,
-        0 as std::ffi::c_int as std::ffi::c_ulong,
+        std::ptr::null_mut(),
+        0,
         b"%d\0" as *const u8 as *const std::ffi::c_char,
         max_level,
     );
@@ -114,14 +127,13 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
             >(b"\0\0\0\0\0\0\0\0");
             snprintf(
                 cl.as_mut_ptr(),
-                ::core::mem::size_of::<[std::ffi::c_char; 8]>() as std::ffi::c_ulong,
+                ::core::mem::size_of::<[std::ffi::c_char; 8]>(),
                 b"%d\0" as *const u8 as *const std::ffi::c_char,
                 (*ar.as_ptr()).currentline,
             );
             n = (strlen(src))
                 .wrapping_add(strlen(cl.as_mut_ptr()))
-                .wrapping_add(1 as std::ffi::c_int as std::ffi::c_ulong)
-                as std::ffi::c_int;
+                .wrapping_add(1) as std::ffi::c_int;
             g_string_append_printf(
                 tb,
                 b"%s:%d\0" as *const u8 as *const std::ffi::c_char,
@@ -145,7 +157,7 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
                 ({
                     let __val: *const std::ffi::c_char =
                         b"\x1B[37m in main chunk\x1B[0m\0" as *const u8 as *const std::ffi::c_char;
-                    g_string_append_len_inline(
+                    g_string_append_len(
                         tb,
                         __val,
                         if !__val.is_null() {
@@ -159,7 +171,7 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
                 ({
                     let __val: *const std::ffi::c_char =
                         b"\x1B[37m in main chunk\x1B[0m\0" as *const u8 as *const std::ffi::c_char;
-                    g_string_append_len_inline(
+                    g_string_append_len(
                         tb,
                         __val,
                         if !__val.is_null() {
@@ -171,7 +183,7 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
                     );
                 });
             } else {
-                g_string_append_len_inline(
+                g_string_append_len(
                     tb,
                     b"\x1B[37m in main chunk\x1B[0m\0" as *const u8 as *const std::ffi::c_char,
                     -(1 as std::ffi::c_int) as gssize,
@@ -193,7 +205,7 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
                 ({
                     let __val: *const std::ffi::c_char =
                         b"\n\0" as *const u8 as *const std::ffi::c_char;
-                    g_string_append_len_inline(
+                    g_string_append_len(
                         tb,
                         __val,
                         if !__val.is_null() {
@@ -207,7 +219,7 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
                 ({
                     let __val: *const std::ffi::c_char =
                         b"\n\0" as *const u8 as *const std::ffi::c_char;
-                    g_string_append_len_inline(
+                    g_string_append_len(
                         tb,
                         __val,
                         if !__val.is_null() {
@@ -219,7 +231,7 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
                     );
                 });
             } else {
-                g_string_append_len_inline(
+                g_string_append_len(
                     tb,
                     b"\n\0" as *const u8 as *const std::ffi::c_char,
                     -(1 as std::ffi::c_int) as gssize,
@@ -229,7 +241,7 @@ pub unsafe extern "C-unwind" fn luaH_traceback(
         level_0 += 1;
         level_0;
     }
-    lua_pushstring(L, (*tb).str_0);
+    lua_pushstring(L, (*tb).str);
     if 0 != 0 {
         if 0 as std::ffi::c_int == 0 {
             g_string_free(tb, (0 as std::ffi::c_int == 0) as std::ffi::c_int);
@@ -354,8 +366,7 @@ pub unsafe extern "C-unwind" fn luaH_add_paths(
         lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
         return;
     }
-    let mut paths: *mut GPtrArray =
-        g_ptr_array_new_with_free_func(Some(g_free as unsafe extern "C-unwind" fn(gpointer) -> ()));
+    let mut paths: *mut GPtrArray = g_ptr_array_new_with_free_func(Some(g_free));
     g_ptr_array_add(
         paths,
         g_build_filename(
@@ -365,7 +376,7 @@ pub unsafe extern "C-unwind" fn luaH_add_paths(
         ) as gpointer,
     );
     if !config_dir.is_null() {
-        g_ptr_array_add(paths, g_strdup_inline(config_dir) as gpointer);
+        g_ptr_array_add(paths, g_strdup(config_dir) as gpointer);
     }
     let mut config_dirs: *const *const gchar = g_get_system_config_dirs();
     while !(*config_dirs).is_null() {

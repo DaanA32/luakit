@@ -2,13 +2,16 @@ use gio_sys::{GFile, g_file_get_path, g_file_new_for_path};
 use glib_sys::*;
 use libc::*;
 use mlua_sys::*;
+use std::mem::MaybeUninit;
 
 use crate::{
     common::{luaclass::luaH_typename, luautil::luaH_traceback, util::strip_ansi_escapes},
     gtypes::*,
+    log::_log,
+    log::LOG_LEVEL_warn,
 };
 
-unsafe extern "C" fn luaH_utf8_strlen(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_utf8_strlen(mut L: *mut lua_State) -> gint {
     let mut cmd: *const gchar = luaL_checklstring(L, 1 as std::ffi::c_int, 0 as *mut size_t);
     lua_pushnumber(
         L,
@@ -23,7 +26,7 @@ unsafe extern "C" fn luaH_utf8_strlen(mut L: *mut lua_State) -> gint {
     );
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaHe_next(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaHe_next(mut L: *mut lua_State) -> gint {
     if luaL_getmetafield(
         L,
         1 as std::ffi::c_int,
@@ -73,13 +76,13 @@ pub unsafe extern "C" fn luaH_mtnext(mut L: *mut lua_State, mut idx: gint) -> gi
     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_generic_pairs(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_generic_pairs(mut L: *mut lua_State) -> gint {
     lua_pushvalue(L, -(10002 as std::ffi::c_int) - 1 as std::ffi::c_int);
     lua_pushvalue(L, 1 as std::ffi::c_int);
     lua_pushnil(L);
     return 3 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaHe_pairs(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaHe_pairs(mut L: *mut lua_State) -> gint {
     if luaL_getmetafield(
         L,
         1 as std::ffi::c_int,
@@ -97,7 +100,7 @@ unsafe extern "C" fn luaHe_pairs(mut L: *mut lua_State) -> gint {
     luaL_checktype(L, 1 as std::ffi::c_int, 5 as std::ffi::c_int);
     return luaH_generic_pairs(L);
 }
-unsafe extern "C" fn luaH_ipairs_aux(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_ipairs_aux(mut L: *mut lua_State) -> gint {
     let mut i: gint =
         luaL_checkinteger(L, 2 as std::ffi::c_int) as std::ffi::c_int + 1 as std::ffi::c_int;
     luaL_checktype(L, 1 as std::ffi::c_int, 5 as std::ffi::c_int);
@@ -109,7 +112,7 @@ unsafe extern "C" fn luaH_ipairs_aux(mut L: *mut lua_State) -> gint {
         2 as std::ffi::c_int
     };
 }
-unsafe extern "C" fn luaHe_ipairs(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaHe_ipairs(mut L: *mut lua_State) -> gint {
     if luaL_getmetafield(
         L,
         1 as std::ffi::c_int,
@@ -130,12 +133,12 @@ unsafe extern "C" fn luaHe_ipairs(mut L: *mut lua_State) -> gint {
     lua_pushinteger(L, 0 as std::ffi::c_int as lua_Integer);
     return 3 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaHe_type(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaHe_type(mut L: *mut lua_State) -> gint {
     luaL_checkany(L, 1 as std::ffi::c_int);
     lua_pushstring(L, luaH_typename(L, 1 as std::ffi::c_int));
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_abspath(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_abspath(mut L: *mut lua_State) -> gint {
     let mut path: *const gchar = luaL_checklstring(L, 1 as std::ffi::c_int, 0 as *mut size_t);
     let mut file: *mut GFile = g_file_new_for_path(path);
     if file.is_null() {
@@ -149,7 +152,7 @@ unsafe extern "C" fn luaH_abspath(mut L: *mut lua_State) -> gint {
     g_free(absolute as gpointer);
     return 1 as std::ffi::c_int;
 }
-unsafe extern "C" fn luaH_debug_traceback(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_debug_traceback(mut L: *mut lua_State) -> gint {
     let mut thread: *mut lua_State = 0 as *mut lua_State;
     thread = lua_tothread(L, 1 as std::ffi::c_int);
     if !thread.is_null() {
@@ -202,11 +205,7 @@ pub unsafe extern "C" fn luaH_fixups(mut L: *mut lua_State) {
         -(10002 as std::ffi::c_int),
         b"string\0" as *const u8 as *const std::ffi::c_char,
     );
-    lua_pushcclosure(
-        L,
-        Some(luaH_utf8_strlen as unsafe extern "C" fn(*mut lua_State) -> gint),
-        0 as std::ffi::c_int,
-    );
+    lua_pushcclosure(L, luaH_utf8_strlen, 0 as std::ffi::c_int);
     lua_setfield(
         L,
         -(2 as std::ffi::c_int),
@@ -218,11 +217,7 @@ pub unsafe extern "C" fn luaH_fixups(mut L: *mut lua_State) {
         -(10002 as std::ffi::c_int),
         b"os\0" as *const u8 as *const std::ffi::c_char,
     );
-    lua_pushcclosure(
-        L,
-        Some(luaH_abspath as unsafe extern "C" fn(*mut lua_State) -> gint),
-        0 as std::ffi::c_int,
-    );
+    lua_pushcclosure(L, luaH_abspath, 0 as std::ffi::c_int);
     lua_setfield(
         L,
         -(2 as std::ffi::c_int),
@@ -236,11 +231,7 @@ pub unsafe extern "C" fn luaH_fixups(mut L: *mut lua_State) {
             .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
             .wrapping_sub(1),
     );
-    lua_pushcclosure(
-        L,
-        Some(luaHe_next as unsafe extern "C" fn(*mut lua_State) -> gint),
-        0 as std::ffi::c_int,
-    );
+    lua_pushcclosure(L, luaHe_next, 0 as std::ffi::c_int);
     lua_settable(L, -(10002 as std::ffi::c_int));
     lua_pushlstring(
         L,
@@ -249,16 +240,8 @@ pub unsafe extern "C" fn luaH_fixups(mut L: *mut lua_State) {
             .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
             .wrapping_sub(1),
     );
-    lua_pushcclosure(
-        L,
-        Some(luaHe_next as unsafe extern "C" fn(*mut lua_State) -> gint),
-        0 as std::ffi::c_int,
-    );
-    lua_pushcclosure(
-        L,
-        Some(luaHe_pairs as unsafe extern "C" fn(*mut lua_State) -> gint),
-        1 as std::ffi::c_int,
-    );
+    lua_pushcclosure(L, luaHe_next, 0 as std::ffi::c_int);
+    lua_pushcclosure(L, luaHe_pairs, 1 as std::ffi::c_int);
     lua_settable(L, -(10002 as std::ffi::c_int));
     lua_pushlstring(
         L,
@@ -267,16 +250,8 @@ pub unsafe extern "C" fn luaH_fixups(mut L: *mut lua_State) {
             .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
             .wrapping_sub(1),
     );
-    lua_pushcclosure(
-        L,
-        Some(luaH_ipairs_aux as unsafe extern "C" fn(*mut lua_State) -> gint),
-        0 as std::ffi::c_int,
-    );
-    lua_pushcclosure(
-        L,
-        Some(luaHe_ipairs as unsafe extern "C" fn(*mut lua_State) -> gint),
-        1 as std::ffi::c_int,
-    );
+    lua_pushcclosure(L, luaH_ipairs_aux, 0 as std::ffi::c_int);
+    lua_pushcclosure(L, luaHe_ipairs, 1 as std::ffi::c_int);
     lua_settable(L, -(10002 as std::ffi::c_int));
     lua_pushlstring(
         L,
@@ -285,22 +260,14 @@ pub unsafe extern "C" fn luaH_fixups(mut L: *mut lua_State) {
             .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
             .wrapping_sub(1),
     );
-    lua_pushcclosure(
-        L,
-        Some(luaHe_type as unsafe extern "C" fn(*mut lua_State) -> gint),
-        0 as std::ffi::c_int,
-    );
+    lua_pushcclosure(L, luaHe_type, 0 as std::ffi::c_int);
     lua_settable(L, -(10002 as std::ffi::c_int));
     lua_getfield(
         L,
         -(10002 as std::ffi::c_int),
         b"debug\0" as *const u8 as *const std::ffi::c_char,
     );
-    lua_pushcclosure(
-        L,
-        Some(luaH_debug_traceback as unsafe extern "C" fn(*mut lua_State) -> gint),
-        0 as std::ffi::c_int,
-    );
+    lua_pushcclosure(L, luaH_debug_traceback, 0 as std::ffi::c_int);
     lua_setfield(
         L,
         -(2 as std::ffi::c_int),
@@ -311,24 +278,17 @@ pub unsafe extern "C" fn luaH_fixups(mut L: *mut lua_State) {
 
 pub unsafe extern "C" fn luaH_warn(mut L: *mut lua_State, mut fmt: *const gchar, mut args: ...) {
     let mut top: gint = lua_gettop(L);
-    let mut ar: lua_Debug = lua_Debug {
-        event: 0,
-        name: 0 as *const std::ffi::c_char,
-        namewhat: 0 as *const std::ffi::c_char,
-        what: 0 as *const std::ffi::c_char,
-        source: 0 as *const std::ffi::c_char,
-        currentline: 0,
-        nups: 0,
-        linedefined: 0,
-        lastlinedefined: 0,
-        short_src: [0; 60],
-        i_ci: 0,
-    };
-    lua_getstack(L, 1 as std::ffi::c_int, &mut ar);
-    lua_getinfo(L, b"Sln\0" as *const u8 as *const std::ffi::c_char, &mut ar);
+    let mut ar = MaybeUninit::<lua_Debug>::uninit();
+    lua_getstack(L, 1 as std::ffi::c_int, ar.as_mut_ptr());
+    lua_getinfo(
+        L,
+        b"Sln\0" as *const u8 as *const std::ffi::c_char,
+        ar.as_mut_ptr(),
+    );
     let mut __n1: gint64 = top as gint64;
     let mut __n2: gint64 = lua_gettop(L) as gint64;
     if !(__n1 == __n2) {
+        /*
         g_assertion_message_cmpint(
             0 as *mut gchar,
             b"./common/luah.h\0" as *const u8 as *const std::ffi::c_char,
@@ -341,13 +301,31 @@ pub unsafe extern "C" fn luaH_warn(mut L: *mut lua_State, mut fmt: *const gchar,
             __n2 as guint64,
             'i' as i32 as std::ffi::c_char,
         );
+        */
     }
     let mut ap: ::core::ffi::VaListImpl;
     ap = args.clone();
-    va_log(
+    _log(
         LOG_LEVEL_warn,
-        (ar.short_src).as_mut_ptr(),
+        ((*ar.as_ptr()).short_src).as_ptr(),
         fmt,
         ap.as_va_list(),
     );
+}
+
+pub unsafe extern "C" fn luaH_dofunction_from_registry(
+    mut L: *mut lua_State,
+    mut ref_0: gint,
+    mut nargs: gint,
+    mut nret: gint,
+) -> gboolean {
+    lua_rawgeti(L, LUA_REGISTRYINDEX, ref_0);
+    return luaH_dofunction(L, nargs, nret);
+}
+
+pub unsafe extern "C" fn luaH_checkboolean(mut L: *mut lua_State, mut n: gint) -> gboolean {
+    if !(lua_type(L, n) == LUA_TBOOLEAN) {
+        luaL_typerror(L, n, b"boolean\0" as *const u8 as *const std::ffi::c_char);
+    }
+    return lua_toboolean(L, n);
 }

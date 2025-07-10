@@ -53,14 +53,14 @@ pub unsafe extern "C" fn luajs_tovalue(
                     val = luajs_tovalue(L, -(1 as std::ffi::c_int), ctx);
                     if val.is_null() {
                         lua_settop(L, top);
-                        g_object_unref(res as gpointer);
+                        g_object_unref(res as *mut GObject);
                         return std::ptr::null_mut();
                     }
                     let fresh0 = i;
                     i = i + 1;
                     jsc_value_object_set_property_at_index(res, fresh0 as guint, val);
                     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
-                    g_object_unref(val as gpointer);
+                    g_object_unref(val as *mut GObject);
                 }
             } else {
                 res = jsc_value_new_object(ctx, 0 as *mut std::ffi::c_void, 0 as *mut JSCClass);
@@ -72,7 +72,7 @@ pub unsafe extern "C" fn luajs_tovalue(
                     val = luajs_tovalue(L, -(1 as std::ffi::c_int), ctx);
                     if val.is_null() {
                         lua_settop(L, top);
-                        g_object_unref(res as gpointer);
+                        g_object_unref(res as *mut GObject);
                         return 0 as *mut JSCValue;
                     }
                     jsc_value_object_set_property(
@@ -81,7 +81,7 @@ pub unsafe extern "C" fn luajs_tovalue(
                         val,
                     );
                     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
-                    g_object_unref(val as gpointer);
+                    g_object_unref(val as *mut GObject);
                 }
             }
             return res;
@@ -131,12 +131,12 @@ pub unsafe extern "C" fn luajs_pushvalue(
             }
             val = jsc_value_object_get_property(value, key);
             if luajs_pushvalue(L, val) == 0 {
-                g_object_unref(val as gpointer);
+                g_object_unref(val as *mut GObject);
                 lua_settop(L, top);
                 g_strfreev(keys);
                 return 0 as std::ffi::c_int;
             }
-            g_object_unref(val as gpointer);
+            g_object_unref(val as *mut GObject);
             lua_rawset(L, -(3 as std::ffi::c_int));
         }
         g_strfreev(keys);

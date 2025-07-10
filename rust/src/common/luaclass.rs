@@ -30,7 +30,7 @@ pub mod signal_h {
                     as unsafe extern "C-unwind" fn(gconstpointer, gconstpointer, gpointer) -> gint,
             )),
             0 as *mut std::ffi::c_void,
-            Some(g_free as unsafe extern "C-unwind" fn(gpointer) -> ()),
+            Some(g_free),
             ::core::mem::transmute::<
                 Option<unsafe extern "C-unwind" fn(*mut gpointer) -> ()>,
                 GDestroyNotify,
@@ -300,12 +300,8 @@ pub unsafe extern "C-unwind" fn luaH_class_setup(
     (*class).index_miss_property = index_miss_property;
     (*class).newindex_miss_property = newindex_miss_property;
     (*class).signals = signal_new();
-    (*class).properties = g_hash_table_new(
-        Some(g_direct_hash as unsafe extern "C-unwind" fn(gconstpointer) -> guint),
-        Some(
-            g_direct_equal as unsafe extern "C-unwind" fn(gconstpointer, gconstpointer) -> gboolean,
-        ),
-    ) as *mut lua_class_property_array_t;
+    (*class).properties = g_hash_table_new(Some(g_direct_hash), Some(g_direct_equal))
+        as *mut lua_class_property_array_t;
     if luaH_classes.is_null() {
         luaH_classes = g_ptr_array_new();
     }

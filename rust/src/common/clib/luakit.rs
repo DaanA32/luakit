@@ -66,7 +66,7 @@ pub unsafe extern "C-unwind" fn luaH_luakit_uri_decode(mut L: *mut lua_State) ->
     return 1 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C-unwind" fn idle_cb(mut func: gpointer) -> gboolean {
+pub unsafe extern "C" fn idle_cb(mut func: gpointer) -> gboolean {
     let mut L: *mut lua_State = common.L;
     let mut top: gint = lua_gettop(L);
     luaH_object_push(L, func);
@@ -89,7 +89,7 @@ pub unsafe extern "C-unwind" fn luaH_luakit_idle_add(mut L: *mut lua_State) -> g
     }
     let mut func: gpointer = luaH_object_ref(L, 1 as std::ffi::c_int);
     g_idle_add(
-        Some(idle_cb as unsafe extern "C-unwind" fn(gpointer) -> gboolean),
+        Some(idle_cb),
         func,
     );
     return 0 as std::ffi::c_int;

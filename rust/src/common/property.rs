@@ -34,7 +34,7 @@ pub mod property_h {
     }
 }
 use crate::{
-    common::tokenize::luakit_token_t,
+    common::{luah::luaH_checkboolean, tokenize::luakit_token_t},
     gtypes::*,
     log::{_log, LOG_LEVEL_warn},
 };
