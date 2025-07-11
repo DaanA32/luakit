@@ -291,22 +291,12 @@ unsafe extern "C-unwind" fn luaH_luakit_spawn_sync(mut L: *mut lua_State) -> gin
     let mut _stdout: *mut gchar = std::ptr::null_mut();
     let mut _stderr: *mut gchar = std::ptr::null_mut();
     let mut rv: gint = 0;
-    let mut sigact: sigaction = sigaction {
-        sa_mask: sigset_t { __val: [0; 16] },
-        sa_flags: 0,
-        sa_restorer: None,
-        sa_sigaction: 0,
-    };
-    let mut oldact: sigaction = sigaction {
-        sa_mask: sigset_t { __val: [0; 16] },
-        sa_flags: 0,
-        sa_restorer: None,
-        sa_sigaction: 0,
-    };
+    let mut sigact: *mut sigaction = std::ptr::null_mut();
+    let mut oldact: *mut sigaction = std::ptr::null_mut();
     let mut command: *const gchar = luaL_checklstring(L, 1 as std::ffi::c_int, 0 as *mut size_t);
-    sigemptyset(&mut sigact.sa_mask);
-    sigact.sa_flags = 0 as std::ffi::c_int;
-    if sigaction(17 as std::ffi::c_int, &mut sigact, &mut oldact) != 0 {
+    sigemptyset(&mut (*sigact).sa_mask);
+    (*sigact).sa_flags = 0 as std::ffi::c_int;
+    if sigaction(17 as std::ffi::c_int, sigact, oldact) != 0 {
         _log(
             LOG_LEVEL_fatal,
             b"clib/luakit.c\0" as *const u8 as *const std::ffi::c_char,
@@ -320,7 +310,7 @@ unsafe extern "C-unwind" fn luaH_luakit_spawn_sync(mut L: *mut lua_State) -> gin
         &mut rv,
         &mut e,
     );
-    if sigaction(17 as std::ffi::c_int, &mut oldact, 0 as *mut sigaction) != 0 {
+    if sigaction(17 as std::ffi::c_int, oldact, 0 as *mut sigaction) != 0 {
         _log(
             LOG_LEVEL_fatal,
             b"clib/luakit.c\0" as *const u8 as *const std::ffi::c_char,

@@ -27,3 +27,6 @@ glib-sys = { version = "0.18.1", features = ["v2_78"] }
 gtk-sys = "0.18.1"
 gdk-sys = "0.18.1"
 javascriptcore-rs-sys = "1.1.1"
+cairo-sys-rs = "0.18.1"
+gdk-pixbuf-sys = "0.18.0"
+pango-sys = "0.18.0"

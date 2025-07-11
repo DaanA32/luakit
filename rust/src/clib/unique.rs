@@ -6,7 +6,7 @@ use gio_sys::{
     g_application_id_is_valid, g_application_register,
 };
 use glib_sys::{
-    G_VARIANT_TYPE_STRING, GTRUE, GType, GVariant, GVariantType, g_error_free,
+    G_VARIANT_TYPE_STRING, GFALSE, GTRUE, GType, GVariant, GVariantType, g_error_free,
     g_variant_get_string, g_variant_is_of_type, g_variant_new_string, gboolean, gpointer,
 };
 use gobject_sys::{GObject, GTypeInstance, g_object_unref, g_type_check_instance_cast};
@@ -103,7 +103,7 @@ unsafe extern "C" fn message_cb(
 }
 unsafe extern "C-unwind" fn unique_is_registered() -> gboolean {
     if (globalconf.application).is_null() {
-        return FALSE;
+        return GFALSE;
     }
     if g_application_get_is_registered(g_type_check_instance_cast(
         globalconf.application as *mut GTypeInstance,
@@ -111,9 +111,9 @@ unsafe extern "C-unwind" fn unique_is_registered() -> gboolean {
     ) as *mut std::ffi::c_void as *mut GApplication)
         == 0
     {
-        return FALSE;
+        return GFALSE;
     }
-    return TRUE;
+    return GTRUE;
 }
 unsafe extern "C-unwind" fn luaH_unique_new(mut L: *mut lua_State) -> gint {
     let mut name = luaL_checklstring(L, 1 as std::ffi::c_int, std::ptr::null_mut());
@@ -310,12 +310,10 @@ unsafe extern "C-unwind" fn luaH_open_luakit_unique(
     lua_setmetatable(L, -(2 as std::ffi::c_int));
     lua_settop(L, -(2 as std::ffi::c_int) - 1 as std::ffi::c_int);
 }
-const FALSE: gboolean = 0;
-const TRUE: gboolean = 1;
-static mut warned: gboolean = FALSE;
+static mut warned: gboolean = GFALSE;
 unsafe extern "C-unwind" fn luaH_unique_proxy_index(mut L: *mut lua_State) -> std::ffi::c_int {
     if warned == 0 {
-        warned = TRUE;
+        warned = GTRUE;
         _log(
             LOG_LEVEL_warn,
             b"clib/unique.c\0" as *const u8 as *const std::ffi::c_char,

@@ -515,3 +515,6 @@ unsafe extern "C" fn glib_log_writer(
     );
     return G_LOG_WRITER_HANDLED;
 }
+
+pub type LuakitError = std::ffi::c_uint;
+pub const LUAKIT_ERROR_TLS: LuakitError = 0;

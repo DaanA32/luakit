@@ -1,13 +1,22 @@
+use cairo_sys::*;
+use gdk_pixbuf_sys::*;
 use gdk_sys::*;
+use gio_sys::*;
 use glib_sys::*;
 use gobject_sys::*;
 use gtk_sys::*;
+use libc::*;
+use luakit_common::common::luaobject::luaH_object_property_signal;
 use mlua_sys::*;
+use webkit2gtk_sys::*;
 
 use crate::common::luaclass::*;
 use crate::common::luah::*;
+use crate::common::resource::*;
 use crate::common::tokenize::*;
 use crate::gtypes::*;
+use crate::log::*;
+use crate::web_context_get;
 use crate::widgets::common::*;
 use crate::widgets::*;
 
@@ -23,11 +32,11 @@ unsafe extern "C" fn luaH_checkimage(mut L: *mut lua_State, mut udx: gint) -> *m
     return w;
 }
 
-unsafe extern "C" fn luaH_image_set_from_file_name(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_image_set_from_file_name(mut L: *mut lua_State) -> gint {
     let mut pixbuf: *mut GdkPixbuf = 0 as *mut GdkPixbuf;
     let mut w = luaH_checkimage(L, 1 as std::ffi::c_int);
-    let mut path = luaL_checklstring(L, 2 as std::ffi::c_int, NULL as *mut size_t) as *mut gchar;
-    let mut x2_path = NULL as *mut gchar;
+    let mut path = luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut()) as *mut gchar;
+    let mut x2_path = std::ptr::null_mut();
     let mut scale = gtk_widget_get_scale_factor((*w).widget) as std::ffi::c_float;
     path = resource_find_file(path);
     if path.is_null() {
@@ -41,10 +50,7 @@ unsafe extern "C" fn luaH_image_set_from_file_name(mut L: *mut lua_State) -> gin
         let mut ext: *const gchar = if !(*fresh0).is_null() {
             *fresh0
         } else {
-            &mut *path.offset((strlen
-                as unsafe extern "C" fn(*const std::ffi::c_char) -> std::ffi::c_ulong)(
-                path
-            ) as isize) as *mut gchar
+            &mut *path.offset(strlen(path) as isize) as *mut gchar
         };
         x2_path = g_strdup_printf(
             b"%.*s@2x%s\0" as *const u8 as *const std::ffi::c_char,
@@ -54,12 +60,12 @@ unsafe extern "C" fn luaH_image_set_from_file_name(mut L: *mut lua_State) -> gin
         );
         if g_file_test(x2_path, G_FILE_TEST_IS_REGULAR) == 0 {
             g_free(x2_path as gpointer);
-            x2_path = NULL as *mut gchar;
+            x2_path = std::ptr::null_mut();
         }
     }
     let mut error = 0 as *mut GError;
     loop {
-        error = NULL as *mut GError;
+        error = std::ptr::null_mut();
         pixbuf =
             gdk_pixbuf_new_from_file(if !x2_path.is_null() { x2_path } else { path }, &mut error);
         if !error.is_null() {
@@ -75,7 +81,7 @@ unsafe extern "C" fn luaH_image_set_from_file_name(mut L: *mut lua_State) -> gin
         }
         g_error_free(error);
         g_free(x2_path as gpointer);
-        x2_path = NULL as *mut gchar;
+        x2_path = std::ptr::null_mut();
     }
     if !error.is_null() {
         lua_pushstring(L, (*error).message);
@@ -84,14 +90,14 @@ unsafe extern "C" fn luaH_image_set_from_file_name(mut L: *mut lua_State) -> gin
         return luaL_error(
             L,
             b"unable to load image file: %s\0" as *const u8 as *const std::ffi::c_char,
-            lua_tolstring(L, -(1 as std::ffi::c_int), NULL as *mut size_t),
+            lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null_mut()),
         );
     }
     if !((*w).data).is_null() {
         g_cancellable_cancel((*w).data as *mut GCancellable);
-        let mut _pp: *mut gpointer = &mut (*w).data;
-        let mut _ptr = *_pp;
-        *_pp = NULL as *mut std::ffi::c_void;
+        let mut _pp = &mut (*w).data;
+        let mut _ptr = *_pp as *mut GObject;
+        *_pp = std::ptr::null_mut();
         if !_ptr.is_null() {
             g_object_unref(_ptr);
         }
@@ -101,12 +107,12 @@ unsafe extern "C" fn luaH_image_set_from_file_name(mut L: *mut lua_State) -> gin
     g_object_unref(g_type_check_instance_cast(
         pixbuf as *mut GTypeInstance,
         ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
-    ) as *mut std::ffi::c_void as *mut GObject as gpointer);
+    ) as *mut std::ffi::c_void as *mut GObject);
     let mut src_w = cairo_image_surface_get_width(source) as std::ffi::c_float;
     let mut src_h = cairo_image_surface_get_height(source) as std::ffi::c_float;
     let mut target = cairo_surface_create_similar(
         source,
-        CAIRO_CONTENT_COLOR_ALPHA,
+        CONTENT_COLOR_ALPHA,
         src_w as std::ffi::c_int,
         src_h as std::ffi::c_int,
     );
@@ -146,7 +152,7 @@ unsafe extern "C" fn luaH_image_set_from_file_name(mut L: *mut lua_State) -> gin
     return 0 as std::ffi::c_int;
 }
 
-unsafe extern "C" fn luaH_image_set_from_icon_name(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_image_set_from_icon_name(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkimage(L, 1 as std::ffi::c_int);
     let mut size = GTK_ICON_SIZE_INVALID;
     match luaL_checkinteger(L, 3 as std::ffi::c_int) as std::ffi::c_int {
@@ -172,9 +178,9 @@ unsafe extern "C" fn luaH_image_set_from_icon_name(mut L: *mut lua_State) -> gin
     }
     if !((*w).data).is_null() {
         g_cancellable_cancel((*w).data as *mut GCancellable);
-        let mut _pp: *mut gpointer = &mut (*w).data;
-        let mut _ptr = *_pp;
-        *_pp = NULL as *mut std::ffi::c_void;
+        let mut _pp = &mut (*w).data;
+        let mut _ptr = *_pp as *mut GObject;
+        *_pp = std::ptr::null_mut();
         if !_ptr.is_null() {
             g_object_unref(_ptr);
         }
@@ -182,13 +188,13 @@ unsafe extern "C" fn luaH_image_set_from_icon_name(mut L: *mut lua_State) -> gin
     gtk_image_set_from_icon_name(
         g_type_check_instance_cast((*w).widget as *mut GTypeInstance, gtk_image_get_type())
             as *mut std::ffi::c_void as *mut GtkImage,
-        luaL_checklstring(L, 2 as std::ffi::c_int, NULL as *mut size_t),
+        luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut()),
         size,
     );
     return 0 as std::ffi::c_int;
 }
 
-unsafe extern "C" fn luaH_image_scale(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_image_scale(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkimage(L, 1 as std::ffi::c_int);
     let mut width = luaL_checkinteger(L, 2 as std::ffi::c_int) as std::ffi::c_int;
     let mut height = (if lua_type(L, 3 as std::ffi::c_int) == LUA_TNIL {
@@ -207,13 +213,13 @@ unsafe extern "C" fn luaH_image_scale(mut L: *mut lua_State) -> gint {
         gtk_image_get_type(),
     ) as *mut std::ffi::c_void as *mut GtkImage);
     let mut scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, height, GDK_INTERP_BILINEAR);
-    g_object_unref(pixbuf as gpointer);
+    g_object_unref(pixbuf as *mut GObject);
     gtk_image_set_from_pixbuf(
         g_type_check_instance_cast((*w).widget as *mut GTypeInstance, gtk_image_get_type())
             as *mut std::ffi::c_void as *mut GtkImage,
         scaled_pixbuf,
     );
-    g_object_unref(scaled_pixbuf as gpointer);
+    g_object_unref(scaled_pixbuf as *mut GObject);
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
@@ -223,7 +229,7 @@ pub unsafe extern "C" fn luaH_image_set_favicon_for_uri_finished(
     mut res: *mut GAsyncResult,
     mut w: *mut widget_t,
 ) {
-    let mut source = webkit_favicon_database_get_favicon_finish(fdb, res, NULL as *mut *mut GError);
+    let mut source = webkit_favicon_database_get_favicon_finish(fdb, res, std::ptr::null_mut());
     if source.is_null() {
         return;
     }
@@ -234,7 +240,7 @@ pub unsafe extern "C" fn luaH_image_set_favicon_for_uri_finished(
     let mut dev_sz = log_sz * scale;
     let mut target = cairo_surface_create_similar(
         source,
-        CAIRO_CONTENT_COLOR_ALPHA,
+        CONTENT_COLOR_ALPHA,
         dev_sz as std::ffi::c_int,
         dev_sz as std::ffi::c_int,
     );
@@ -271,21 +277,21 @@ pub unsafe extern "C" fn luaH_image_set_favicon_for_uri_finished(
     cairo_destroy(cr);
 }
 
-unsafe extern "C" fn luaH_image_set_favicon_for_uri(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_image_set_favicon_for_uri(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkimage(L, 1 as std::ffi::c_int);
-    let mut uri = luaL_checklstring(L, 2 as std::ffi::c_int, NULL as *mut size_t);
+    let mut uri = luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut());
     let mut main_ctx = web_context_get();
     let mut main_fdb = webkit_web_context_get_favicon_database(main_ctx);
     let mut f_uri = 0 as *mut gchar;
-    let mut ok = TRUE;
+    let mut ok = GTRUE;
     f_uri = webkit_favicon_database_get_favicon_uri(main_fdb, uri);
     if !f_uri.is_null() {
         g_free(f_uri as gpointer);
         if !((*w).data).is_null() {
             g_cancellable_cancel((*w).data as *mut GCancellable);
-            let mut _pp: *mut gpointer = &mut (*w).data;
-            let mut _ptr = *_pp;
-            *_pp = NULL as *mut std::ffi::c_void;
+            let mut _pp = &mut (*w).data;
+            let mut _ptr = *_pp as *mut GObject;
+            *_pp = std::ptr::null_mut();
             if !_ptr.is_null() {
                 g_object_unref(_ptr);
             }
@@ -304,18 +310,11 @@ unsafe extern "C" fn luaH_image_set_favicon_for_uri(mut L: *mut lua_State) -> gi
                     ) -> (),
                 >,
                 GAsyncReadyCallback,
-            >(Some(
-                luaH_image_set_favicon_for_uri_finished
-                    as unsafe extern "C" fn(
-                        *mut WebKitFaviconDatabase,
-                        *mut GAsyncResult,
-                        *mut widget_t,
-                    ) -> (),
-            )),
+            >(Some(luaH_image_set_favicon_for_uri_finished)),
             w as gpointer,
         );
     } else {
-        ok = FALSE;
+        ok = GFALSE;
     }
     lua_pushboolean(L, ok);
     return 1 as std::ffi::c_int;
@@ -337,85 +336,43 @@ unsafe extern "C" fn luaH_image_index(
         3 => return luaH_widget_get_align(L, w),
         24 => return luaH_widget_get_children(L, w),
         211 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_show as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_show, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         110 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_hide as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_hide, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         99 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_focus as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_focus, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         50 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_destroy as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_destroy, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         183 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_replace as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_replace, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         203 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_send_key as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_send_key, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         95 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_image_set_from_file_name as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_image_set_from_file_name, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         116 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_image_set_from_icon_name as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_image_set_from_icon_name, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         189 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_image_scale as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_image_scale, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         208 => {
-            lua_pushcclosure(
-                L,
-                Some(
-                    luaH_image_set_favicon_for_uri as unsafe extern "C" fn(*mut lua_State) -> gint,
-                ),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_image_set_favicon_for_uri, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         _ => {}
@@ -452,21 +409,15 @@ pub unsafe extern "C" fn widget_image(
     mut w: *mut widget_t,
     mut UNUSED_token: luakit_token_t,
 ) -> *mut widget_t {
-    (*w).index = Some(
-        luaH_image_index
-            as unsafe extern "C" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> gint,
-    );
-    (*w).newindex = Some(
-        luaH_image_newindex
-            as unsafe extern "C" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> gint,
-    );
+    (*w).index = Some(luaH_image_index);
+    (*w).newindex = Some(luaH_image_newindex);
     (*w).widget = gtk_image_new();
-    (*w).data = NULL as *mut std::ffi::c_void;
+    (*w).data = std::ptr::null_mut();
     g_object_connect(
         g_type_check_instance_cast(
             (*w).widget as *mut GTypeInstance,
             ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
-        ) as *mut std::ffi::c_void as *mut GObject as gpointer,
+        ) as *mut std::ffi::c_void as *mut GObject,
         b"signal::destroy\0" as *const u8 as *const std::ffi::c_char,
         ::core::mem::transmute::<
             Option<unsafe extern "C" fn(*mut GtkWidget, *mut widget_t) -> ()>,
@@ -523,7 +474,7 @@ pub unsafe extern "C" fn widget_image(
                 as unsafe extern "C" fn(*mut GtkWidget, *mut GtkWidget, *mut widget_t) -> (),
         )),
         w,
-        NULL as *mut std::ffi::c_void,
+        // std::ptr::null_mut(),
     );
     gtk_widget_show((*w).widget);
     return w;

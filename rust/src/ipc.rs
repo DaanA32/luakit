@@ -5,6 +5,7 @@ use crate::{
     common::common,
     globalconf::globalconf,
     gtypes::{gchar, gint, gsize, guint, guint8, guint64},
+    ipc_common::ipc::ipc_endpoint_new,
     log::{_log, LOG_LEVEL_debug, LOG_LEVEL_fatal, LOG_LEVEL_verbose},
     web_context::web_context_get,
     widgets::{
@@ -36,9 +37,9 @@ pub use self::ipc_h::{
     IPC_SCROLL_TYPE_docresize, IPC_SCROLL_TYPE_scroll, IPC_SCROLL_TYPE_winresize, IPC_TYPE_crash,
     IPC_TYPE_eval_js, IPC_TYPE_extension_init, IPC_TYPE_log, IPC_TYPE_lua_ipc,
     IPC_TYPE_lua_require_module, IPC_TYPE_page_created, IPC_TYPE_scroll,
-    ipc_endpoint_connect_to_socket, ipc_endpoint_new, ipc_endpoint_status_t, ipc_endpoint_t,
-    ipc_header_t, ipc_lua_ipc_t, ipc_page_created_t, ipc_recv_state_t, ipc_scroll_subtype_t,
-    ipc_scroll_t, ipc_send, ipc_type_t,
+    ipc_endpoint_connect_to_socket, ipc_endpoint_status_t, ipc_endpoint_t, ipc_header_t,
+    ipc_lua_ipc_t, ipc_page_created_t, ipc_recv_state_t, ipc_scroll_subtype_t, ipc_scroll_t,
+    ipc_send, ipc_type_t,
 };
 unsafe extern "C" {
     pub fn webview_scroll_recv(d: *mut std::ffi::c_void, ipc: *const ipc_scroll_t);

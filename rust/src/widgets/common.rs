@@ -1,8 +1,11 @@
 use crate::gtypes::*;
+use crate::luah::luaH_keystr_push;
+use crate::luah::luaH_modifier_table_push;
 use gdk_sys::*;
 use glib_sys::*;
 use gobject_sys::*;
 use gtk_sys::*;
+use libc::*;
 use mlua_sys::*;
 
 use crate::clib::widget::*;
@@ -11,6 +14,8 @@ use crate::common::luaclass::*;
 use crate::common::luah::*;
 use crate::common::luaobject::*;
 use crate::common::tokenize::*;
+use crate::gtypes::*;
+use crate::log::*;
 use crate::widgets::*;
 
 pub struct widget_info_t {
@@ -26,50 +31,12 @@ pub const GOBJECT_LUAKIT_WIDGET_DATA_KEY: [std::ffi::c_char; 19] = unsafe {
     *::core::mem::transmute::<&[u8; 19], &[std::ffi::c_char; 19]>(b"luakit_widget_data\0")
 };
 #[inline]
-pub unsafe extern "C" fn luaH_checkwidget(mut L: *mut lua_State, mut udx: gint) -> *mut widget_t {
-    let mut w = luaH_checkudata(L, udx, &mut widget_class) as *mut widget_t;
-    if ((*w).widget).is_null() {
-        luaL_error(
-            L,
-            b"widget %p (%s) has been destroyed\0" as *const u8 as *const std::ffi::c_char,
-            w,
-            (*(*w).info).name,
-        );
-    }
-    if ({
-        let mut __inst = (*w).widget as *mut GTypeInstance;
-        let mut __t = gtk_widget_get_type();
-        let mut __r: gboolean = 0;
-        if __inst.is_null() {
-            __r = 0 as std::ffi::c_int;
-        } else if !((*__inst).g_class).is_null() && (*(*__inst).g_class).g_type == __t {
-            __r = (0 as std::ffi::c_int == 0) as std::ffi::c_int;
-        } else {
-            __r = g_type_check_instance_is_a(__inst, __t);
-        }
-        __r
-    }) != 0
-    {
-    } else {
-        g_assertion_message_expr(
-            G_LOG_DOMAIN as *const std::ffi::c_char,
-            b"./clib/widget.h\0" as *const u8 as *const std::ffi::c_char,
-            101 as std::ffi::c_int,
-            (*::core::mem::transmute::<&[u8; 17], &[std::ffi::c_char; 17]>(b"luaH_checkwidget\0"))
-                .as_ptr(),
-            b"GTK_IS_WIDGET(w->widget)\0" as *const u8 as *const std::ffi::c_char,
-        );
-    }
-    return w;
-}
-#[inline]
-
 pub unsafe extern "C" fn luaH_checkwidgetornil(
     mut L: *mut lua_State,
     mut udx: gint,
 ) -> *mut widget_t {
     if lua_type(L, udx) == LUA_TNIL {
-        return NULL as *mut widget_t;
+        return std::ptr::null_mut();
     }
     return luaH_checkwidget(L, udx);
 }
@@ -94,9 +61,9 @@ pub unsafe extern "C" fn key_press_cb(
         1 as std::ffi::c_int,
     );
     let mut catch = if ret != 0 && lua_toboolean(L, -(1 as std::ffi::c_int)) != 0 {
-        TRUE
+        GTRUE
     } else {
-        FALSE
+        GFALSE
     };
     lua_settop(L, -(ret + 1 as std::ffi::c_int) - 1 as std::ffi::c_int);
     return catch;
@@ -113,7 +80,7 @@ pub unsafe extern "C" fn button_cb(
     luaH_object_push(L, (*w).ref_0);
     luaH_modifier_table_push(L, (*ev).state);
     lua_pushinteger(L, (*ev).button as lua_Integer);
-    match (*ev).type_0 as std::ffi::c_int {
+    match (*ev).type_ as std::ffi::c_int {
         5 => {
             ret = luaH_object_emit_signal(
                 L,
@@ -143,9 +110,9 @@ pub unsafe extern "C" fn button_cb(
         }
     }
     let mut catch = if ret != 0 && lua_toboolean(L, -(1 as std::ffi::c_int)) != 0 {
-        TRUE
+        GTRUE
     } else {
-        FALSE
+        GFALSE
     };
     lua_settop(L, -(ret + 1 as std::ffi::c_int) - 1 as std::ffi::c_int);
     return catch;
@@ -186,7 +153,7 @@ pub unsafe extern "C" fn scroll_cb(
                 79 as std::ffi::c_int,
                 (*::core::mem::transmute::<&[u8; 10], &[std::ffi::c_char; 10]>(b"scroll_cb\0"))
                     .as_ptr(),
-                NULL as *const std::ffi::c_char,
+                std::ptr::null(),
             );
         }
     }
@@ -215,7 +182,7 @@ pub unsafe extern "C" fn mouse_cb(
     let mut L = common.L;
     luaH_object_push(L, (*w).ref_0);
     luaH_modifier_table_push(L, (*ev).state);
-    let mut type_0 = (*ev).type_0;
+    let mut type_0 = (*ev).type_;
     if type_0 as std::ffi::c_int == GDK_ENTER_NOTIFY as std::ffi::c_int
         || type_0 as std::ffi::c_int == GDK_LEAVE_NOTIFY as std::ffi::c_int
     {
@@ -241,9 +208,9 @@ pub unsafe extern "C" fn mouse_cb(
         1 as std::ffi::c_int,
     );
     let mut catch = if ret != 0 && lua_toboolean(L, -(1 as std::ffi::c_int)) != 0 {
-        TRUE
+        GTRUE
     } else {
-        FALSE
+        GFALSE
     };
     lua_settop(L, -(ret + 1 as std::ffi::c_int) - 1 as std::ffi::c_int);
     return catch;
@@ -258,7 +225,7 @@ pub unsafe extern "C" fn focus_cb(
     let mut L = common.L;
     luaH_object_push(L, (*w).ref_0);
     let mut ret: gint = 0;
-    if (*ev).in_0 != 0 {
+    if (*ev).in_ != 0 {
         ret = luaH_object_emit_signal(
             L,
             -(1 as std::ffi::c_int),
@@ -277,10 +244,10 @@ pub unsafe extern "C" fn focus_cb(
     }
     if ret != 0 && lua_toboolean(L, -(1 as std::ffi::c_int)) != 0 {
         lua_settop(L, -(ret + 1 as std::ffi::c_int) - 1 as std::ffi::c_int);
-        return TRUE;
+        return GTRUE;
     }
     lua_settop(L, -(ret + 1 as std::ffi::c_int) - 1 as std::ffi::c_int);
-    return FALSE;
+    return GFALSE;
 }
 #[unsafe(no_mangle)]
 
@@ -369,16 +336,16 @@ pub unsafe extern "C" fn parent_set_cb(
     mut w: *mut widget_t,
 ) {
     let mut L = common.L;
-    let mut parent = NULL as *mut widget_t;
+    let mut parent = std::ptr::null();
     let mut new = 0 as *mut GtkContainer;
     g_object_get(
         g_type_check_instance_cast(
             widget as *mut GTypeInstance,
             ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
-        ) as *mut std::ffi::c_void as *mut GObject as gpointer,
+        ) as *mut std::ffi::c_void as *mut GObject,
         b"parent\0" as *const u8 as *const std::ffi::c_char,
         &mut new as *mut *mut GtkContainer,
-        NULL as *mut std::ffi::c_void,
+        // std::ptr::null(),
     );
     luaH_object_push(L, (*w).ref_0);
     if !new.is_null() && {
@@ -427,20 +394,18 @@ pub unsafe extern "C" fn destroy_cb(mut UNUSED_win: *mut GtkWidget, mut w: *mut 
     if ((*w).destructor).is_some() {
         ((*w).destructor).expect("non-null function pointer")(w);
     }
-    (*w).destructor = ::core::mem::transmute::<libc::intptr_t, Option<widget_destructor_t>>(
-        NULL as libc::intptr_t,
-    );
-    (*w).widget = NULL as *mut GtkWidget;
+    (*w).destructor = None;
+    (*w).widget = std::ptr::null_mut();
     luaH_object_unref(L, (*w).ref_0);
 }
 #[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn true_cb() -> gboolean {
-    return TRUE;
+    return GTRUE;
 }
 #[unsafe(no_mangle)]
 
-pub unsafe extern "C" fn luaH_widget_set_child(
+pub unsafe extern "C-unwind" fn luaH_widget_set_child(
     mut L: *mut lua_State,
     mut w: *mut widget_t,
 ) -> gint {
@@ -453,8 +418,7 @@ pub unsafe extern "C" fn luaH_widget_set_child(
         g_object_ref(g_type_check_instance_cast(
             widget as *mut GTypeInstance,
             ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
-        ) as *mut std::ffi::c_void as *mut GObject
-            as gpointer);
+        ) as *mut std::ffi::c_void as *mut GObject);
         gtk_container_remove(
             g_type_check_instance_cast((*w).widget as *mut GTypeInstance, gtk_container_get_type())
                 as *mut std::ffi::c_void as *mut GtkContainer,
@@ -474,7 +438,7 @@ pub unsafe extern "C" fn luaH_widget_set_child(
 }
 #[unsafe(no_mangle)]
 
-pub unsafe extern "C" fn luaH_widget_get_child(
+pub unsafe extern "C-unwind" fn luaH_widget_get_child(
     mut L: *mut lua_State,
     mut w: *mut widget_t,
 ) -> gint {
@@ -497,13 +461,13 @@ pub unsafe extern "C" fn luaH_widget_get_child(
 }
 #[unsafe(no_mangle)]
 
-pub unsafe extern "C" fn luaH_widget_remove(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_widget_remove(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     let mut child = luaH_checkwidget(L, 2 as std::ffi::c_int);
     g_object_ref(g_type_check_instance_cast(
         (*child).widget as *mut GTypeInstance,
         ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
-    ) as *mut std::ffi::c_void as *mut GObject as gpointer);
+    ) as *mut std::ffi::c_void as *mut GObject);
     gtk_container_remove(
         g_type_check_instance_cast((*w).widget as *mut GTypeInstance, gtk_container_get_type())
             as *mut std::ffi::c_void as *mut GtkContainer,
@@ -514,7 +478,7 @@ pub unsafe extern "C" fn luaH_widget_remove(mut L: *mut lua_State) -> gint {
 }
 #[unsafe(no_mangle)]
 
-pub unsafe extern "C" fn luaH_widget_get_children(
+pub unsafe extern "C-unwind" fn luaH_widget_get_children(
     mut L: *mut lua_State,
     mut w: *mut widget_t,
 ) -> gint {
@@ -523,9 +487,9 @@ pub unsafe extern "C" fn luaH_widget_get_children(
         let mut __t = gtk_container_get_type();
         let mut __r: gboolean = 0;
         if __inst.is_null() {
-            __r = FALSE;
+            __r = GFALSE;
         } else if !((*__inst).g_class).is_null() && (*(*__inst).g_class).g_type == __t {
-            __r = TRUE;
+            __r = GTRUE;
         } else {
             __r = g_type_check_instance_is_a(__inst, __t);
         }
@@ -541,7 +505,7 @@ pub unsafe extern "C" fn luaH_widget_get_children(
         as *mut GtkContainer);
     let mut iter = children;
     lua_createtable(L, 0 as std::ffi::c_int, 0 as std::ffi::c_int);
-    let mut i = 1 as std::ffi::c_int;
+    let mut i = 1;
     while !iter.is_null() {
         luaH_object_push(
             L,
@@ -564,7 +528,7 @@ pub unsafe extern "C" fn luaH_widget_get_children(
 }
 #[unsafe(no_mangle)]
 
-pub unsafe extern "C" fn luaH_widget_replace(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_widget_replace(mut L: *mut lua_State) -> gint {
     let mut och = luaH_checkwidget(L, 1 as std::ffi::c_int);
     let mut nch = luaH_checkwidget(L, 2 as std::ffi::c_int);
     let mut parent = gtk_widget_get_parent(g_type_check_instance_cast(
@@ -575,14 +539,14 @@ pub unsafe extern "C" fn luaH_widget_replace(mut L: *mut lua_State) -> gint {
         return 0 as std::ffi::c_int;
     }
     let mut num_props: guint = 0;
-    let mut props = gtk_container_class_list_child_properties(
+    // let mut props = gtk_container_class_list_child_properties(
+    let mut props: *mut *mut GList = todo!(
+        "{:?}, {:?}",
         (*(parent as *mut GTypeInstance)).g_class as *mut GObjectClass,
         &mut num_props,
     );
-    let mut values = g_malloc0_n(
-        num_props as gsize,
-        ::core::mem::size_of::<GValue>() as std::ffi::c_ulong,
-    ) as *mut GValue;
+    let mut values =
+        g_malloc0_n(num_props as size_t, ::core::mem::size_of::<GValue>()) as *mut GValue;
     let mut i = 0 as std::ffi::c_int as guint;
     while i < num_props {
         g_value_init(
@@ -598,7 +562,7 @@ pub unsafe extern "C" fn luaH_widget_replace(mut L: *mut lua_State) -> gint {
                 as *mut std::ffi::c_void as *mut GtkContainer,
             g_type_check_instance_cast((*och).widget as *mut GTypeInstance, gtk_widget_get_type())
                 as *mut std::ffi::c_void as *mut GtkWidget,
-            (**props.offset(i as isize)).name,
+            (**props.offset(i as isize)).data as *const i8,
             &mut *values.offset(i as isize),
         );
         i = i.wrapping_add(1);
@@ -607,7 +571,7 @@ pub unsafe extern "C" fn luaH_widget_replace(mut L: *mut lua_State) -> gint {
     g_object_ref(g_type_check_instance_cast(
         (*och).widget as *mut GTypeInstance,
         ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
-    ) as *mut std::ffi::c_void as *mut GObject as gpointer);
+    ) as *mut std::ffi::c_void as *mut GObject);
     gtk_container_remove(
         g_type_check_instance_cast(parent as *mut GTypeInstance, gtk_container_get_type())
             as *mut std::ffi::c_void as *mut GtkContainer,
@@ -627,7 +591,7 @@ pub unsafe extern "C" fn luaH_widget_replace(mut L: *mut lua_State) -> gint {
                 as *mut std::ffi::c_void as *mut GtkContainer,
             g_type_check_instance_cast((*nch).widget as *mut GTypeInstance, gtk_widget_get_type())
                 as *mut std::ffi::c_void as *mut GtkWidget,
-            (**props.offset(i_0 as isize)).name,
+            (**props.offset(i_0 as isize)).data as *const i8,
             &mut *values.offset(i_0 as isize),
         );
         g_value_unset(&mut *values.offset(i_0 as isize));
@@ -639,33 +603,31 @@ pub unsafe extern "C" fn luaH_widget_replace(mut L: *mut lua_State) -> gint {
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-
-pub unsafe extern "C" fn luaH_widget_show(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_widget_show(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     gtk_widget_show((*w).widget);
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
-
-pub unsafe extern "C" fn luaH_widget_hide(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_widget_hide(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     gtk_widget_hide((*w).widget);
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
 
-pub unsafe extern "C" fn luaH_widget_send_key(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_widget_send_key(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
-    let mut key_name = luaL_checklstring(L, 2 as std::ffi::c_int, NULL as *mut size_t);
+    let mut key_name = luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut());
     if !(lua_type(L, 3 as std::ffi::c_int) == LUA_TTABLE) {
         lua_createtable(L, 0 as std::ffi::c_int, 0 as std::ffi::c_int);
         lua_insert(L, 3 as std::ffi::c_int);
     }
     let is_release = lua_toboolean(L, 4 as std::ffi::c_int);
     if g_utf8_validate(
-        key_name,
-        -(1 as std::ffi::c_int) as gssize,
-        NULL as *mut *const gchar,
+        key_name as *const u8,
+        -(1 as std::ffi::c_int) as ssize_t,
+        std::ptr::null_mut(),
     ) == 0
     {
         return luaL_error(
@@ -674,7 +636,8 @@ pub unsafe extern "C" fn luaH_widget_send_key(mut L: *mut lua_State) -> gint {
         );
     }
     let mut keyval: guint = 0;
-    if g_utf8_strlen(key_name, -(1 as std::ffi::c_int) as gssize) == 1 as std::ffi::c_int as glong {
+    if g_utf8_strlen(key_name, -(1 as std::ffi::c_int) as ssize_t) == 1 as std::ffi::c_int as glong
+    {
         keyval = gdk_unicode_to_keyval(g_utf8_get_char(key_name));
     } else {
         keyval = gdk_keyval_from_name(key_name);
@@ -686,10 +649,10 @@ pub unsafe extern "C" fn luaH_widget_send_key(mut L: *mut lua_State) -> gint {
         );
     }
     let mut state = 0 as std::ffi::c_int as guint;
-    let mut state_string = g_string_sized_new(32 as std::ffi::c_int as gsize);
+    let mut state_string = g_string_sized_new(32);
     lua_pushnil(L);
     while lua_next(L, 3 as std::ffi::c_int) != 0 {
-        let mut mod_0 = luaL_checklstring(L, -(1 as std::ffi::c_int), NULL as *mut size_t);
+        let mut mod_0 = luaL_checklstring(L, -(1 as std::ffi::c_int), std::ptr::null_mut());
         g_string_append_printf(
             state_string,
             b"%s-\0" as *const u8 as *const std::ffi::c_char,
@@ -730,7 +693,7 @@ pub unsafe extern "C" fn luaH_widget_send_key(mut L: *mut lua_State) -> gint {
         }
         lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
     }
-    let mut keys = NULL as *mut GdkKeymapKey;
+    let mut keys: *mut GdkKeymapKey = std::ptr::null_mut();
     let mut n_keys: gint = 0;
     let mut keymap = gdk_keymap_get_for_display(gdk_display_get_default());
     if gdk_keymap_get_entries_for_keyval(keymap, keyval, &mut keys, &mut n_keys) == 0 {
@@ -759,14 +722,13 @@ pub unsafe extern "C" fn luaH_widget_send_key(mut L: *mut lua_State) -> gint {
     );
     let mut event_key = event as *mut GdkEventKey;
     (*event_key).window = gtk_widget_get_window((*w).widget);
-    (*event_key).send_event = TRUE as gint8;
+    (*event_key).send_event = GTRUE as i8;
     (*event_key).time = GDK_CURRENT_TIME as guint32;
     (*event_key).state = state;
     (*event_key).keyval = keyval;
-    (*event_key).hardware_keycode =
-        (*keys.offset(0 as std::ffi::c_int as isize)).keycode as guint16;
+    (*event_key).hardware_keycode = (*keys.offset(0 as std::ffi::c_int as isize)).keycode as u16;
     (*event_key).group = (*keys.offset(0 as std::ffi::c_int as isize)).group as guint8;
-    let mut kbd = NULL as *mut GdkDevice;
+    let mut kbd = std::ptr::null_mut();
     let mut seat = gdk_display_get_default_seat(gdk_display_get_default());
     kbd = gdk_seat_get_keyboard(seat);
     if kbd.is_null() {
@@ -781,12 +743,12 @@ pub unsafe extern "C" fn luaH_widget_send_key(mut L: *mut lua_State) -> gint {
         LOG_LEVEL_debug,
         b"widgets/common.c\0" as *const u8 as *const std::ffi::c_char,
         b"sending key '%s%s' to widget %p\0" as *const u8 as *const std::ffi::c_char,
-        (*state_string).str_0,
+        (*state_string).str,
         key_name,
         (*w).widget,
     );
     g_signal_emit_by_name(
-        (*w).widget as gpointer,
+        (*w).widget as *mut GObject,
         if is_release != 0 {
             b"key-release-event\0" as *const u8 as *const std::ffi::c_char
         } else {
@@ -836,18 +798,18 @@ pub unsafe extern "C" fn luaH_widget_get_min_size(
     lua_pushlstring(
         L,
         b"width\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 6]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 6]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_pushinteger(L, width as lua_Integer);
     lua_rawset(L, -(3 as std::ffi::c_int));
     lua_pushlstring(
         L,
         b"height\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 7]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 7]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_pushinteger(L, height as lua_Integer);
     lua_rawset(L, -(3 as std::ffi::c_int));
@@ -909,18 +871,18 @@ pub unsafe extern "C" fn luaH_widget_get_align(
     lua_pushlstring(
         L,
         b"h\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 2]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 2]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_pushnumber(L, halign as lua_Number);
     lua_rawset(L, -(3 as std::ffi::c_int));
     lua_pushlstring(
         L,
         b"v\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 2]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 2]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_pushnumber(L, valign as lua_Number);
     lua_rawset(L, -(3 as std::ffi::c_int));
@@ -957,7 +919,7 @@ pub unsafe extern "C" fn luaH_widget_set_align(
         match l_tokenize(lua_tolstring(
             L,
             -(1 as std::ffi::c_int),
-            NULL as *mut size_t,
+            std::ptr::null_mut(),
         )) as std::ffi::c_uint
         {
             96 => {
@@ -993,7 +955,7 @@ pub unsafe extern "C" fn luaH_widget_set_align(
         match l_tokenize(lua_tolstring(
             L,
             -(1 as std::ffi::c_int),
-            NULL as *mut size_t,
+            std::ptr::null_mut(),
         )) as std::ffi::c_uint
         {
             96 => {
@@ -1038,7 +1000,7 @@ pub unsafe extern "C" fn luaH_widget_set_tooltip(
     mut L: *mut lua_State,
     mut w: *mut widget_t,
 ) -> gint {
-    let ref mut fresh1 = lua_tolstring(L, 3 as std::ffi::c_int, NULL as *mut size_t);
+    let ref mut fresh1 = lua_tolstring(L, 3 as std::ffi::c_int, std::ptr::null_mut());
     gtk_widget_set_tooltip_markup(
         (*w).widget,
         if !(*fresh1).is_null() {
@@ -1130,16 +1092,16 @@ pub unsafe extern "C" fn luaH_widget_get_height(
     );
     return 1 as std::ffi::c_int;
 }
-#[unsafe(no_mangle)]
 
-pub unsafe extern "C" fn luaH_widget_focus(mut L: *mut lua_State) -> gint {
+#[unsafe(no_mangle)]
+pub unsafe extern "C-unwind" fn luaH_widget_focus(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     match (*(*w).info).tok as std::ffi::c_uint {
         263 => {
             gtk_window_set_focus(
                 g_type_check_instance_cast((*w).widget as *mut GTypeInstance, gtk_window_get_type())
                     as *mut std::ffi::c_void as *mut GtkWindow,
-                NULL as *mut GtkWidget,
+                std::ptr::null_mut(),
             );
         }
         87 => {
@@ -1157,7 +1119,7 @@ pub unsafe extern "C" fn luaH_widget_focus(mut L: *mut lua_State) -> gint {
 }
 #[unsafe(no_mangle)]
 
-pub unsafe extern "C" fn luaH_widget_destroy(mut L: *mut lua_State) -> gint {
+pub unsafe extern "C-unwind" fn luaH_widget_destroy(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     gtk_widget_destroy(g_type_check_instance_cast(
         (*w).widget as *mut GTypeInstance,

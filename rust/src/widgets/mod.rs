@@ -44,7 +44,6 @@ pub struct widget_info_t {
 pub type widget_constructor_t =
     unsafe extern "C" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> *mut widget_t;
 #[inline]
-
 pub unsafe extern "C" fn luaH_checkwidget(mut L: *mut lua_State, mut udx: gint) -> *mut widget_t {
     let mut w = luaH_checkudata(L, udx, &mut widget_class) as *mut widget_t;
     if ((*w).widget).is_null() {

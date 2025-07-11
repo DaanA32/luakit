@@ -2,10 +2,14 @@ use gdk_sys::*;
 use glib_sys::*;
 use gobject_sys::*;
 use gtk_sys::*;
+use libc::*;
 use mlua_sys::*;
 
+use crate::clib::widget::widget_set_css_properties;
+use crate::common::common;
 use crate::common::luaclass::*;
 use crate::common::luah::*;
+use crate::common::luaobject::*;
 use crate::common::tokenize::*;
 use crate::gtypes::*;
 use crate::widgets::common::*;
@@ -27,60 +31,32 @@ unsafe extern "C" fn luaH_eventbox_index(
         3 => return luaH_widget_get_align(L, w),
         24 => return luaH_widget_get_children(L, w),
         211 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_show as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_show, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         110 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_hide as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_hide, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         99 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_focus as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_focus, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         50 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_destroy as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_destroy, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         183 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_replace as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_replace, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         203 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_send_key as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_send_key, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         23 => return luaH_widget_get_child(L, w),
         180 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_remove as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_remove, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         13 => {
@@ -107,8 +83,8 @@ unsafe extern "C" fn luaH_eventbox_newindex(
     mut token: luakit_token_t,
 ) -> gint {
     let mut len: size_t = 0;
-    let mut tmp = 0 as *const gchar;
-    let mut c = _GdkRGBA {
+    let mut tmp = std::ptr::null_mut();
+    let mut c = GdkRGBA {
         red: 0.,
         green: 0.,
         blue: 0.,
@@ -131,7 +107,7 @@ unsafe extern "C" fn luaH_eventbox_newindex(
             luaH_widget_set_child(L, w);
         }
         13 => {
-            tmp = luaL_checklstring(L, 3 as std::ffi::c_int, &mut len);
+            tmp = luaL_checklstring(L, 3 as std::ffi::c_int, &mut len) as *mut i8;
             if gdk_rgba_parse(&mut c, tmp) == 0 {
                 luaL_argerror(
                     L,
@@ -143,7 +119,7 @@ unsafe extern "C" fn luaH_eventbox_newindex(
                 w,
                 b"background-color\0" as *const u8 as *const std::ffi::c_char,
                 tmp,
-                NULL_0 as *mut std::ffi::c_void,
+                std::ptr::null_mut() as *mut std::ffi::c_void,
             );
             g_object_set_data_full(
                 g_type_check_instance_cast(
@@ -151,7 +127,7 @@ unsafe extern "C" fn luaH_eventbox_newindex(
                     ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
                 ) as *mut std::ffi::c_void as *mut GObject,
                 b"bg\0" as *const u8 as *const std::ffi::c_char,
-                g_strdup_inline(tmp) as gpointer,
+                g_strdup(tmp as *const _) as gpointer,
                 Some(g_free as unsafe extern "C" fn(gpointer) -> ()),
             );
         }
@@ -180,7 +156,7 @@ pub unsafe extern "C" fn widget_eventbox(
         g_type_check_instance_cast(
             (*w).widget as *mut GTypeInstance,
             ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
-        ) as *mut std::ffi::c_void as *mut GObject as gpointer,
+        ) as *mut std::ffi::c_void as *mut GObject,
         b"signal::destroy\0" as *const u8 as *const std::ffi::c_char,
         ::core::mem::transmute::<
             Option<unsafe extern "C" fn(*mut GtkWidget, *mut widget_t) -> ()>,
@@ -340,7 +316,7 @@ pub unsafe extern "C" fn widget_eventbox(
                 ) -> gboolean,
         )),
         w,
-        NULL_0 as *mut std::ffi::c_void,
+        std::ptr::null_mut() as *mut std::ffi::c_void,
     );
     return w;
 }

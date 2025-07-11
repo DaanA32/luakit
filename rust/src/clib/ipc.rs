@@ -20,8 +20,8 @@ use crate::ipc_common::ipc::*;
 use crate::log::*;
 use crate::luah::*;
 use crate::web_context::*;
-use crate::widgets::webview::*;
-use crate::widgets::*;
+use crate::widgets::webview::{luaH_checkwebview, webview_get_by_id, webview_get_endpoint};
+use crate::widgets::widget_t;
 
 use crate::gtypes::*;
 use gobject_sys::*;

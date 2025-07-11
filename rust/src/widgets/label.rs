@@ -1,13 +1,24 @@
+use cairo_sys::*;
+use gdk_pixbuf_sys::*;
 use gdk_sys::*;
+use gio_sys::*;
 use glib_sys::*;
 use gobject_sys::*;
 use gtk_sys::*;
+use libc::*;
 use mlua_sys::*;
+use pango_sys::*;
+use webkit2gtk_sys::*;
 
+use crate::clib::widget::widget_set_css_properties;
 use crate::common::luaclass::*;
 use crate::common::luah::*;
+use crate::common::luaobject::luaH_object_property_signal;
+use crate::common::resource::*;
 use crate::common::tokenize::*;
 use crate::gtypes::*;
+use crate::log::*;
+use crate::web_context_get;
 use crate::widgets::common::*;
 use crate::widgets::*;
 
@@ -26,18 +37,18 @@ unsafe extern "C" fn luaH_label_get_align(mut L: *mut lua_State, mut w: *mut wid
     lua_pushlstring(
         L,
         b"x\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 2]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 2]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_pushnumber(L, xalign as lua_Number);
     lua_rawset(L, -(3 as std::ffi::c_int));
     lua_pushlstring(
         L,
         b"y\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 2]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 2]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_pushnumber(L, yalign as lua_Number);
     lua_rawset(L, -(3 as std::ffi::c_int));
@@ -105,51 +116,27 @@ unsafe extern "C" fn luaH_label_index(
         3 => return luaH_widget_get_align(L, w),
         24 => return luaH_widget_get_children(L, w),
         211 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_show as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_show, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         110 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_hide as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_hide, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         99 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_focus as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_focus, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         50 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_destroy as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_destroy, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         183 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_replace as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_replace, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         203 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_send_key as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_send_key, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         94 => {
@@ -235,7 +222,7 @@ unsafe extern "C" fn luaH_label_newindex(
 ) -> gint {
     let mut len: size_t = 0;
     let mut tmp = 0 as *const gchar;
-    let mut c = _GdkRGBA {
+    let mut c = GdkRGBA {
         red: 0.,
         green: 0.,
         blue: 0.,
@@ -279,7 +266,7 @@ unsafe extern "C" fn luaH_label_newindex(
                 w,
                 b"color\0" as *const u8 as *const std::ffi::c_char,
                 tmp,
-                NULL_0 as *mut std::ffi::c_void,
+                // std::ptr::null_mut(),
             );
             g_object_set_data_full(
                 g_type_check_instance_cast(
@@ -287,7 +274,7 @@ unsafe extern "C" fn luaH_label_newindex(
                     ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
                 ) as *mut std::ffi::c_void as *mut GObject,
                 b"fg\0" as *const u8 as *const std::ffi::c_char,
-                g_strdup_inline(tmp) as gpointer,
+                g_strdup(tmp) as gpointer,
                 Some(g_free as unsafe extern "C" fn(gpointer) -> ()),
             );
         }
@@ -304,7 +291,7 @@ unsafe extern "C" fn luaH_label_newindex(
                 w,
                 b"background-color\0" as *const u8 as *const std::ffi::c_char,
                 tmp,
-                NULL_0 as *mut std::ffi::c_void,
+                // std::ptr::null_mut(),
             );
             g_object_set_data_full(
                 g_type_check_instance_cast(
@@ -312,7 +299,7 @@ unsafe extern "C" fn luaH_label_newindex(
                     ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
                 ) as *mut std::ffi::c_void as *mut GObject,
                 b"bg\0" as *const u8 as *const std::ffi::c_char,
-                g_strdup_inline(tmp) as gpointer,
+                g_strdup(tmp) as gpointer,
                 Some(g_free as unsafe extern "C" fn(gpointer) -> ()),
             );
         }
@@ -323,7 +310,7 @@ unsafe extern "C" fn luaH_label_newindex(
                 w,
                 b"font\0" as *const u8 as *const std::ffi::c_char,
                 tmp,
-                NULL_0 as *mut std::ffi::c_void,
+                // std::ptr::null_mut(),
             );
             pango_font_description_free(font);
             g_object_set_data_full(
@@ -332,7 +319,7 @@ unsafe extern "C" fn luaH_label_newindex(
                     ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
                 ) as *mut std::ffi::c_void as *mut GObject,
                 b"font\0" as *const u8 as *const std::ffi::c_char,
-                g_strdup_inline(tmp) as gpointer,
+                g_strdup(tmp) as gpointer,
                 Some(g_free as unsafe extern "C" fn(gpointer) -> ()),
             );
         }
@@ -354,7 +341,7 @@ unsafe extern "C" fn luaH_label_newindex(
             luaH_warn(
                 L,
                 b"unknown property: %s\0" as *const u8 as *const std::ffi::c_char,
-                luaL_checklstring(L, 2 as std::ffi::c_int, NULL_0 as *mut size_t),
+                luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut()),
             );
             return 0 as std::ffi::c_int;
         }
@@ -376,7 +363,7 @@ pub unsafe extern "C" fn widget_label(
         luaH_label_newindex
             as unsafe extern "C" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> gint,
     );
-    (*w).widget = gtk_label_new(NULL_0 as *const gchar);
+    (*w).widget = gtk_label_new(std::ptr::null_mut());
     gtk_label_set_ellipsize(
         g_type_check_instance_cast((*w).widget as *mut GTypeInstance, gtk_label_get_type())
             as *mut std::ffi::c_void as *mut GtkLabel,
@@ -385,12 +372,12 @@ pub unsafe extern "C" fn widget_label(
     gtk_label_set_selectable(
         g_type_check_instance_cast((*w).widget as *mut GTypeInstance, gtk_label_get_type())
             as *mut std::ffi::c_void as *mut GtkLabel,
-        FALSE,
+        GFALSE,
     );
     gtk_label_set_use_markup(
         g_type_check_instance_cast((*w).widget as *mut GTypeInstance, gtk_label_get_type())
             as *mut std::ffi::c_void as *mut GtkLabel,
-        TRUE,
+        GTRUE,
     );
     gtk_widget_set_halign(
         g_type_check_instance_cast((*w).widget as *mut GTypeInstance, gtk_widget_get_type())
@@ -403,14 +390,9 @@ pub unsafe extern "C" fn widget_label(
         GTK_ALIGN_START,
     );
     let mut margin = {
-        let mut init = _GValue {
+        let mut init = GValue {
             g_type: 0 as std::ffi::c_int as GType,
-            data: [
-                C2RustUnnamed {
-                    v_int: 0 as std::ffi::c_int,
-                },
-                C2RustUnnamed { v_int: 0 },
-            ],
+            data: [GValue_data { v_int: 0 }, GValue_data { v_int: 0 }],
         };
         init
     };
@@ -428,7 +410,7 @@ pub unsafe extern "C" fn widget_label(
         g_type_check_instance_cast(
             (*w).widget as *mut GTypeInstance,
             ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
-        ) as *mut std::ffi::c_void as *mut GObject as gpointer,
+        ) as *mut std::ffi::c_void as *mut GObject,
         b"signal::destroy\0" as *const u8 as *const std::ffi::c_char,
         ::core::mem::transmute::<
             Option<unsafe extern "C" fn(*mut GtkWidget, *mut widget_t) -> ()>,
@@ -500,7 +482,7 @@ pub unsafe extern "C" fn widget_label(
                 ) -> gboolean,
         )),
         w,
-        NULL_0 as *mut std::ffi::c_void,
+        // std::ptr::null_mut(),
     );
     gtk_widget_show((*w).widget);
     return w;

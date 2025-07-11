@@ -1,17 +1,29 @@
+use cairo_sys::*;
+use gdk_pixbuf_sys::*;
 use gdk_sys::*;
+use gio_sys::*;
 use glib_sys::*;
 use gobject_sys::*;
 use gtk_sys::*;
+use libc::*;
 use mlua_sys::*;
+use pango_sys::*;
+use webkit2gtk_sys::*;
 
+use crate::clib::widget::widget_set_css_properties;
+use crate::common::common;
 use crate::common::luaclass::*;
 use crate::common::luah::*;
+use crate::common::luaobject::*;
+use crate::common::resource::*;
 use crate::common::tokenize::*;
 use crate::gtypes::*;
+use crate::log::*;
+use crate::web_context_get;
 use crate::widgets::common::*;
 use crate::widgets::*;
 
-unsafe extern "C" fn luaH_notebook_current(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_notebook_current(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     let mut n = gtk_notebook_get_n_pages(g_type_check_instance_cast(
         (*w).widget as *mut GTypeInstance,
@@ -33,7 +45,7 @@ unsafe extern "C" fn luaH_notebook_current(mut L: *mut lua_State) -> gint {
     return 1 as std::ffi::c_int;
 }
 
-unsafe extern "C" fn luaH_notebook_atindex(
+unsafe extern "C-unwind" fn luaH_notebook_atindex(
     mut L: *mut lua_State,
     mut w: *mut widget_t,
     mut idx: gint,
@@ -61,7 +73,7 @@ unsafe extern "C" fn luaH_notebook_atindex(
     return 1 as std::ffi::c_int;
 }
 
-unsafe extern "C" fn luaH_notebook_indexof(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_notebook_indexof(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     let mut child = luaH_checkwidget(L, 2 as std::ffi::c_int);
     let mut i = gtk_notebook_page_num(
@@ -77,7 +89,7 @@ unsafe extern "C" fn luaH_notebook_indexof(mut L: *mut lua_State) -> gint {
     return 1 as std::ffi::c_int;
 }
 
-unsafe extern "C" fn luaH_notebook_insert(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_notebook_insert(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     let mut pos = -(1 as std::ffi::c_int);
     let mut idx = 2 as std::ffi::c_int;
@@ -97,7 +109,7 @@ unsafe extern "C" fn luaH_notebook_insert(mut L: *mut lua_State) -> gint {
             (*luaH_checkwidget(L, idx)).widget as *mut GTypeInstance,
             gtk_widget_get_type(),
         ) as *mut std::ffi::c_void as *mut GtkWidget,
-        NULL as *mut GtkWidget,
+        std::ptr::null_mut(),
         pos,
     );
     if pos == -(1 as std::ffi::c_int) {
@@ -108,7 +120,7 @@ unsafe extern "C" fn luaH_notebook_insert(mut L: *mut lua_State) -> gint {
     return 1 as std::ffi::c_int;
 }
 
-unsafe extern "C" fn luaH_notebook_count(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_notebook_count(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     lua_pushnumber(
         L,
@@ -120,7 +132,7 @@ unsafe extern "C" fn luaH_notebook_count(mut L: *mut lua_State) -> gint {
     return 1 as std::ffi::c_int;
 }
 
-unsafe extern "C" fn luaH_notebook_set_title(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_notebook_set_title(mut L: *mut lua_State) -> gint {
     let mut len: size_t = 0;
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     let mut child = luaH_checkwidget(L, 2 as std::ffi::c_int);
@@ -142,15 +154,15 @@ unsafe extern "C" fn luaH_notebook_set_title(mut L: *mut lua_State) -> gint {
             as *mut std::ffi::c_void as *mut GtkContainer,
         label,
         b"tab-expand\0" as *const u8 as *const std::ffi::c_char,
-        TRUE,
+        GTRUE,
         b"tab-fill\0" as *const u8 as *const std::ffi::c_char,
-        TRUE,
-        NULL as *mut std::ffi::c_void,
+        GTRUE,
+        // std::ptr::null_mut(),
     );
     return 0 as std::ffi::c_int;
 }
 
-unsafe extern "C" fn luaH_notebook_get_title(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_notebook_get_title(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     let mut child = luaH_checkwidget(L, 2 as std::ffi::c_int);
     lua_pushstring(
@@ -164,7 +176,7 @@ unsafe extern "C" fn luaH_notebook_get_title(mut L: *mut lua_State) -> gint {
     return 1 as std::ffi::c_int;
 }
 
-unsafe extern "C" fn luaH_notebook_switch(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_notebook_switch(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     let mut i = luaL_checknumber(L, 2 as std::ffi::c_int) as gint;
     if i != -(1 as std::ffi::c_int) {
@@ -186,7 +198,7 @@ unsafe extern "C" fn luaH_notebook_switch(mut L: *mut lua_State) -> gint {
     return 1 as std::ffi::c_int;
 }
 
-unsafe extern "C" fn luaH_notebook_reorder(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_notebook_reorder(mut L: *mut lua_State) -> gint {
     let mut w = luaH_checkwidget(L, 1 as std::ffi::c_int);
     let mut child = luaH_checkwidget(L, 2 as std::ffi::c_int);
     let mut i = luaL_checknumber(L, 3 as std::ffi::c_int) as gint;
@@ -232,123 +244,63 @@ unsafe extern "C" fn luaH_notebook_index(
         3 => return luaH_widget_get_align(L, w),
         24 => return luaH_widget_get_children(L, w),
         211 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_show as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_show, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         110 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_hide as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_hide, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         99 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_focus as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_focus, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         50 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_destroy as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_destroy, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         183 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_replace as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_replace, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         203 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_send_key as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_send_key, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         180 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_remove as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_remove, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         35 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_notebook_count as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_notebook_count, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         39 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_notebook_current as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_notebook_current, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         104 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_notebook_get_title as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_notebook_get_title, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         119 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_notebook_indexof as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_notebook_indexof, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         123 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_notebook_insert as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_notebook_insert, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         210 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_notebook_set_title as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_notebook_set_title, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         232 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_notebook_switch as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_notebook_switch, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         182 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_notebook_reorder as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_notebook_reorder, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         215 => {
@@ -546,30 +498,24 @@ pub unsafe extern "C" fn widget_notebook(
     mut w: *mut widget_t,
     mut UNUSED_token: luakit_token_t,
 ) -> *mut widget_t {
-    (*w).index = Some(
-        luaH_notebook_index
-            as unsafe extern "C" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> gint,
-    );
-    (*w).newindex = Some(
-        luaH_notebook_newindex
-            as unsafe extern "C" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> gint,
-    );
+    (*w).index = Some(luaH_notebook_index);
+    (*w).newindex = Some(luaH_notebook_newindex);
     (*w).widget = gtk_notebook_new();
     gtk_notebook_set_show_border(
         g_type_check_instance_cast((*w).widget as *mut GTypeInstance, gtk_notebook_get_type())
             as *mut std::ffi::c_void as *mut GtkNotebook,
-        FALSE,
+        GFALSE,
     );
     gtk_notebook_set_scrollable(
         g_type_check_instance_cast((*w).widget as *mut GTypeInstance, gtk_notebook_get_type())
             as *mut std::ffi::c_void as *mut GtkNotebook,
-        TRUE,
+        GTRUE,
     );
     g_object_connect(
         g_type_check_instance_cast(
             (*w).widget as *mut GTypeInstance,
             ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
-        ) as *mut std::ffi::c_void as *mut GObject as gpointer,
+        ) as *mut std::ffi::c_void as *mut GObject,
         b"signal::destroy\0" as *const u8 as *const std::ffi::c_char,
         ::core::mem::transmute::<
             Option<unsafe extern "C" fn(*mut GtkWidget, *mut widget_t) -> ()>,
@@ -705,7 +651,7 @@ pub unsafe extern "C" fn widget_notebook(
                 ) -> (),
         )),
         w,
-        NULL as *mut std::ffi::c_void,
+        // std::ptr::null_mut(),
     );
     gtk_widget_show((*w).widget);
     return w;

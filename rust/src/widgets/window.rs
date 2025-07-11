@@ -7,13 +7,20 @@ use mlua_sys::*;
 use crate::common::common;
 use crate::common::luaclass::*;
 use crate::common::luah::*;
-use crate::common::luaobject::luaH_object_emit_signal;
-use crate::common::luaobject::luaH_object_push;
+use crate::common::luaobject::*;
 use crate::common::tokenize::*;
 use crate::globalconf::globalconf;
 use crate::gtypes::*;
 use crate::widgets::common::*;
 use crate::widgets::*;
+
+pub struct window_data_t {
+    pub widget: *mut widget_t,
+    pub win: *mut GtkWindow,
+    pub state: GdkWindowState,
+    pub id: guint,
+}
+static mut window_id_next: std::ffi::c_int = 0 as std::ffi::c_int;
 
 unsafe extern "C" fn luaH_checkwindow(mut L: *mut lua_State, mut udx: gint) -> *mut widget_t {
     let mut w = luaH_checkwidget(L, udx);
@@ -51,22 +58,22 @@ unsafe extern "C" fn can_close_cb(
     return keep_open;
 }
 
-unsafe extern "C" fn luaH_window_set_dark_mode(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_window_set_dark_mode(mut L: *mut lua_State) -> gint {
     let mut d = (*luaH_checkwindow(L, 1 as std::ffi::c_int)).data as *mut window_data_t;
     let mut dark_mode = lua_toboolean(L, 2 as std::ffi::c_int);
     g_object_set(
         gtk_widget_get_settings(g_type_check_instance_cast(
             (*d).win as *mut GTypeInstance,
             gtk_widget_get_type(),
-        ) as *mut std::ffi::c_void as *mut GtkWidget) as gpointer,
+        ) as *mut std::ffi::c_void as *mut GtkWidget) as *mut GObject,
         b"gtk-application-prefer-dark-theme\0" as *const u8 as *const std::ffi::c_char,
         dark_mode,
-        NULL as *mut std::ffi::c_void,
+        // std::ptr::null_mut(),
     );
     return 0 as std::ffi::c_int;
 }
 
-unsafe extern "C" fn luaH_window_set_default_size(mut L: *mut lua_State) -> gint {
+unsafe extern "C-unwind" fn luaH_window_set_default_size(mut L: *mut lua_State) -> gint {
     let mut d = (*luaH_checkwindow(L, 1 as std::ffi::c_int)).data as *mut window_data_t;
     let mut width = luaL_checknumber(L, 2 as std::ffi::c_int) as gint;
     let mut height = luaL_checknumber(L, 3 as std::ffi::c_int) as gint;
@@ -91,68 +98,36 @@ unsafe extern "C" fn luaH_window_index(
         3 => return luaH_widget_get_align(L, w),
         24 => return luaH_widget_get_children(L, w),
         211 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_show as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_show, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         110 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_hide as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_hide, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         99 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_focus as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_focus, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         50 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_destroy as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_destroy, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         183 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_replace as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_replace, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         203 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_send_key as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_send_key, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         23 => return luaH_widget_get_child(L, w),
         180 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_remove as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_remove, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         207 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_window_set_default_size as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_window_set_default_size, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         240 => {
@@ -186,11 +161,7 @@ unsafe extern "C" fn luaH_window_index(
             return 1 as std::ffi::c_int;
         }
         206 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_window_set_dark_mode as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_window_set_dark_mode, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         117 => {
@@ -268,14 +239,14 @@ unsafe extern "C" fn luaH_window_newindex(
         240 => {
             gtk_window_set_title(
                 (*d).win,
-                luaL_checklstring(L, 3 as std::ffi::c_int, NULL as *mut size_t),
+                luaL_checklstring(L, 3 as std::ffi::c_int, std::ptr::null_mut()),
             );
         }
         116 => {
             gtk_window_set_icon_from_file(
                 (*d).win,
-                luaL_checklstring(L, 3 as std::ffi::c_int, NULL as *mut size_t),
-                NULL as *mut *mut GError,
+                luaL_checklstring(L, 3 as std::ffi::c_int, std::ptr::null_mut()),
+                std::ptr::null_mut(),
             );
         }
         190 => {
@@ -335,14 +306,11 @@ unsafe extern "C" fn window_state_cb(
         luaH_object_property_signal(L, -(1 as std::ffi::c_int), L_TK_FULLSCREEN);
     }
     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
-    return FALSE;
+    return GFALSE;
 }
 
 unsafe extern "C" fn window_destructor(mut w: *mut widget_t) {
-    g_slice_free1(
-        ::core::mem::size_of::<window_data_t>() as std::ffi::c_ulong,
-        (*w).data,
-    );
+    g_slice_free1(::core::mem::size_of::<window_data_t>(), (*w).data);
 }
 #[unsafe(no_mangle)]
 
@@ -351,17 +319,10 @@ pub unsafe extern "C" fn widget_window(
     mut w: *mut widget_t,
     mut UNUSED_token: luakit_token_t,
 ) -> *mut widget_t {
-    (*w).index = Some(
-        luaH_window_index
-            as unsafe extern "C" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> gint,
-    );
-    (*w).newindex = Some(
-        luaH_window_newindex
-            as unsafe extern "C" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> gint,
-    );
+    (*w).index = Some(luaH_window_index);
+    (*w).newindex = Some(luaH_window_newindex);
     (*w).destructor = Some(window_destructor as unsafe extern "C" fn(*mut widget_t) -> ());
-    let mut d = g_slice_alloc0(::core::mem::size_of::<window_data_t>() as std::ffi::c_ulong)
-        as *mut window_data_t;
+    let mut d = g_slice_alloc0(::core::mem::size_of::<window_data_t>()) as *mut window_data_t;
     (*d).widget = w;
     (*w).data = d as gpointer;
     (*w).widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -375,7 +336,7 @@ pub unsafe extern "C" fn widget_window(
     if !(globalconf.application).is_null() {
         gtk_window_set_application((*d).win, globalconf.application);
     }
-    let mut hints = _GdkGeometry {
+    let mut hints = GdkGeometry {
         min_width: 0,
         min_height: 0,
         max_width: 0,
@@ -392,7 +353,7 @@ pub unsafe extern "C" fn widget_window(
     hints.min_height = 1 as std::ffi::c_int;
     gtk_window_set_geometry_hints(
         (*d).win,
-        NULL as *mut GtkWidget,
+        std::ptr::null_mut(),
         &mut hints,
         GDK_HINT_MIN_SIZE,
     );
@@ -400,7 +361,7 @@ pub unsafe extern "C" fn widget_window(
         g_type_check_instance_cast(
             (*w).widget as *mut GTypeInstance,
             ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
-        ) as *mut std::ffi::c_void as *mut GObject as gpointer,
+        ) as *mut std::ffi::c_void as *mut GObject,
         b"signal::destroy\0" as *const u8 as *const std::ffi::c_char,
         ::core::mem::transmute::<
             Option<unsafe extern "C" fn(*mut GtkWidget, *mut widget_t) -> ()>,
@@ -525,7 +486,7 @@ pub unsafe extern "C" fn widget_window(
                 ) -> gboolean,
         )),
         w,
-        NULL as *mut std::ffi::c_void,
+        // std::ptr::null_mut(),
     );
     window_id_next += 1;
     (*d).id = window_id_next as guint;

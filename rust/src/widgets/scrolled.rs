@@ -1,14 +1,25 @@
+use cairo_sys::*;
+use gdk_pixbuf_sys::*;
 use gdk_sys::*;
+use gio_sys::*;
 use glib_sys::*;
 use gobject_sys::*;
 use gtk_sys::*;
-use libc::strcmp;
+use libc::*;
 use mlua_sys::*;
+use pango_sys::*;
+use webkit2gtk_sys::*;
 
+use crate::clib::widget::widget_set_css_properties;
+use crate::common::common;
 use crate::common::luaclass::*;
 use crate::common::luah::*;
+use crate::common::luaobject::*;
+use crate::common::resource::*;
 use crate::common::tokenize::*;
 use crate::gtypes::*;
+use crate::log::*;
+use crate::web_context_get;
 use crate::widgets::common::*;
 use crate::widgets::*;
 
@@ -40,12 +51,12 @@ unsafe extern "C" fn string_from_gtk_policy(mut policy: GtkPolicyType) -> *const
         1 => return b"auto\0" as *const u8 as *const std::ffi::c_char,
         2 => return b"never\0" as *const u8 as *const std::ffi::c_char,
         3 => return b"unsafe external\0" as *const u8 as *const std::ffi::c_char,
-        _ => return NULL as *const gchar,
+        _ => return std::ptr::null_mut(),
     };
 }
 #[unsafe(no_mangle)]
 
-pub unsafe extern "C" fn luaH_widget_get_scrollbars(
+pub unsafe extern "C-unwind" fn luaH_widget_get_scrollbars(
     mut L: *mut lua_State,
     mut w: *mut widget_t,
 ) -> gint {
@@ -63,18 +74,18 @@ pub unsafe extern "C" fn luaH_widget_get_scrollbars(
     lua_pushlstring(
         L,
         b"h\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 2]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 2]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_pushstring(L, string_from_gtk_policy(horz));
     lua_rawset(L, -(3 as std::ffi::c_int));
     lua_pushlstring(
         L,
         b"v\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 2]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 2]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_pushstring(L, string_from_gtk_policy(vert));
     lua_rawset(L, -(3 as std::ffi::c_int));
@@ -82,7 +93,7 @@ pub unsafe extern "C" fn luaH_widget_get_scrollbars(
 }
 #[unsafe(no_mangle)]
 
-pub unsafe extern "C" fn luaH_widget_set_scrollbars(
+pub unsafe extern "C-unwind" fn luaH_widget_set_scrollbars(
     mut L: *mut lua_State,
     mut w: *mut widget_t,
 ) -> gint {
@@ -111,7 +122,7 @@ pub unsafe extern "C" fn luaH_widget_set_scrollbars(
     ) != 0
     {
         if gtk_policy_from_string(
-            lua_tolstring(L, -(1 as std::ffi::c_int), NULL as *mut size_t),
+            lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null_mut()),
             &mut horz,
         ) != 0
         {
@@ -128,7 +139,7 @@ pub unsafe extern "C" fn luaH_widget_set_scrollbars(
     ) != 0
     {
         if gtk_policy_from_string(
-            lua_tolstring(L, -(1 as std::ffi::c_int), NULL as *mut size_t),
+            lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null_mut()),
             &mut vert,
         ) != 0
         {
@@ -151,7 +162,7 @@ pub unsafe extern "C" fn luaH_widget_set_scrollbars(
 }
 #[unsafe(no_mangle)]
 
-pub unsafe extern "C" fn luaH_scrolled_get_scroll(
+pub unsafe extern "C-unwind" fn luaH_scrolled_get_scroll(
     mut L: *mut lua_State,
     mut w: *mut widget_t,
 ) -> gint {
@@ -169,44 +180,44 @@ pub unsafe extern "C" fn luaH_scrolled_get_scroll(
     lua_pushlstring(
         L,
         b"x\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 2]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 2]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_pushnumber(L, gtk_adjustment_get_value(horz));
     lua_rawset(L, -(3 as std::ffi::c_int));
     lua_pushlstring(
         L,
         b"y\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 2]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 2]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_pushnumber(L, gtk_adjustment_get_value(vert));
     lua_rawset(L, -(3 as std::ffi::c_int));
     lua_pushlstring(
         L,
         b"xmax\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 5]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 5]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_pushnumber(L, gtk_adjustment_get_upper(horz));
     lua_rawset(L, -(3 as std::ffi::c_int));
     lua_pushlstring(
         L,
         b"ymax\0" as *const u8 as *const std::ffi::c_char,
-        (::core::mem::size_of::<[std::ffi::c_char; 5]>() as std::ffi::c_ulong)
-            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
-            .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
+        (::core::mem::size_of::<[std::ffi::c_char; 5]>())
+            .wrapping_div(::core::mem::size_of::<std::ffi::c_char>())
+            .wrapping_sub(1),
     );
     lua_pushnumber(L, gtk_adjustment_get_upper(vert));
-    lua_rawset(L, -(3 as std::ffi::c_int));
-    return 1 as std::ffi::c_int;
+    lua_rawset(L, -(3));
+    return 1;
 }
 #[unsafe(no_mangle)]
 
-pub unsafe extern "C" fn luaH_scrolled_set_scroll(
+pub unsafe extern "C-unwind" fn luaH_scrolled_set_scroll(
     mut L: *mut lua_State,
     mut w: *mut widget_t,
 ) -> gint {
@@ -264,60 +275,32 @@ unsafe extern "C" fn luaH_scrolled_index(
         3 => return luaH_widget_get_align(L, w),
         24 => return luaH_widget_get_children(L, w),
         211 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_show as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_show, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         110 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_hide as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_hide, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         99 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_focus as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_focus, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         50 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_destroy as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_destroy, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         183 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_replace as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_replace, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         203 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_send_key as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_send_key, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         23 => return luaH_widget_get_child(L, w),
         180 => {
-            lua_pushcclosure(
-                L,
-                Some(luaH_widget_remove as unsafe extern "C" fn(*mut lua_State) -> gint),
-                0 as std::ffi::c_int,
-            );
+            lua_pushcclosure(L, luaH_widget_remove, 0 as std::ffi::c_int);
             return 1 as std::ffi::c_int;
         }
         192 => return luaH_widget_get_scrollbars(L, w),
@@ -373,12 +356,12 @@ pub unsafe extern "C" fn widget_scrolled(
         luaH_scrolled_newindex
             as unsafe extern "C" fn(*mut lua_State, *mut widget_t, luakit_token_t) -> gint,
     );
-    (*w).widget = gtk_scrolled_window_new(NULL as *mut GtkAdjustment, NULL as *mut GtkAdjustment);
+    (*w).widget = gtk_scrolled_window_new(std::ptr::null_mut(), std::ptr::null_mut());
     g_object_connect(
         g_type_check_instance_cast(
             (*w).widget as *mut GTypeInstance,
             ((20 as std::ffi::c_int) << 2 as std::ffi::c_int) as GType,
-        ) as *mut std::ffi::c_void as *mut GObject as gpointer,
+        ) as *mut std::ffi::c_void as *mut GObject,
         b"signal::destroy\0" as *const u8 as *const std::ffi::c_char,
         ::core::mem::transmute::<
             Option<unsafe extern "C" fn(*mut GtkWidget, *mut widget_t) -> ()>,
@@ -435,7 +418,7 @@ pub unsafe extern "C" fn widget_scrolled(
                 as unsafe extern "C" fn(*mut GtkWidget, *mut GtkWidget, *mut widget_t) -> (),
         )),
         w,
-        NULL as *mut std::ffi::c_void,
+        // std::ptr::null_mut(),
     );
     gtk_widget_show((*w).widget);
     return w;

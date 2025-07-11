@@ -77,7 +77,6 @@ use glib_sys::{
 };
 use libc::pid_t;
 unsafe extern "C" {
-    pub fn ipc_endpoint_new(name: *const gchar) -> *mut ipc_endpoint_t;
     pub fn ipc_endpoint_connect_to_socket(ipc: *mut ipc_endpoint_t, sock: std::ffi::c_int);
     pub fn ipc_send(
         ipc: *mut ipc_endpoint_t,

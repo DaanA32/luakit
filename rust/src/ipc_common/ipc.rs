@@ -103,7 +103,7 @@ unsafe extern "C" fn ipc_send_thread(mut UNUSED_user_data: gpointer) -> gpointer
         {
             g_io_channel_write_chars(
                 (*ipc).channel,
-                header as *const gchar,
+                header as *const u8,
                 ::core::mem::size_of::<ipc_header_t>() as std::ffi::c_ulong as ssize_t,
                 std::ptr::null_mut(),
                 0 as *mut *mut GError,
@@ -115,7 +115,7 @@ unsafe extern "C" fn ipc_send_thread(mut UNUSED_user_data: gpointer) -> gpointer
         {
             g_io_channel_write_chars(
                 (*ipc).channel,
-                data as *const gchar,
+                data as *const u8,
                 (*header).length as ssize_t,
                 std::ptr::null_mut(),
                 0 as *mut *mut GError,
