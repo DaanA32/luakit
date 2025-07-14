@@ -106,7 +106,7 @@ pub use self::msg_h::{
 
 static mut msg_class: lua_class_t = lua_class_t {
     name: 0 as *const gchar,
-    signals: 0 as *mut glib_sys::GTree,
+    signals: std::ptr::null_mut(),
     allocator: None,
     properties: 0 as *const lua_class_property_array_t as *mut lua_class_property_array_t,
     index_miss_property: None,

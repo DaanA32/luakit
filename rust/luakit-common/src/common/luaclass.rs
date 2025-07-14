@@ -1,10 +1,10 @@
-use std::ffi::CStr;
+use std::{collections::BTreeMap, ffi::CStr};
 
 use libc;
 use libc::size_t;
 use mlua::{Lua, ffi::*};
 pub mod signal_h {
-    pub type signal_t = GTree;
+    pub type signal_t = BTreeMap<*const gchar, gpointer>;
     pub type signal_array_t = GPtrArray;
     #[inline]
     pub unsafe extern "C-unwind" fn signal_cmp(
@@ -43,70 +43,69 @@ pub mod signal_h {
     }
     #[inline]
     pub unsafe extern "C-unwind" fn signal_lookup(
-        mut signals: *mut signal_t,
+        mut signals: &mut signal_t,
         mut name: *const gchar,
-    ) -> *mut signal_array_t {
-        return g_tree_lookup(signals as *mut GTree, name as gpointer as gconstpointer)
-            as *mut signal_array_t;
+    ) -> Option<*mut signal_array_t> {
+        return signals.get(&name).map(|v| *v as *mut signal_array_t);
     }
     #[inline]
     pub unsafe extern "C-unwind" fn signal_add(
-        mut signals: *mut signal_t,
+        mut signals: &mut signal_t,
         mut name: *const gchar,
         mut func: gpointer,
     ) {
-        let mut sigfuncs: *mut signal_array_t = signal_lookup(signals, name);
-        if sigfuncs.is_null() {
-            sigfuncs = g_ptr_array_new() as *mut signal_array_t;
-            g_tree_insert(
-                signals as *mut GTree,
-                g_strdup(name) as gpointer,
-                sigfuncs as gpointer,
-            );
+        let mut sigfuncs = signal_lookup(signals, name);
+        match sigfuncs {
+            Some(sigfuncs) => {
+                g_ptr_array_add(sigfuncs as *mut GPtrArray, func);
+            }
+            None => {
+                let sigfuncs = g_ptr_array_new() as *mut signal_array_t;
+                g_ptr_array_add(sigfuncs as *mut GPtrArray, func);
+                signals.insert(name, sigfuncs as gpointer);
+            }
         }
-        g_ptr_array_add(sigfuncs as *mut GPtrArray, func);
     }
     #[inline]
     pub unsafe extern "C-unwind" fn signal_remove(
-        mut signals: *mut signal_t,
+        mut signals: &mut signal_t,
         mut name: *const gchar,
         mut func: gpointer,
     ) {
-        let mut sigfuncs: *mut signal_array_t = signal_lookup(signals, name);
-        if !sigfuncs.is_null() {
+        let mut sigfuncs = signal_lookup(signals, name);
+        if let Some(sigfuncs) = sigfuncs {
             g_ptr_array_remove(sigfuncs as *mut GPtrArray, func);
             if (*sigfuncs).len == 0 {
-                g_tree_remove(signals as *mut GTree, name as gpointer as gconstpointer);
+                signals.remove(&name);
             }
         }
     }
 
     pub unsafe extern "C-unwind" fn signals_remove(
-        mut signals: *mut signal_t,
+        mut signals: &mut signal_t,
         mut name: *const gchar,
     ) {
-        let mut sigfuncs: *mut signal_array_t = signal_lookup(signals, name);
-        if !sigfuncs.is_null() {
+        let mut sigfuncs = signal_lookup(signals, name);
+        if let Some(sigfuncs) = sigfuncs {
             g_ptr_array_remove(sigfuncs as *mut GPtrArray, std::ptr::null_mut());
             if (*sigfuncs).len == 0 {
-                g_tree_remove(signals as *mut GTree, name as gpointer as gconstpointer);
+                signals.remove(&name);
             }
         }
     }
 
-    pub unsafe extern "C-unwind" fn signal_destroy(mut signals: *mut signal_t) {
-        g_tree_destroy(signals as *mut GTree);
-    }
+    use std::{borrow::Cow, collections::BTreeMap, ffi::CStr};
+
     use glib_sys::*;
 
     use crate::gtypes::{gchar, gint};
 }
 pub type lua_class_propfunc_t =
     Option<unsafe extern "C-unwind" fn(*mut lua_State, *mut lua_object_t) -> gint>;
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 #[repr(C)]
 pub struct lua_object_t {
-    pub signals: *mut signal_t,
+    pub signals: Option<signal_t>,
 }
 pub type lua_class_property_t = lua_class_property;
 pub type lua_class_property_array_t = GHashTable;
@@ -330,7 +329,7 @@ pub unsafe extern "C-unwind" fn luaH_class_add_signal(
         ),
     );
     g_free(origin as gpointer);
-    signal_add((*lua_class).signals, name, luaH_object_ref(L, ud));
+    signal_add(&mut *(*lua_class).signals, name, luaH_object_ref(L, ud));
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn luaH_class_remove_signal(
@@ -343,7 +342,7 @@ pub unsafe extern "C-unwind" fn luaH_class_remove_signal(
         luaL_argerror(L, ud, b"function\0" as *const u8 as *const std::ffi::c_char);
     }
     let mut ref_0: gpointer = lua_topointer(L, ud) as gpointer;
-    signal_remove((*lua_class).signals, name, ref_0);
+    signal_remove((*lua_class).signals.as_mut().unwrap(), name, ref_0);
     luaH_object_unref(L, ref_0);
     lua_remove(L, ud);
 }
