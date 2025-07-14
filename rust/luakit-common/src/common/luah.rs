@@ -278,7 +278,8 @@ pub unsafe extern "C" fn luaH_fixups(mut L: *mut lua_State) {
     lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
 }
 
-pub unsafe extern "C" fn luaH_warn(mut L: *mut lua_State, mut fmt: *const gchar, mut args: ...) {
+// pub unsafe extern "C" fn luaH_warn(mut L: *mut lua_State, mut fmt: *const gchar, mut args: ...) {
+pub unsafe fn luaH_warn(mut L: *mut lua_State, msg: &str) {
     let mut top: gint = lua_gettop(L);
     let mut ar = MaybeUninit::<lua_Debug>::uninit();
     lua_getstack(L, 1 as std::ffi::c_int, ar.as_mut_ptr());
@@ -305,14 +306,7 @@ pub unsafe extern "C" fn luaH_warn(mut L: *mut lua_State, mut fmt: *const gchar,
         );
         */
     }
-    let mut ap: ::core::ffi::VaListImpl;
-    ap = args.clone();
-    _log(
-        LOG_LEVEL_warn,
-        ((*ar.as_ptr()).short_src).as_ptr(),
-        fmt,
-        ap.as_va_list(),
-    );
+    _log(LOG_LEVEL_warn, ((*ar.as_ptr()).short_src).as_ptr(), msg);
 }
 
 pub unsafe extern "C" fn luaH_dofunction_from_registry(

@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use glib_sys::{g_free, g_strdup, gpointer};
 use libc::{c_void, intptr_t, memset};
 use mlua_sys::{
@@ -7,78 +9,8 @@ use mlua_sys::{
     lua_rawseti, lua_setmetatable, lua_settop, lua_toboolean, lua_tointeger, lua_tolstring,
     lua_tonumber, lua_type, lua_typename, luaL_Reg, luaL_argerror, luaL_checklstring,
 };
+use sqlite3_sys::*;
 
-pub mod sqlite3_h {
-    pub type sqlite3_destructor_type =
-        Option<unsafe extern "C-unwind" fn(*mut std::ffi::c_void) -> ()>;
-    pub const SQLITE_OK: std::ffi::c_int = 0 as std::ffi::c_int;
-    pub const SQLITE_RANGE: std::ffi::c_int = 25 as std::ffi::c_int;
-    pub const SQLITE_ROW: std::ffi::c_int = 100 as std::ffi::c_int;
-    pub const SQLITE_DONE: std::ffi::c_int = 101 as std::ffi::c_int;
-    pub const SQLITE_INTEGER: std::ffi::c_int = 1;
-    pub const SQLITE_FLOAT: std::ffi::c_int = 2;
-    pub const SQLITE_BLOB: std::ffi::c_int = 4;
-    pub const SQLITE_NULL: std::ffi::c_int = 5;
-    pub const SQLITE_TEXT: std::ffi::c_int = 3;
-    pub const SQLITE_TRANSIENT: std::ffi::c_int = -(1 as std::ffi::c_int);
-    unsafe extern "C-unwind" {
-        pub type sqlite3_stmt;
-        pub type sqlite3;
-        pub fn sqlite3_close(_: *mut sqlite3) -> std::ffi::c_int;
-        pub fn sqlite3_changes(_: *mut sqlite3) -> std::ffi::c_int;
-        pub fn sqlite3_open(
-            filename: *const std::ffi::c_char,
-            ppDb: *mut *mut sqlite3,
-        ) -> std::ffi::c_int;
-        pub fn sqlite3_errmsg(_: *mut sqlite3) -> *const std::ffi::c_char;
-        pub fn sqlite3_prepare_v2(
-            db: *mut sqlite3,
-            zSql: *const std::ffi::c_char,
-            nByte: std::ffi::c_int,
-            ppStmt: *mut *mut sqlite3_stmt,
-            pzTail: *mut *const std::ffi::c_char,
-        ) -> std::ffi::c_int;
-        pub fn sqlite3_bind_double(
-            _: *mut sqlite3_stmt,
-            _: std::ffi::c_int,
-            _: std::ffi::c_double,
-        ) -> std::ffi::c_int;
-        pub fn sqlite3_bind_int(
-            _: *mut sqlite3_stmt,
-            _: std::ffi::c_int,
-            _: std::ffi::c_int,
-        ) -> std::ffi::c_int;
-        pub fn sqlite3_bind_text(
-            _: *mut sqlite3_stmt,
-            _: std::ffi::c_int,
-            _: *const std::ffi::c_char,
-            _: std::ffi::c_int,
-            _: Option<unsafe extern "C-unwind" fn(*mut std::ffi::c_void) -> ()>,
-        ) -> std::ffi::c_int;
-        pub fn sqlite3_bind_parameter_index(
-            _: *mut sqlite3_stmt,
-            zName: *const std::ffi::c_char,
-        ) -> std::ffi::c_int;
-        pub fn sqlite3_clear_bindings(_: *mut sqlite3_stmt) -> std::ffi::c_int;
-        pub fn sqlite3_column_count(pStmt: *mut sqlite3_stmt) -> std::ffi::c_int;
-        pub fn sqlite3_column_name(
-            _: *mut sqlite3_stmt,
-            N: std::ffi::c_int,
-        ) -> *const std::ffi::c_char;
-        pub fn sqlite3_step(_: *mut sqlite3_stmt) -> std::ffi::c_int;
-        pub fn sqlite3_column_blob(
-            _: *mut sqlite3_stmt,
-            iCol: std::ffi::c_int,
-        ) -> *const std::ffi::c_void;
-        pub fn sqlite3_column_double(
-            _: *mut sqlite3_stmt,
-            iCol: std::ffi::c_int,
-        ) -> std::ffi::c_double;
-        pub fn sqlite3_column_type(_: *mut sqlite3_stmt, iCol: std::ffi::c_int) -> std::ffi::c_int;
-        pub fn sqlite3_finalize(pStmt: *mut sqlite3_stmt) -> std::ffi::c_int;
-        pub fn sqlite3_reset(pStmt: *mut sqlite3_stmt) -> std::ffi::c_int;
-    }
-}
 use crate::common::luaclass::signal_h::{signal_new, signal_t};
 use crate::common::luaclass::{
     lua_class_allocator_t, lua_class_property_array_t, lua_class_propfunc_t, lua_class_t,
@@ -96,14 +28,6 @@ use crate::common::tokenize::L_TK_FILENAME;
 use crate::gtypes::{gchar, gint};
 use crate::log::{_log, LOG_LEVEL_warn};
 
-pub use self::sqlite3_h::{
-    SQLITE_BLOB, SQLITE_DONE, SQLITE_FLOAT, SQLITE_INTEGER, SQLITE_NULL, SQLITE_OK, SQLITE_RANGE,
-    SQLITE_ROW, SQLITE_TEXT, SQLITE_TRANSIENT, sqlite3, sqlite3_bind_double, sqlite3_bind_int,
-    sqlite3_bind_parameter_index, sqlite3_bind_text, sqlite3_changes, sqlite3_clear_bindings,
-    sqlite3_close, sqlite3_column_blob, sqlite3_column_count, sqlite3_column_double,
-    sqlite3_column_name, sqlite3_column_type, sqlite3_destructor_type, sqlite3_errmsg,
-    sqlite3_finalize, sqlite3_open, sqlite3_prepare_v2, sqlite3_reset, sqlite3_step, sqlite3_stmt,
-};
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sqlite3_stmt_t {
@@ -351,7 +275,8 @@ unsafe extern "C-unwind" fn luaH_bind_value(
                 lua_tolstring(L, idx, std::ptr::null_mut()),
                 -(1 as std::ffi::c_int),
                 ::core::mem::transmute::<libc::intptr_t, sqlite3_destructor_type>(
-                    SQLITE_TRANSIENT as libc::intptr_t,
+                    SQLITE_OPEN_TRANSIENT_DB as libc::intptr_t,
+                    // SQLITE_TRANSIENT as libc::intptr_t,
                 ),
             );
         }
@@ -359,9 +284,10 @@ unsafe extern "C-unwind" fn luaH_bind_value(
             _log(
                 LOG_LEVEL_warn,
                 b"clib/sqlite3.c\0" as *const u8 as *const std::ffi::c_char,
-                b"sqlite3: unable to bind Lua value (type %s)\0" as *const u8
-                    as *const std::ffi::c_char,
-                lua_typename(L, lua_type(L, idx)),
+                &format!(
+                    "sqlite3: unable to bind Lua value (type {})",
+                    CStr::from_ptr(lua_typename(L, lua_type(L, idx))).to_string_lossy()
+                ),
             );
         }
     }

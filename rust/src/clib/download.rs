@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use gdk_sys::*;
 use glib_sys::*;
 use libc::*;
@@ -196,9 +198,11 @@ unsafe extern "C-unwind" fn failed_cb(
         _log(
             LOG_LEVEL_warn,
             b"clib/download.c\0" as *const u8 as *const std::ffi::c_char,
-            b"download %p failed: %s\0" as *const u8 as *const std::ffi::c_char,
-            download,
-            (*error).message,
+            &format!(
+                "download {} failed: {}",
+                download as usize,
+                CStr::from_ptr((*error).message).to_string_lossy()
+            ),
         );
         (*download).status = LUAKIT_DOWNLOAD_STATUS_FAILED;
         if !((*download).ref_0).is_null() {
@@ -461,8 +465,7 @@ unsafe extern "C-unwind" fn luaH_download_set_destination(
     if download != current_destination_cb {
         luaH_warn(
             L,
-            b"cannot set destination outside decide-destination handler\0" as *const u8
-                as *const std::ffi::c_char,
+            "cannot set destination outside decide-destination handler",
         );
         return 0 as std::ffi::c_int;
     }
@@ -543,10 +546,7 @@ unsafe extern "C-unwind" fn luaH_download_get_status(
             lua_pushstring(L, b"failed\0" as *const u8 as *const std::ffi::c_char);
         }
         _ => {
-            luaH_warn(
-                L,
-                b"unknown download status\0" as *const u8 as *const std::ffi::c_char,
-            );
+            luaH_warn(L, "unknown download status");
             return 0 as std::ffi::c_int;
         }
     }

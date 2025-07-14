@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use ::libc;
 use libc::size_t;
 use mlua_sys::*;
@@ -320,11 +322,12 @@ pub unsafe extern "C-unwind" fn luaH_class_add_signal(
     _log(
         LOG_LEVEL_debug,
         b"common/luaclass.c\0" as *const u8 as *const std::ffi::c_char,
-        b"add \x1B[34m\"%s\"\x1B[0m on %p from \x1B[32m%s\x1B[0m\0" as *const u8
-            as *const std::ffi::c_char,
-        name,
-        lua_class,
-        origin,
+        &format!(
+            "add \x1B[34m\"{}\"\x1B[0m on {} from \x1B[32m{}\x1B[0m\0",
+            CStr::from_ptr(name).to_string_lossy(),
+            lua_class as usize,
+            CStr::from_ptr(origin).to_string_lossy()
+        ),
     );
     g_free(origin as gpointer);
     signal_add((*lua_class).signals, name, luaH_object_ref(L, ud));

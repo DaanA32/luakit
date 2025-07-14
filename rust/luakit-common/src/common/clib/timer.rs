@@ -145,10 +145,7 @@ unsafe extern "C-unwind" fn luaH_timer_start(mut L: *mut lua_State) -> std::ffi:
             timer as gpointer,
         ) as std::ffi::c_int;
     } else {
-        luaH_warn(
-            L,
-            b"timer already started\0" as *const u8 as *const std::ffi::c_char,
-        );
+        luaH_warn(L, "timer already started");
     }
     return 0 as std::ffi::c_int;
 }
@@ -156,10 +153,7 @@ unsafe extern "C-unwind" fn luaH_timer_stop(mut L: *mut lua_State) -> std::ffi::
     let mut timer: *mut ltimer_t =
         luaH_checkudata(L, 1 as std::ffi::c_int, &mut timer_class) as *mut ltimer_t;
     if (*timer).id == -(1 as std::ffi::c_int) {
-        luaH_warn(
-            L,
-            b"timer already stopped\0" as *const u8 as *const std::ffi::c_char,
-        );
+        luaH_warn(L, "timer already stopped");
     } else {
         luaH_timer_destroy(L, timer);
     }

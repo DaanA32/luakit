@@ -10,6 +10,8 @@ pub mod luakit_h {
 
     use crate::gtypes::gint;
 }
+use std::ffi::CStr;
+
 use gdk_sys::*;
 use glib_sys::*;
 use libc::*;
@@ -300,7 +302,7 @@ unsafe extern "C-unwind" fn luaH_luakit_spawn_sync(mut L: *mut lua_State) -> gin
         _log(
             LOG_LEVEL_fatal,
             b"clib/luakit.c\0" as *const u8 as *const std::ffi::c_char,
-            b"Can't clear SIGCHLD handler\0" as *const u8 as *const std::ffi::c_char,
+            "Can't clear SIGCHLD handler",
         );
     }
     g_spawn_command_line_sync(
@@ -314,7 +316,7 @@ unsafe extern "C-unwind" fn luaH_luakit_spawn_sync(mut L: *mut lua_State) -> gin
         _log(
             LOG_LEVEL_fatal,
             b"clib/luakit.c\0" as *const u8 as *const std::ffi::c_char,
-            b"Can't restore SIGCHLD handler\0" as *const u8 as *const std::ffi::c_char,
+            "Can't restore SIGCHLD handler",
         );
     }
     if !e.is_null() {
@@ -1185,8 +1187,10 @@ unsafe extern "C-unwind" fn luaH_string_wch_convert_case(
         _log(
             LOG_LEVEL_debug,
             b"clib/luakit.c\0" as *const u8 as *const std::ffi::c_char,
-            b"unrecognized key symbol '%s'\0" as *const u8 as *const std::ffi::c_char,
-            key,
+            &format!(
+                "unrecognized key symbol '{}'",
+                CStr::from_ptr(key).to_string_lossy()
+            ),
         );
         lua_pushstring(L, key);
         return 1 as std::ffi::c_int;
@@ -1406,8 +1410,7 @@ unsafe extern "C-unwind" fn luaH_luakit_index(mut L: *mut lua_State) -> gint {
             _log(
                 LOG_LEVEL_warn,
                 b"clib/luakit.c\0" as *const u8 as *const std::ffi::c_char,
-                b"luakit.install_path is deprecated: use luakit.install_paths.install_dir instead\0"
-                    as *const u8 as *const std::ffi::c_char,
+                "luakit.install_path is deprecated: use luakit.install_paths.install_dir instead",
             );
             lua_pushlstring(
                 L,
@@ -1469,6 +1472,7 @@ unsafe extern "C-unwind" fn luaH_luakit_newindex(mut L: *mut lua_State) -> gint 
         219 => {
             let mut langs: *mut *const gchar = luaH_checkstrv(L, 3 as std::ffi::c_int);
             let mut ctx: *mut WebKitWebContext = web_context_get();
+            eprintln!("219");
             webkit_web_context_set_spell_checking_languages(ctx, langs);
             let mut accepted: *const *const gchar =
                 webkit_web_context_get_spell_checking_languages(ctx);
@@ -1478,9 +1482,10 @@ unsafe extern "C-unwind" fn luaH_luakit_newindex(mut L: *mut lua_State) -> gint 
                     _log(
                         LOG_LEVEL_warn,
                         b"clib/luakit.c\0" as *const u8 as *const std::ffi::c_char,
-                        b"unrecognized language code '%s'\0" as *const u8
-                            as *const std::ffi::c_char,
-                        *lang,
+                        &format!(
+                            "unrecognized language code '{}'",
+                            CStr::from_ptr(*lang).to_string_lossy()
+                        ),
                     );
                 }
                 lang = lang.offset(1);

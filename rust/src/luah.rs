@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use gdk_sys::{
     GDK_CONTROL_MASK, GDK_LOCK_MASK, GDK_MOD1_MASK, GDK_MOD2_MASK, GDK_MOD3_MASK, GDK_MOD4_MASK,
     GDK_MOD5_MASK, GDK_MODIFIER_MASK, GDK_SHIFT_MASK, gdk_keyval_name, gdk_keyval_to_unicode,
@@ -165,16 +167,18 @@ unsafe extern "C" fn luaH_loadrc(mut confpath: *const gchar, mut run: gboolean) 
     _log(
         LOG_LEVEL_info,
         b"luah.c\0" as *const u8 as *const std::ffi::c_char,
-        b"Loading rc: %s\0" as *const u8 as *const std::ffi::c_char,
-        confpath,
+        &format!("Loading rc: {}", CStr::from_ptr(confpath).to_string_lossy(),),
     );
     let mut L: *mut lua_State = common.L;
     if luaL_loadfile(L, confpath) != 0 {
         _log(
             LOG_LEVEL_error,
             b"luah.c\0" as *const u8 as *const std::ffi::c_char,
-            b"Error loading rc: %s\0" as *const u8 as *const std::ffi::c_char,
-            lua_tolstring(L, -(1 as std::ffi::c_int), 0 as *mut usize),
+            &format!(
+                "Error loading rc: {}",
+                CStr::from_ptr(lua_tolstring(L, -(1 as std::ffi::c_int), 0 as *mut usize))
+                    .to_string_lossy(),
+            ),
         );
         return 0 as std::ffi::c_int;
     }
@@ -238,8 +242,10 @@ pub unsafe extern "C" fn luaH_parserc(mut confpath: *const gchar, mut run: gbool
                 _log(
                     LOG_LEVEL_verbose,
                     b"luah.c\0" as *const u8 as *const std::ffi::c_char,
-                    b"rc file '%s' does not exist\0" as *const u8 as *const std::ffi::c_char,
-                    path,
+                    &format!(
+                        "rc file '{}' does not exist",
+                        CStr::from_ptr(path).to_string_lossy(),
+                    ),
                 );
                 i += 1;
                 i;
@@ -248,7 +254,7 @@ pub unsafe extern "C" fn luaH_parserc(mut confpath: *const gchar, mut run: gbool
                 _log(
                     LOG_LEVEL_warn,
                     b"luah.c\0" as *const u8 as *const std::ffi::c_char,
-                    b"couldn't load any rc file\0" as *const u8 as *const std::ffi::c_char,
+                    "couldn't load any rc file",
                 );
             } else {
                 let fresh8 = i;
@@ -262,9 +268,10 @@ pub unsafe extern "C" fn luaH_parserc(mut confpath: *const gchar, mut run: gbool
                     _log(
                         LOG_LEVEL_warn,
                         b"luah.c\0" as *const u8 as *const std::ffi::c_char,
-                        b"loading rc '%s' failed, falling back...\0" as *const u8
-                            as *const std::ffi::c_char,
-                        path_0,
+                        &format!(
+                            "loading rc '{}' failed, falling back...",
+                            CStr::from_ptr(path_0).to_string_lossy(),
+                        ),
                     );
                     i_str = g_strdup_printf(b"%i\0" as *const u8 as *const std::ffi::c_char, i);
                     setenv(
@@ -287,10 +294,13 @@ pub unsafe extern "C" fn luaH_parserc(mut confpath: *const gchar, mut run: gbool
                     _log(
                         LOG_LEVEL_verbose,
                         b"luah.c\0" as *const u8 as *const std::ffi::c_char,
-                        b"exec: %s\0" as *const u8 as *const std::ffi::c_char,
-                        g_strjoinv(
-                            b" \0" as *const u8 as *const std::ffi::c_char,
-                            (*argv).pdata as *mut *mut gchar,
+                        &format!(
+                            "exec: {}",
+                            CStr::from_ptr(g_strjoinv(
+                                b" \0" as *const u8 as *const std::ffi::c_char,
+                                (*argv).pdata as *mut *mut gchar,
+                            ))
+                            .to_string_lossy(),
                         ),
                     );
                     log_dump_file = log_dump_queued_emissions();

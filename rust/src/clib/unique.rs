@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use gio_sys::{
     G_APPLICATION_DEFAULT_FLAGS, GActionEntry, GActionGroup, GActionMap, GApplication,
     GSimpleAction, g_action_group_activate_action, g_action_group_get_type,
@@ -87,7 +89,7 @@ unsafe extern "C" fn message_cb(
             _log(
                 LOG_LEVEL_warn,
                 b"clib/unique.c\0" as *const u8 as *const std::ffi::c_char,
-                b"It's not a window!!!\0" as *const u8 as *const std::ffi::c_char,
+                "It's not a window!!!",
             );
         }
         let mut screen = gtk_window_get_screen(window);
@@ -143,8 +145,10 @@ unsafe extern "C-unwind" fn luaH_unique_new(mut L: *mut lua_State) -> gint {
             _log(
                 LOG_LEVEL_verbose,
                 b"clib/unique.c\0" as *const u8 as *const std::ffi::c_char,
-                b"GApplication '%s' already setup\0" as *const u8 as *const std::ffi::c_char,
-                name,
+                &format!(
+                    "GApplication '{}' already setup",
+                    CStr::from_ptr(name).to_string_lossy()
+                ),
             );
         }
         return 0 as std::ffi::c_int;
@@ -317,26 +321,22 @@ unsafe extern "C-unwind" fn luaH_unique_proxy_index(mut L: *mut lua_State) -> st
         _log(
             LOG_LEVEL_warn,
             b"clib/unique.c\0" as *const u8 as *const std::ffi::c_char,
-            b"the unique library has been moved to luakit.unique\0" as *const u8
-                as *const std::ffi::c_char,
+            "the unique library has been moved to luakit.unique",
         );
         _log(
             LOG_LEVEL_warn,
             b"clib/unique.c\0" as *const u8 as *const std::ffi::c_char,
-            b"this compatibility wrapper will be removed in a future version\0" as *const u8
-                as *const std::ffi::c_char,
+            "this compatibility wrapper will be removed in a future version",
         );
         _log(
             LOG_LEVEL_warn,
             b"clib/unique.c\0" as *const u8 as *const std::ffi::c_char,
-            b"you should remove the two `if unique then ... end` blocks from your rc.lua\0"
-                as *const u8 as *const std::ffi::c_char,
+            "you should remove the two `if unique then ... end` blocks from your rc.lua",
         );
         _log(
             LOG_LEVEL_warn,
             b"clib/unique.c\0" as *const u8 as *const std::ffi::c_char,
-            b"then, at the start of your rc.lua, add `require \"unique_instance\"`\0" as *const u8
-                as *const std::ffi::c_char,
+            "then, at the start of your rc.lua, add `require \"unique_instance\"`",
         );
     }
     lua_getfield(

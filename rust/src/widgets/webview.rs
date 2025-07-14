@@ -9,9 +9,11 @@ use gtk_sys::*;
 use libc::*;
 use mlua_sys::*;
 use pango_sys::*;
+use std::ffi::CStr;
 use webkit2gtk_sys::*;
 
 pub mod auth;
+pub mod download;
 pub mod find_controller;
 pub mod inspector;
 pub mod javascript;
@@ -1154,8 +1156,7 @@ unsafe extern "C" fn load_changed_cb(
             _log(
                 LOG_LEVEL_warn,
                 b"widgets/webview.c\0" as *const u8 as *const std::ffi::c_char,
-                b"programmer error, unable to get load status literal\0" as *const u8
-                    as *const std::ffi::c_char,
+                "programmer error, unable to get load status literal",
             );
         }
     }
@@ -1264,18 +1265,21 @@ unsafe extern "C" fn create_cb(
                 _log(
                     LOG_LEVEL_warn,
                     b"widgets/webview.c\0" as *const u8 as *const std::ffi::c_char,
-                    b"invalid return widget type (expected webview, got %s)\0" as *const u8
-                        as *const std::ffi::c_char,
-                    (*(*new).info).name,
+                    &format!(
+                        "invalid return widget type (expected webview, got {})",
+                        CStr::from_ptr((*(*new).info).name).to_string_lossy(),
+                    ),
                 );
             }
         } else {
             _log(
                 LOG_LEVEL_warn,
                 b"widgets/webview.c\0" as *const u8 as *const std::ffi::c_char,
-                b"invalid signal return object type (expected webview widget, got %s)\0"
-                    as *const u8 as *const std::ffi::c_char,
-                lua_typename(L, lua_type(L, -(1 as std::ffi::c_int))),
+                &format!(
+                    "invalid signal return object type (expected webview widget, got {})",
+                    CStr::from_ptr(lua_typename(L, lua_type(L, -(1 as std::ffi::c_int))))
+                        .to_string_lossy(),
+                ),
             );
         }
     }
@@ -1336,8 +1340,7 @@ unsafe extern "C" fn decide_policy_cb(
                     _log(
                         LOG_LEVEL_warn,
                         b"widgets/webview.c\0" as *const u8 as *const std::ffi::c_char,
-                        b"programmer error, unable to get web navigation reason literal\0"
-                            as *const u8 as *const std::ffi::c_char,
+                        "programmer error, unable to get web navigation reason literal",
                     );
                 }
             }
@@ -1510,8 +1513,7 @@ unsafe extern "C-unwind" fn luaH_webview_allow_certificate(mut L: *mut lua_State
     _log(
         LOG_LEVEL_warn,
         b"widgets/webview.c\0" as *const u8 as *const std::ffi::c_char,
-        b"webview:allow_certificate() is deprecated: use luakit.allow_certificate() instead\0"
-            as *const u8 as *const std::ffi::c_char,
+        "webview:allow_certificate() is deprecated: use luakit.allow_certificate() instead",
     );
     luaH_checkwebview(L, 1 as std::ffi::c_int);
     lua_remove(L, 1 as std::ffi::c_int);

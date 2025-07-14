@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use glib_sys::gboolean;
 use libc::{c_void, size_t, strlen};
 use mlua_sys::{
@@ -85,8 +87,8 @@ pub unsafe extern "C" fn luaH_resume(mut L: *mut lua_State, mut nret: gint) -> g
     _log(
         LOG_LEVEL_error,
         b"common/luayield.c\0" as *const u8 as *const std::ffi::c_char,
-        b"%s\0" as *const u8 as *const std::ffi::c_char,
-        lua_tolstring(L, -(1 as std::ffi::c_int), 0 as *mut size_t),
+        &CStr::from_ptr(lua_tolstring(L, -(1 as std::ffi::c_int), 0 as *mut size_t))
+            .to_string_lossy(),
     );
     lua_settop(L, top);
     return 0 as std::ffi::c_int;

@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use glib_sys::{GType, g_assertion_message_expr, g_free, g_strdup, g_strdup_printf, gpointer};
 use gobject_sys::{GObject, GTypeInstance, g_object_set_data, g_type_check_instance_cast};
 use gtk_sys::{
@@ -318,9 +320,11 @@ unsafe extern "C-unwind" fn luaH_widget_gc(mut L: *mut lua_State) -> gint {
         _log(
             LOG_LEVEL_debug,
             b"clib/widget.c\0" as *const u8 as *const std::ffi::c_char,
-            b"collecting widget at %p of type '%s'\0" as *const u8 as *const std::ffi::c_char,
-            w,
-            (*(*w).info).name,
+            &format!(
+                "collecting widget at {} of type '{}'",
+                w as usize,
+                CStr::from_ptr((*(*w).info).name).to_string_lossy()
+            ),
         );
     }
     if ((*w).destructor).is_none() {
@@ -526,8 +530,10 @@ unsafe extern "C-unwind" fn luaH_widget_set_type(
             _log(
                 LOG_LEVEL_verbose,
                 b"clib/widget.c\0" as *const u8 as *const std::ffi::c_char,
-                b"created widget of type: %s\0" as *const u8 as *const std::ffi::c_char,
-                (*(*w).info).name,
+                &format!(
+                    "created widget of type: {}",
+                    CStr::from_ptr((*(*w).info).name).to_string_lossy()
+                ),
             );
             lua_pushvalue(L, -(3 as std::ffi::c_int));
             luaH_class_emit_signal(

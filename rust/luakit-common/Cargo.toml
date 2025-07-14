@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [profile.dev]
-debug = false
+# debug = false
 
 [lib]
 name = "luakit_common"
@@ -21,3 +21,4 @@ glib-sys = { version = "0.18.1", features = ["v2_78"] }
 gtk-sys = "0.18.1"
 gdk-sys = "0.18.1"
 javascriptcore-rs-sys = "1.1.1"
+regex = "1.11.1"

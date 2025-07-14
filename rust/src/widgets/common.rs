@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use crate::gtypes::*;
 use crate::luah::luaH_keystr_push;
 use crate::luah::luaH_modifier_table_push;
@@ -387,9 +389,11 @@ pub unsafe extern "C" fn destroy_cb(mut UNUSED_win: *mut GtkWidget, mut w: *mut 
     _log(
         LOG_LEVEL_debug,
         b"widgets/common.c\0" as *const u8 as *const std::ffi::c_char,
-        b"destroy %p (%s)\0" as *const u8 as *const std::ffi::c_char,
-        w,
-        (*(*w).info).name,
+        &format!(
+            "destroy {} ({})",
+            w as usize,
+            CStr::from_ptr((*(*w).info).name).to_string_lossy(),
+        ),
     );
     if ((*w).destructor).is_some() {
         ((*w).destructor).expect("non-null function pointer")(w);
@@ -742,10 +746,12 @@ pub unsafe extern "C-unwind" fn luaH_widget_send_key(mut L: *mut lua_State) -> g
     _log(
         LOG_LEVEL_debug,
         b"widgets/common.c\0" as *const u8 as *const std::ffi::c_char,
-        b"sending key '%s%s' to widget %p\0" as *const u8 as *const std::ffi::c_char,
-        (*state_string).str,
-        key_name,
-        (*w).widget,
+        &format!(
+            "sending key '{}{}' to widget {}",
+            CStr::from_ptr((*state_string).str).to_string_lossy(),
+            CStr::from_ptr(key_name).to_string_lossy(),
+            (*w).widget as usize,
+        ),
     );
     g_signal_emit_by_name(
         (*w).widget as *mut GObject,

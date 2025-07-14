@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use gdk_sys::*;
 use glib_sys::*;
 use gobject_sys::*;
@@ -296,8 +298,15 @@ unsafe extern "C" fn luaH_entry_newindex(
         _ => {
             luaH_warn(
                 L,
-                b"unknown property: %s\0" as *const u8 as *const std::ffi::c_char,
-                luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut()),
+                &format!(
+                    "unknown property: {}",
+                    CStr::from_ptr(luaL_checklstring(
+                        L,
+                        2 as std::ffi::c_int,
+                        std::ptr::null_mut()
+                    ))
+                    .to_string_lossy(),
+                ),
             );
             return 0 as std::ffi::c_int;
         }

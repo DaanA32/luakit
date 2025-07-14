@@ -1,21 +1,17 @@
+use std::ffi::CStr;
+
 use crate::{
     globalconf::globalconf,
     gtypes::*,
     log::{_log, LOG_LEVEL_verbose},
+    widgets::webview::download::download_start_cb,
 };
 use glib_sys::*;
 use gobject_sys::*;
+use libc::c_char;
 use webkit2gtk_sys::*;
 
-unsafe extern "C" {
-    pub fn download_start_cb(
-        _: *mut WebKitWebContext,
-        _: *mut WebKitDownload,
-        _: gpointer,
-    ) -> gboolean;
-}
-static mut web_context: *mut WebKitWebContext =
-    0 as *const WebKitWebContext as *mut WebKitWebContext;
+static mut web_context: *mut WebKitWebContext = std::ptr::null_mut();
 static mut process_limit: guint = 0 as std::ffi::c_int as guint;
 static mut web_context_started: gboolean = 0 as std::ffi::c_int;
 #[unsafe(no_mangle)]
@@ -57,21 +53,36 @@ unsafe extern "C" fn website_data_manager_init() {
     _log(
         LOG_LEVEL_verbose,
         b"web_context.c\0" as *const u8 as *const std::ffi::c_char,
-        b"base_data_directory:                 %s\0" as *const u8 as *const std::ffi::c_char,
-        webkit_website_data_manager_get_base_data_directory(data_mgr),
+        &format!(
+            "base_data_directory:                 {}",
+            CStr::from_ptr(webkit_website_data_manager_get_base_data_directory(
+                data_mgr
+            ))
+            .to_string_lossy(),
+        ),
     );
     _log(
         LOG_LEVEL_verbose,
         b"web_context.c\0" as *const u8 as *const std::ffi::c_char,
-        b"base_cache_directory:                %s\0" as *const u8 as *const std::ffi::c_char,
-        webkit_website_data_manager_get_base_cache_directory(data_mgr),
+        &format!(
+            "base_cache_directory:                {}",
+            CStr::from_ptr(webkit_website_data_manager_get_base_cache_directory(
+                data_mgr
+            ))
+            .to_string_lossy(),
+        ),
     );
 }
 unsafe extern "C" fn web_context_set_default_spelling_language() {
-    let mut null: *const gchar = 0 as *const gchar;
-    webkit_web_context_set_spell_checking_languages(web_context, &mut null);
+    let null: *const *const c_char = { std::ptr::null() };
+    eprintln!(
+        "web_context_set_default_spelling_language: {:?}",
+        web_context
+    );
+    webkit_web_context_set_spell_checking_languages(web_context, null);
     let mut ret: *mut *mut gchar =
         webkit_web_context_get_spell_checking_languages(web_context) as *mut *mut gchar;
+    eprintln!("webkit_web_context_get_spell_checking_languages: {:?}", ret);
     if ret.is_null() {
         return;
     }
@@ -79,8 +90,10 @@ unsafe extern "C" fn web_context_set_default_spelling_language() {
     _log(
         LOG_LEVEL_verbose,
         b"web_context.c\0" as *const u8 as *const std::ffi::c_char,
-        b"setting spell check languages: %s\0" as *const u8 as *const std::ffi::c_char,
-        langs,
+        &format!(
+            "setting spell check languages: {}",
+            CStr::from_ptr(langs).to_string_lossy(),
+        ),
     );
     g_free(langs as gpointer);
 }

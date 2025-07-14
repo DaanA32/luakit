@@ -93,7 +93,19 @@ use crate::common::{
 };
 use crate::gtypes::*;
 
-unsafe extern "C" {
-
-    pub static mut widget_class: lua_class_t;
-}
+/*
+    pub name: *const gchar,
+    pub signals: *mut signal_t,
+    pub allocator: lua_class_allocator_t,
+    pub properties: *mut lua_class_property_array_t,
+    pub index_miss_property: lua_class_propfunc_t,
+    pub newindex_miss_property: lua_class_propfunc_t,
+*/
+pub static mut widget_class: lua_class_t = lua_class_t {
+    name: std::ptr::null_mut(),
+    signals: std::ptr::null_mut(),
+    allocator: None,
+    properties: std::ptr::null_mut(),
+    index_miss_property: None,
+    newindex_miss_property: None,
+};

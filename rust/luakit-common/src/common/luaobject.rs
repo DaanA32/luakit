@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use gdk_sys::*;
 use glib_sys::*;
 use libc::getenv;
@@ -201,7 +203,7 @@ pub unsafe extern "C-unwind" fn luaH_object_add_signal(
         _log(
             LOG_LEVEL_warn,
             b"common/luaobject.c\0" as *const u8 as *const std::ffi::c_char,
-            b"object add signal on non object\0" as *const u8 as *const std::ffi::c_char,
+            "object add signal on non object",
         );
         return;
     }
@@ -209,11 +211,12 @@ pub unsafe extern "C-unwind" fn luaH_object_add_signal(
     _log(
         LOG_LEVEL_debug,
         b"common/luaobject.c\0" as *const u8 as *const std::ffi::c_char,
-        b"add \x1B[34m\"%s\"\x1B[0m on %p from \x1B[32m%s\x1B[0m\0" as *const u8
-            as *const std::ffi::c_char,
-        name,
-        obj,
-        origin,
+        &format!(
+            "add \x1B[34m\"{}\"\x1B[0m on {} from \x1B[32m{}\x1B[0m\0",
+            CStr::from_ptr(name).to_string_lossy(),
+            obj as usize,
+            CStr::from_ptr(origin).to_string_lossy()
+        ),
     );
     g_free(origin as gpointer);
     signal_add((*obj).signals, name, luaH_object_ref_item(L, oud, ud));
@@ -233,7 +236,7 @@ pub unsafe extern "C-unwind" fn luaH_object_remove_signal(
         _log(
             LOG_LEVEL_warn,
             b"common/luaobject.c\0" as *const u8 as *const std::ffi::c_char,
-            b"object remove signal on non object\0" as *const u8 as *const std::ffi::c_char,
+            "object remove signal on non object",
         );
         return;
     }
@@ -253,7 +256,7 @@ pub unsafe extern "C-unwind" fn luaH_object_remove_signals(
         _log(
             LOG_LEVEL_warn,
             b"common/luaobject.c\0" as *const u8 as *const std::ffi::c_char,
-            b"object remove signals on non object\0" as *const u8 as *const std::ffi::c_char,
+            "object remove signals on non object",
         );
         return;
     }
@@ -284,17 +287,18 @@ pub unsafe extern "C-unwind" fn signal_array_emit(
     _log(
         LOG_LEVEL_debug,
         b"common/luaobject.c\0" as *const u8 as *const std::ffi::c_char,
-        b"emit \x1B[34m\"%s\"\x1B[0m on %p from \x1B[32m%s\x1B[0m (%d args, %d nret)\0" as *const u8
-            as *const std::ffi::c_char,
-        name,
-        signals,
-        if !origin.is_null() {
-            origin as *const gchar
-        } else {
-            b"<GTK>\0" as *const u8 as *const std::ffi::c_char
-        },
-        nargs,
-        nret,
+        &format!(
+            "emit \x1B[34m\"{}\"\x1B[0m on {} from \x1B[32m{}\x1B[0m ({} args, {} nret)",
+            CStr::from_ptr(name).to_string_lossy(),
+            signals as usize,
+            if !origin.is_null() {
+                &CStr::from_ptr(origin).to_string_lossy()
+            } else {
+                "<GTK>"
+            },
+            nargs,
+            nret
+        ),
     );
     g_free(origin as gpointer);
     if !sigfuncs.is_null() {
@@ -388,17 +392,18 @@ pub unsafe extern "C-unwind" fn luaH_object_emit_signal(
     _log(
         LOG_LEVEL_debug,
         b"common/luaobject.c\0" as *const u8 as *const std::ffi::c_char,
-        b"emit \x1B[34m\"%s\"\x1B[0m on %p from \x1B[32m%s\x1B[0m (%d args, %d nret)\0" as *const u8
-            as *const std::ffi::c_char,
-        name,
-        obj,
-        if !origin.is_null() {
-            origin as *const gchar
-        } else {
-            b"<GTK>\0" as *const u8 as *const std::ffi::c_char
-        },
-        nargs,
-        nret,
+        &format!(
+            "emit \x1B[34m\"{}\"\x1B[0m on {} from \x1B[32m{}\x1B[0m ({} args, {} nret)\0",
+            CStr::from_ptr(name).to_string_lossy(),
+            obj as usize,
+            if !origin.is_null() {
+                &CStr::from_ptr(origin).to_string_lossy()
+            } else {
+                "<GTK>"
+            },
+            nargs,
+            nret
+        ),
     );
     g_free(origin as gpointer);
     if obj.is_null() {
@@ -597,7 +602,7 @@ pub unsafe extern "C-unwind" fn luaH_object_gc(mut L: *mut lua_State) -> gint {
         _log(
             LOG_LEVEL_warn,
             b"common/luaobject.c\0" as *const u8 as *const std::ffi::c_char,
-            b"garbage collect on non-object\0" as *const u8 as *const std::ffi::c_char,
+            "garbage collect on non-object",
         );
         return 0 as std::ffi::c_int;
     }

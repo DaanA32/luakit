@@ -5,16 +5,16 @@ use std::{
 };
 
 use glib_sys::{
-    G_REGEX_DEFAULT, G_REGEX_MATCH_DEFAULT, GAsyncQueue, GError, GHashTable, GPtrArray, GQuark,
-    GRegex, GString, g_ascii_strtod, g_assertion_message_error, g_assertion_message_expr,
-    g_async_queue_lock, g_async_queue_new, g_async_queue_push, g_async_queue_push_unlocked,
-    g_async_queue_try_pop, g_async_queue_try_pop_unlocked, g_async_queue_unlock, g_build_path,
-    g_error_free, g_file_get_contents, g_file_open_tmp, g_fprintf, g_free, g_hash_table_insert,
+    g_ascii_strtod, g_assertion_message_error, g_assertion_message_expr, g_async_queue_lock,
+    g_async_queue_new, g_async_queue_push, g_async_queue_push_unlocked, g_async_queue_try_pop,
+    g_async_queue_try_pop_unlocked, g_async_queue_unlock, g_build_path, g_error_free,
+    g_file_get_contents, g_file_open_tmp, g_fprintf, g_free, g_hash_table_insert,
     g_hash_table_lookup, g_hash_table_new_full, g_idle_add, g_ptr_array_add,
     g_ptr_array_new_with_free_func, g_regex_new, g_regex_replace_literal, g_slice_alloc0,
     g_slice_free1, g_str_equal, g_str_has_prefix, g_str_hash, g_strdup, g_strdup_printf,
     g_string_append_c, g_string_append_len, g_string_append_printf, g_string_free, g_string_new,
-    gboolean, gconstpointer, gpointer,
+    gboolean, gconstpointer, gpointer, GAsyncQueue, GError, GHashTable, GPtrArray, GQuark, GRegex,
+    GString, G_REGEX_DEFAULT, G_REGEX_MATCH_DEFAULT,
 };
 use libc::{
     c_void, close, exit, getenv, isatty, memcmp, size_t, ssize_t, strcmp, strlen, strncmp, strrchr,
@@ -29,7 +29,7 @@ use crate::{
     common::{
         clib::luakit::l_time,
         common,
-        luaclass::{lua_class_t, luaH_class_emit_signal},
+        luaclass::{luaH_class_emit_signal, lua_class_t},
         util::{file_exists, strip_ansi_escapes},
     },
     globalconf::globalconf,
@@ -40,8 +40,8 @@ use crate::{
 pub type queued_log_t = _queued_log_t;
 
 pub use self::log_h::{
-    LOG_LEVEL_debug, LOG_LEVEL_error, LOG_LEVEL_fatal, LOG_LEVEL_info, LOG_LEVEL_verbose,
-    LOG_LEVEL_warn, log_level_t,
+    log_level_t, LOG_LEVEL_debug, LOG_LEVEL_error, LOG_LEVEL_fatal, LOG_LEVEL_info,
+    LOG_LEVEL_verbose, LOG_LEVEL_warn,
 };
 pub mod log_h {
     pub type log_level_t = std::ffi::c_uint;

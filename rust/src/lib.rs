@@ -18,6 +18,8 @@
 #![allow(unused_parens)]
 #![allow(unused_unsafe)]
 
+use std::ffi::CStr;
+
 use gtk_sys::{gtk_disable_setlocale, gtk_get_option_group, gtk_init};
 
 pub use luakit_common::common;
@@ -61,7 +63,7 @@ use crate::{
     web_context::*,
 };
 
-unsafe extern "C" fn init_directories() {
+pub unsafe extern "C" fn init_directories() {
     globalconf.cache_dir = g_build_filename(
         g_get_user_cache_dir(),
         b"luakit\0" as *const u8 as *const std::ffi::c_char,
@@ -84,7 +86,7 @@ unsafe extern "C" fn init_directories() {
     g_mkdir_with_parents(globalconf.config_dir, 0o700 as std::ffi::c_int);
     g_mkdir_with_parents(globalconf.data_dir, 0o700 as std::ffi::c_int);
 }
-unsafe extern "C" fn parse_log_level_option(mut log_lvl: *mut gchar) {
+pub unsafe extern "C" fn parse_log_level_option(mut log_lvl: *mut gchar) {
     let mut parts: *mut *mut gchar = g_strsplit(
         log_lvl,
         b",\0" as *const u8 as *const std::ffi::c_char,
@@ -106,9 +108,10 @@ unsafe extern "C" fn parse_log_level_option(mut log_lvl: *mut gchar) {
                 _log(
                     LOG_LEVEL_warn,
                     b"luakit.c\0" as *const u8 as *const std::ffi::c_char,
-                    b"ignoring unrecognized --log option '%s'\0" as *const u8
-                        as *const std::ffi::c_char,
-                    *part,
+                    &format!(
+                        "ignoring unrecognized --log option '{}'",
+                        CStr::from_ptr(*part).to_string_lossy(),
+                    ),
                 );
             }
         }
@@ -117,7 +120,7 @@ unsafe extern "C" fn parse_log_level_option(mut log_lvl: *mut gchar) {
     }
     g_strfreev(parts);
 }
-unsafe extern "C" fn parseopts(
+pub unsafe extern "C" fn parseopts(
     mut argc: *mut std::ffi::c_int,
     mut argv: *mut *mut gchar,
     mut nonblock: *mut *mut gboolean,
@@ -315,8 +318,7 @@ unsafe extern "C" fn parseopts(
             _log(
                 LOG_LEVEL_warn,
                 b"luakit.c\0" as *const u8 as *const std::ffi::c_char,
-                b"invalid mix of -v and -l, ignoring -v...\0" as *const u8
-                    as *const std::ffi::c_char,
+                "invalid mix of -v and -l, ignoring -v...",
             );
         }
     }
@@ -335,8 +337,7 @@ unsafe extern "C" fn parseopts(
         _log(
             LOG_LEVEL_fatal,
             b"luakit.c\0" as *const u8 as *const std::ffi::c_char,
-            b"invalid mix of -u and default uri arguments\0" as *const u8
-                as *const std::ffi::c_char,
+            "invalid mix of -u and default uri arguments",
         );
     }
     if !uris.is_null() {
@@ -345,7 +346,7 @@ unsafe extern "C" fn parseopts(
         return g_strdupv(argv.offset(1 as std::ffi::c_int as isize));
     };
 }
-unsafe extern "C" fn glib_log_writer(
+pub unsafe extern "C" fn glib_log_writer(
     mut log_level_flags: GLogLevelFlags,
     mut fields: *const GLogField,
     mut n_fields: usize,
@@ -509,9 +510,11 @@ unsafe extern "C" fn glib_log_writer(
     _log(
         log_level,
         b"glib\0" as *const u8 as *const std::ffi::c_char,
-        b"%s: %s\0" as *const u8 as *const std::ffi::c_char,
-        log_domain,
-        message,
+        &format!(
+            "{}: {}",
+            CStr::from_ptr(log_domain).to_string_lossy(),
+            CStr::from_ptr(message).to_string_lossy(),
+        ),
     );
     return G_LOG_WRITER_HANDLED;
 }

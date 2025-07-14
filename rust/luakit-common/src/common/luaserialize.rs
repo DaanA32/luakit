@@ -120,8 +120,7 @@ unsafe extern "C" fn lua_serialize_value(
                 _log(
                     LOG_LEVEL_warn,
                     b"common/luaserialize.c\0" as *const u8 as *const std::ffi::c_char,
-                    b"serialize lua lightuserdata on non object\0" as *const u8
-                        as *const std::ffi::c_char,
+                    "serialize lua lightuserdata on non object",
                 );
             } else {
                 g_byte_array_append(

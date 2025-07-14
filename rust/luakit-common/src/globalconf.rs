@@ -20,6 +20,18 @@ pub struct globalconf_t {
     pub starttime: gdouble,
 }
 
-unsafe extern "C" {
-    pub static mut globalconf: globalconf_t;
-}
+pub static mut globalconf: globalconf_t = globalconf_t {
+    application: std::ptr::null_mut(),
+    config_dir: std::ptr::null_mut(),
+    data_dir: std::ptr::null_mut(),
+    cache_dir: std::ptr::null_mut(),
+    profile: std::ptr::null_mut(),
+    confpath: std::ptr::null_mut(),
+    execpath: std::ptr::null_mut(),
+    nounique: 0,
+    argv: std::ptr::null_mut(),
+    windows: std::ptr::null_mut(),
+    webviews: std::ptr::null_mut(),
+    stylesheets: std::ptr::null_mut(),
+    starttime: 0.0,
+};

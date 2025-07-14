@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use glib_sys::*;
 use gtk_sys::{gtk_disable_setlocale, gtk_get_option_group, gtk_init, gtk_main};
 use libc::{
@@ -50,7 +52,7 @@ unsafe fn main_0(mut argc: gint, mut argv: *mut *mut gchar) -> gint {
             1 as std::ffi::c_int,
             b"C\0" as *const u8 as *const std::ffi::c_char,
         );
-        let mut uris: *mut *mut gchar = parseopts(&mut argc, argv, &mut nonblock);
+        let uris: *mut *mut gchar = parseopts(&mut argc, argv, &mut nonblock);
         let mut i: gint = 1 as std::ffi::c_int;
         while i < argc {
             memset(
@@ -59,28 +61,25 @@ unsafe fn main_0(mut argc: gint, mut argv: *mut *mut gchar) -> gint {
                 strlen(*argv.offset(i as isize)),
             );
             i += 1;
-            i;
         }
         globalconf.windows = g_ptr_array_new();
         if !nonblock.is_null() {
-            let mut pid: pid_t = fork();
+            let pid: pid_t = fork();
             if pid < 0 as std::ffi::c_int {
                 _log(
                     LOG_LEVEL_fatal,
                     b"luakit.c\0" as *const u8 as *const std::ffi::c_char,
-                    b"Cannot fork: %d\0" as *const u8 as *const std::ffi::c_char,
-                    *__errno_location(),
+                    &format!("Cannot fork: {}", *__errno_location()),
                 );
             } else if pid > 0 as std::ffi::c_int {
                 exit(0 as std::ffi::c_int);
             }
-            let mut sid: pid_t = setsid();
+            let sid: pid_t = setsid();
             if sid < 0 as std::ffi::c_int {
                 _log(
                     LOG_LEVEL_fatal,
                     b"luakit.c\0" as *const u8 as *const std::ffi::c_char,
-                    b"New SID creation failure: %d\0" as *const u8 as *const std::ffi::c_char,
-                    *__errno_location(),
+                    &format!("New SID creation failure: {}", *__errno_location()),
                 );
             }
         }
@@ -98,14 +97,14 @@ unsafe fn main_0(mut argc: gint, mut argv: *mut *mut gchar) -> gint {
             _log(
                 LOG_LEVEL_fatal,
                 b"luakit.c\0" as *const u8 as *const std::ffi::c_char,
-                b"couldn't find rc file\0" as *const u8 as *const std::ffi::c_char,
+                "couldn't find rc file",
             );
         }
         if (*globalconf.windows).len == 0 {
             _log(
                 LOG_LEVEL_fatal,
                 b"luakit.c\0" as *const u8 as *const std::ffi::c_char,
-                b"no windows spawned by rc file, exiting\0" as *const u8 as *const std::ffi::c_char,
+                "no windows spawned by rc file, exiting",
             );
         }
         gtk_main();
@@ -114,10 +113,10 @@ unsafe fn main_0(mut argc: gint, mut argv: *mut *mut gchar) -> gint {
 }
 
 unsafe extern "C" fn glib_log_writer(
-    mut log_level_flags: GLogLevelFlags,
-    mut fields: *const GLogField,
-    mut n_fields: usize,
-    mut UNUSED_user_data: gpointer,
+    log_level_flags: GLogLevelFlags,
+    fields: *const GLogField,
+    n_fields: usize,
+    _user_data: gpointer,
 ) -> GLogWriterOutput {
     unsafe {
         let mut log_domain: *const gchar = b"(unknown)\0" as *const u8 as *const std::ffi::c_char;
@@ -139,12 +138,11 @@ unsafe extern "C" fn glib_log_writer(
                 message = (*fields.offset(i as isize)).value as *const gchar;
             }
             i = i.wrapping_add(1);
-            i;
         }
         if G_LOG_LEVEL_MASK as std::ffi::c_int & log_level_flags as std::ffi::c_int == 0 {
             return G_LOG_WRITER_UNHANDLED;
         }
-        let mut log_level: log_level_t = [
+        let log_level: log_level_t = [
             LOG_LEVEL_fatal,
             LOG_LEVEL_fatal,
             LOG_LEVEL_fatal,
@@ -275,12 +273,13 @@ unsafe extern "C" fn glib_log_writer(
             LOG_LEVEL_fatal,
             LOG_LEVEL_debug,
         ][log_level_flags as usize];
+        let log_domain = CStr::from_ptr(log_domain).to_string_lossy();
+        let message = CStr::from_ptr(message).to_string_lossy();
+        eprintln!("main_log: {}, {}", log_domain, message);
         _log(
             log_level,
             b"glib\0" as *const u8 as *const std::ffi::c_char,
-            b"%s: %s\0" as *const u8 as *const std::ffi::c_char,
-            log_domain,
-            message,
+            &format!("{}: {}", log_domain, message),
         );
         return G_LOG_WRITER_HANDLED;
     }
@@ -313,12 +312,12 @@ unsafe extern "C" fn init_directories() {
 }
 
 unsafe extern "C" fn parseopts(
-    mut argc: *mut std::ffi::c_int,
+    argc: *mut std::ffi::c_int,
     mut argv: *mut *mut gchar,
-    mut nonblock: *mut *mut gboolean,
+    nonblock: *mut *mut gboolean,
 ) -> *mut *mut gchar {
     unsafe {
-        let mut context: *mut GOptionContext = 0 as *mut GOptionContext;
+        // let mut context: *mut GOptionContext = std::ptr::null_mut();
         let mut version_only: *mut gboolean = 0 as *mut gboolean;
         let mut check_only: *mut gboolean = 0 as *mut gboolean;
         let mut uris: *mut *mut gchar = 0 as *mut *mut gchar;
@@ -329,7 +328,7 @@ unsafe extern "C" fn parseopts(
         globalconf.nounique = 0 as std::ffi::c_int;
         let entries: [GOptionEntry; 10] = [
             {
-                let mut init = GOptionEntry {
+                GOptionEntry {
                     long_name: b"check\0" as *const u8 as *const std::ffi::c_char,
                     short_name: 'k' as i32 as gchar,
                     flags: 0 as std::ffi::c_int,
@@ -337,11 +336,10 @@ unsafe extern "C" fn parseopts(
                     arg_data: &mut check_only as *mut *mut gboolean as gpointer,
                     description: b"check config and exit\0" as *const u8 as *const std::ffi::c_char,
                     arg_description: 0 as *const gchar,
-                };
-                init
+                }
             },
             {
-                let mut init = GOptionEntry {
+                GOptionEntry {
                     long_name: b"config\0" as *const u8 as *const std::ffi::c_char,
                     short_name: 'c' as i32 as gchar,
                     flags: 0 as std::ffi::c_int,
@@ -350,11 +348,10 @@ unsafe extern "C" fn parseopts(
                     description: b"configuration file to use\0" as *const u8
                         as *const std::ffi::c_char,
                     arg_description: b"FILE\0" as *const u8 as *const std::ffi::c_char,
-                };
-                init
+                }
             },
             {
-                let mut init = GOptionEntry {
+                GOptionEntry {
                     long_name: b"profile\0" as *const u8 as *const std::ffi::c_char,
                     short_name: 'p' as i32 as gchar,
                     flags: 0 as std::ffi::c_int,
@@ -362,11 +359,10 @@ unsafe extern "C" fn parseopts(
                     arg_data: &raw mut globalconf.profile as *mut *mut gchar as gpointer,
                     description: b"profile name to use\0" as *const u8 as *const std::ffi::c_char,
                     arg_description: b"NAME\0" as *const u8 as *const std::ffi::c_char,
-                };
-                init
+                }
             },
             {
-                let mut init = GOptionEntry {
+                GOptionEntry {
                     long_name: b"nonblock\0" as *const u8 as *const std::ffi::c_char,
                     short_name: 'n' as i32 as gchar,
                     flags: 0 as std::ffi::c_int,
@@ -374,11 +370,10 @@ unsafe extern "C" fn parseopts(
                     arg_data: nonblock as gpointer,
                     description: b"run in background\0" as *const u8 as *const std::ffi::c_char,
                     arg_description: 0 as *const gchar,
-                };
-                init
+                }
             },
             {
-                let mut init = GOptionEntry {
+                GOptionEntry {
                     long_name: b"nounique\0" as *const u8 as *const std::ffi::c_char,
                     short_name: 'U' as i32 as gchar,
                     flags: 0 as std::ffi::c_int,
@@ -387,11 +382,10 @@ unsafe extern "C" fn parseopts(
                     description: b"ignore libunique bindings\0" as *const u8
                         as *const std::ffi::c_char,
                     arg_description: 0 as *const gchar,
-                };
-                init
+                }
             },
             {
-                let mut init = GOptionEntry {
+                let init = GOptionEntry {
                     long_name: b"uri\0" as *const u8 as *const std::ffi::c_char,
                     short_name: 'u' as i32 as gchar,
                     flags: 0 as std::ffi::c_int,
@@ -404,7 +398,7 @@ unsafe extern "C" fn parseopts(
                 init
             },
             {
-                let mut init = GOptionEntry {
+                let init = GOptionEntry {
                     long_name: b"verbose\0" as *const u8 as *const std::ffi::c_char,
                     short_name: 'v' as i32 as gchar,
                     flags: 0 as std::ffi::c_int,
@@ -416,7 +410,7 @@ unsafe extern "C" fn parseopts(
                 init
             },
             {
-                let mut init = GOptionEntry {
+                let init = GOptionEntry {
                     long_name: b"log\0" as *const u8 as *const std::ffi::c_char,
                     short_name: 'l' as i32 as gchar,
                     flags: 0 as std::ffi::c_int,
@@ -429,7 +423,7 @@ unsafe extern "C" fn parseopts(
                 init
             },
             {
-                let mut init = GOptionEntry {
+                let init = GOptionEntry {
                     long_name: b"version\0" as *const u8 as *const std::ffi::c_char,
                     short_name: 'V' as i32 as gchar,
                     flags: 0 as std::ffi::c_int,
@@ -442,7 +436,7 @@ unsafe extern "C" fn parseopts(
                 init
             },
             {
-                let mut init = GOptionEntry {
+                let init = GOptionEntry {
                     long_name: 0 as *const gchar,
                     short_name: 0 as std::ffi::c_int as gchar,
                     flags: 0 as std::ffi::c_int,
@@ -463,9 +457,8 @@ unsafe extern "C" fn parseopts(
                 g_strdup(*argv.offset(i as isize)) as gpointer,
             );
             i += 1;
-            i;
         }
-        context = g_option_context_new(b"[URI...]\0" as *const u8 as *const std::ffi::c_char);
+        let context = g_option_context_new(b"[URI...]\0" as *const u8 as *const std::ffi::c_char);
         g_option_context_add_main_entries(context, entries.as_ptr(), 0 as *const gchar);
         g_option_context_add_group(context, gtk_get_option_group(0 as std::ffi::c_int));
         g_option_context_parse(context, argc, &mut argv, 0 as *mut *mut GError);
@@ -481,7 +474,6 @@ unsafe extern "C" fn parseopts(
                 g_ptr_array_remove_index(globalconf.argv, i_0 as u32);
             }
             i_0 += 1;
-            i_0;
         }
         if !version_only.is_null() {
             g_printf(
@@ -539,8 +531,7 @@ unsafe extern "C" fn parseopts(
                 _log(
                     LOG_LEVEL_warn,
                     b"luakit.c\0" as *const u8 as *const std::ffi::c_char,
-                    b"invalid mix of -v and -l, ignoring -v...\0" as *const u8
-                        as *const std::ffi::c_char,
+                    "invalid mix of -v and -l, ignoring -v...",
                 );
             }
         }
@@ -559,8 +550,7 @@ unsafe extern "C" fn parseopts(
             _log(
                 LOG_LEVEL_fatal,
                 b"luakit.c\0" as *const u8 as *const std::ffi::c_char,
-                b"invalid mix of -u and default uri arguments\0" as *const u8
-                    as *const std::ffi::c_char,
+                "invalid mix of -u and default uri arguments",
             );
         }
         if !uris.is_null() {
@@ -571,20 +561,20 @@ unsafe extern "C" fn parseopts(
     }
 }
 
-unsafe extern "C" fn parse_log_level_option(mut log_lvl: *mut gchar) {
+unsafe extern "C" fn parse_log_level_option(log_lvl: *mut gchar) {
     unsafe {
-        let mut parts: *mut *mut gchar = g_strsplit(
+        let parts: *mut *mut gchar = g_strsplit(
             log_lvl,
             b",\0" as *const u8 as *const std::ffi::c_char,
             0 as std::ffi::c_int,
         );
-        let mut part: *mut *mut gchar = parts;
+        let part: *mut *mut gchar = parts;
         while !(*part).is_null() {
             let mut lvl: log_level_t = LOG_LEVEL_fatal;
             if log_level_from_string(&mut lvl, *part) == 0 {
                 log_set_verbosity(b"all\0" as *const u8 as *const std::ffi::c_char, lvl);
             } else {
-                let mut sep: *mut gchar = strchr(*part, '=' as i32);
+                let sep: *mut gchar = strchr(*part, '=' as i32);
                 if !sep.is_null()
                     && log_level_from_string(&mut lvl, sep.offset(1 as std::ffi::c_int as isize))
                         == 0
@@ -595,14 +585,13 @@ unsafe extern "C" fn parse_log_level_option(mut log_lvl: *mut gchar) {
                     _log(
                         LOG_LEVEL_warn,
                         b"luakit.c\0" as *const u8 as *const std::ffi::c_char,
-                        b"ignoring unrecognized --log option '%s'\0" as *const u8
-                            as *const std::ffi::c_char,
-                        *part,
+                        &format!(
+                            "ignoring unrecognized --log option '{}'",
+                            CStr::from_ptr(*part).to_string_lossy()
+                        ),
                     );
                 }
             }
-            part = part.offset(1);
-            part;
         }
         g_strfreev(parts);
     }

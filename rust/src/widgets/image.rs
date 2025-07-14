@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use cairo_sys::*;
 use gdk_pixbuf_sys::*;
 use gdk_sys::*;
@@ -72,8 +74,10 @@ unsafe extern "C-unwind" fn luaH_image_set_from_file_name(mut L: *mut lua_State)
             _log(
                 LOG_LEVEL_verbose,
                 b"widgets/image.c\0" as *const u8 as *const std::ffi::c_char,
-                b"unable to load image file: %s\0" as *const u8 as *const std::ffi::c_char,
-                (*error).message,
+                &format!(
+                    "unable to load image file: {}",
+                    CStr::from_ptr((*error).message).to_string_lossy(),
+                ),
             );
         }
         if !(!error.is_null() && !x2_path.is_null()) {

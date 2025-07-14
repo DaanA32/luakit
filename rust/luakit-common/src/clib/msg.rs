@@ -2,7 +2,10 @@ use libc::size_t;
 use mlua_sys::*;
 
 pub mod msg_h {
-    use std::{ffi::c_void, mem::MaybeUninit};
+    use std::{
+        ffi::{CStr, c_void},
+        mem::MaybeUninit,
+    };
 
     use glib_sys::*;
     use libc::size_t;
@@ -65,8 +68,7 @@ pub mod msg_h {
         _log(
             lvl,
             src,
-            b"%s\0" as *const u8 as *const std::ffi::c_char,
-            luaH_msg_string_from_args(L),
+            &CStr::from_ptr(luaH_msg_string_from_args(L)).to_string_lossy(),
         );
         return 0 as std::ffi::c_int;
     }

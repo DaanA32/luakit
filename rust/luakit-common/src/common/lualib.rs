@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use glib_sys::gboolean;
 use libc::getenv;
 use mlua_sys::{
@@ -145,8 +147,12 @@ pub unsafe extern "C" fn luaH_dofunction(
         _log(
             LOG_LEVEL_error,
             b"./common/lualib.h\0" as *const u8 as *const std::ffi::c_char,
-            b"%s\0" as *const u8 as *const std::ffi::c_char,
-            lua_tolstring(L, -(1 as std::ffi::c_int), std::ptr::null_mut()),
+            &CStr::from_ptr(lua_tolstring(
+                L,
+                -(1 as std::ffi::c_int),
+                std::ptr::null_mut(),
+            ))
+            .to_string_lossy(),
         );
         lua_settop(L, -(2 as std::ffi::c_int) - 1 as std::ffi::c_int);
         return GFALSE;

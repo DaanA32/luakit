@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [profile.dev]
-debug = false
+# debug = false
 
 [[bin]]
 name = "luakit"
@@ -13,7 +13,7 @@ path = "src/main.rs"
 [lib]
 name = "luakit"
 path = "src/lib.rs"
-crate-type = ["dylib"]
+# crate-type = ["dylib"]
 
 [dependencies]
 libc = "0.2.174"
@@ -30,3 +30,5 @@ javascriptcore-rs-sys = "1.1.1"
 cairo-sys-rs = "0.18.1"
 gdk-pixbuf-sys = "0.18.0"
 pango-sys = "0.18.0"
+sqlite3-sys = "0.18.0"
+

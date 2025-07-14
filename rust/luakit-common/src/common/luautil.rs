@@ -340,7 +340,7 @@ pub unsafe extern "C-unwind" fn luaH_add_paths(
         _log(
             LOG_LEVEL_warn,
             b"common/luautil.c\0" as *const u8 as *const std::ffi::c_char,
-            b"package is not a table\0" as *const u8 as *const std::ffi::c_char,
+            "package is not a table\0",
         );
         return;
     }
@@ -353,7 +353,7 @@ pub unsafe extern "C-unwind" fn luaH_add_paths(
         _log(
             LOG_LEVEL_warn,
             b"common/luautil.c\0" as *const u8 as *const std::ffi::c_char,
-            b"package.path is not a string\0" as *const u8 as *const std::ffi::c_char,
+            "package.path is not a string",
         );
         lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
         return;

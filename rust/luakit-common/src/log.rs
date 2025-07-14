@@ -1,5 +1,7 @@
 use core::intrinsics::AtomicOrdering;
+use regex::Regex;
 use std::{
+    ffi::CStr,
     io::stderr,
     os::fd::{AsFd, AsRawFd},
 };
@@ -297,7 +299,7 @@ unsafe extern "C" fn emit_log_signal(
     lua_pushnumber(common.L, time);
     lua_pushstring(common.L, log_string_from_level(lvl));
     lua_pushstring(common.L, group);
-    lua_pushstring(common.L, msg);
+    lua_pushstring(common.L, msg as *const i8);
     block_log = (0 as std::ffi::c_int == 0) as std::ffi::c_int;
     luaH_class_emit_signal(
         common.L,
@@ -335,18 +337,18 @@ unsafe extern "C" fn log_emit_pending_signals(
     );
     return 0 as std::ffi::c_int;
 }
-unsafe extern "C" fn queue_log_signal(
+unsafe fn queue_log_signal(
     mut time: std::ffi::c_double,
     mut lvl: log_level_t,
     mut group: *const gchar,
-    mut msg: *const gchar,
+    mut msg: &mut str,
 ) {
     let mut entry: *mut queued_log_t =
         g_slice_alloc0(::core::mem::size_of::<queued_log_t>()) as *mut queued_log_t;
     (*entry).time = time;
     (*entry).lvl = lvl;
     (*entry).group = g_strdup(group);
-    (*entry).msg = g_strdup(msg);
+    (*entry).msg = (msg.as_mut_ptr() as *mut i8);
     g_async_queue_push(queued_emissions, entry as gpointer);
     if ({
         let mut gaicae_oldval: gint = 0 as std::ffi::c_int;
@@ -383,30 +385,14 @@ unsafe extern "C" fn queue_log_signal(
         );
     }
 }
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn _log(
-    mut lvl: log_level_t,
-    mut fct: *const gchar,
-    mut fmt: *const gchar,
-    mut args: ...
-) {
-    let mut ap: ::core::ffi::VaListImpl;
-    ap = args.clone();
-    va_log(lvl, fct, fmt, ap.as_va_list());
-}
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn va_log(
-    mut lvl: log_level_t,
-    mut fct: *const gchar,
-    mut fmt: *const gchar,
-    mut ap: ::core::ffi::VaList,
-) {
-    let mut msg: *mut gchar = 0 as *mut gchar;
+
+pub unsafe fn _log(lvl: log_level_t, fct: *const gchar, msg: &str) {
+    let mut msg = msg.to_string();
     let mut log_fd: gint = 0;
     let mut time: std::ffi::c_double = 0.;
     let mut prefix_char: gchar = 0;
     let mut style: *mut gchar = 0 as *mut gchar;
-    static mut indent_lines_reg: *mut GRegex = 0 as *const GRegex as *mut GRegex;
+    let indent_lines_reg = r"\n";
     let mut wrapped: *mut gchar = 0 as *mut gchar;
     if block_log != 0 {
         return;
@@ -414,10 +400,9 @@ pub unsafe extern "C" fn va_log(
     let mut group: *mut std::ffi::c_char = log_group_from_fct(fct);
     let mut verbosity: log_level_t = log_get_verbosity(group);
     if !(lvl as std::ffi::c_uint > verbosity as std::ffi::c_uint) {
-        msg = g_strdup_printf(fmt, ap.as_va_list());
         log_fd = 2 as std::ffi::c_int;
         time = l_time() - globalconf.starttime;
-        queue_log_signal(time, lvl, group, msg);
+        queue_log_signal(time, lvl, group, &mut msg);
         prefix_char = 0;
         style = b"\0" as *const u8 as *const std::ffi::c_char as *mut gchar;
         match lvl as std::ffi::c_uint {
@@ -453,6 +438,7 @@ pub unsafe extern "C" fn va_log(
                 );
             }
         }
+        /*
         if indent_lines_reg.is_null() {
             let mut err: *mut GError = 0 as *mut GError;
             indent_lines_reg = g_regex_new(
@@ -475,29 +461,28 @@ pub unsafe extern "C" fn va_log(
                 );
             }
         }
-        wrapped = g_regex_replace_literal(
-            indent_lines_reg,
-            msg,
-            -(1 as std::ffi::c_int) as isize,
-            0 as std::ffi::c_int,
-            b"\n                 \0" as *const u8 as *const std::ffi::c_char,
-            G_REGEX_MATCH_DEFAULT,
-            0 as *mut *mut GError,
-        );
-        g_free(msg as gpointer);
-        msg = wrapped;
+        */
+        let wrapped = Regex::new(indent_lines_reg)
+            .unwrap()
+            .replace_all(&msg, "\n                 ");
+        let msg = wrapped;
         if isatty(log_fd) == 0 {
-            let mut stripped: *mut gchar = strip_ansi_escapes(msg);
+            /*
+            let mut stripped = strip_ansi_escapes(msg);
             g_free(msg as gpointer);
             msg = stripped;
+            */
             eprintln!("[{:12}] {:?} [{:?}]: {:?}", time, prefix_char, group, msg,);
         } else {
             eprintln!(
-                "{:?}[{:12}] {:?} [{:?}]: {:?}\x1B[0m",
-                style, time, prefix_char, group, msg,
+                "{}[{:12}] {} [{}]: {}\x1B[0m",
+                CStr::from_ptr(style).to_string_lossy(),
+                time,
+                prefix_char as u8 as char,
+                CStr::from_ptr(group).to_string_lossy(),
+                msg,
             );
         }
-        g_free(msg as gpointer);
         if lvl as std::ffi::c_uint == LOG_LEVEL_fatal as std::ffi::c_int as std::ffi::c_uint {
             exit(1 as std::ffi::c_int);
         }
@@ -533,12 +518,7 @@ pub unsafe extern "C" fn ipc_recv_log(
     let mut lvl: log_level_t = lua_tointeger(L, -(3 as std::ffi::c_int)) as log_level_t;
     let mut fct: *const gchar = lua_tolstring(L, -(2 as std::ffi::c_int), 0 as *mut size_t);
     let mut msg: *const gchar = lua_tolstring(L, -(1 as std::ffi::c_int), 0 as *mut size_t);
-    _log(
-        lvl,
-        fct,
-        b"%s\0" as *const u8 as *const std::ffi::c_char,
-        msg,
-    );
+    _log(lvl, fct, &CStr::from_ptr(msg).to_string_lossy());
     lua_settop(L, -(3 as std::ffi::c_int) - 1 as std::ffi::c_int);
 }
 #[unsafe(no_mangle)]
@@ -557,8 +537,10 @@ pub unsafe extern "C" fn log_init() {
         _log(
             LOG_LEVEL_error,
             b"log.c\0" as *const u8 as *const std::ffi::c_char,
-            b"unable to load previous log messages: %s\0" as *const u8 as *const std::ffi::c_char,
-            (*error).message,
+            &format!(
+                "unable to load previous log messages: {}",
+                CStr::from_ptr((*error).message).to_string_lossy()
+            ),
         );
         g_error_free(error);
         return;

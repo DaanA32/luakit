@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use glib_sys::*;
 use gobject_sys::*;
 use libc::size_t;
@@ -286,8 +288,10 @@ pub unsafe extern "C" fn luaH_gobject_newindex(
                 _log(
                     LOG_LEVEL_warn,
                     b"common/property.c\0" as *const u8 as *const std::ffi::c_char,
-                    b"read-only property: %s\0" as *const u8 as *const std::ffi::c_char,
-                    (*p).name,
+                    &format!(
+                        "read-only property: ({})",
+                        CStr::from_ptr((*p).name).to_string_lossy()
+                    ),
                 );
             }
             break;

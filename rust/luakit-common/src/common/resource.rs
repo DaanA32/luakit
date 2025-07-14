@@ -1,3 +1,5 @@
+use std::ffi::CStr;
+
 use glib_sys::{
     g_assertion_message_expr, g_build_filename, g_free, g_strdup, g_strerror, g_strsplit, gpointer,
 };
@@ -12,8 +14,10 @@ pub unsafe extern "C" fn resource_path_set(mut path: *const gchar) {
     _log(
         LOG_LEVEL_verbose,
         b"common/resource.c\0" as *const u8 as *const std::ffi::c_char,
-        b"setting resource path '%s'\0" as *const u8 as *const std::ffi::c_char,
-        path,
+        &format!(
+            "setting resource path '{}'",
+            CStr::from_ptr(path).to_string_lossy()
+        ),
     );
     g_free(resource_path as gpointer);
     resource_path = g_strdup(path);
@@ -41,8 +45,10 @@ pub unsafe extern "C" fn resource_find_file(mut path: *const gchar) -> *mut gcha
     _log(
         LOG_LEVEL_verbose,
         b"common/resource.c\0" as *const u8 as *const std::ffi::c_char,
-        b"finding resource file '%s'\0" as *const u8 as *const std::ffi::c_char,
-        path,
+        &format!(
+            "finding resource file '{}'",
+            CStr::from_ptr(path).to_string_lossy()
+        ),
     );
     if *path.offset(0 as std::ffi::c_int as isize) as std::ffi::c_int == '/' as i32 {
         return g_strdup(path);
@@ -61,16 +67,20 @@ pub unsafe extern "C" fn resource_find_file(mut path: *const gchar) -> *mut gcha
             _log(
                 LOG_LEVEL_debug,
                 b"common/resource.c\0" as *const u8 as *const std::ffi::c_char,
-                b"tried path '%s': %s\0" as *const u8 as *const std::ffi::c_char,
-                full_path,
-                g_strerror(*__errno_location()),
+                &format!(
+                    "tried path '{}': {}",
+                    CStr::from_ptr(full_path).to_string_lossy(),
+                    CStr::from_ptr(g_strerror(*__errno_location())).to_string_lossy()
+                ),
             );
         } else {
             _log(
                 LOG_LEVEL_verbose,
                 b"common/resource.c\0" as *const u8 as *const std::ffi::c_char,
-                b"found resource file at '%s'\0" as *const u8 as *const std::ffi::c_char,
-                full_path,
+                &format!(
+                    "found resource file at '{}'",
+                    CStr::from_ptr(full_path).to_string_lossy()
+                ),
             );
             return full_path;
         }
@@ -81,8 +91,10 @@ pub unsafe extern "C" fn resource_find_file(mut path: *const gchar) -> *mut gcha
     _log(
         LOG_LEVEL_verbose,
         b"common/resource.c\0" as *const u8 as *const std::ffi::c_char,
-        b"no resource file found for '%s'\0" as *const u8 as *const std::ffi::c_char,
-        path,
+        &format!(
+            "no resource file found for '{}'",
+            CStr::from_ptr(path).to_string_lossy()
+        ),
     );
     return 0 as *mut gchar;
 }

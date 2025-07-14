@@ -81,7 +81,7 @@ pub unsafe extern "C" fn run_javascript_finished(mut msg: *const guint8, mut len
         _log(
             LOG_LEVEL_warn,
             b"./widgets/webview/javascript.c\0" as *const u8 as *const std::ffi::c_char,
-            b"javascript finshed called on non object\0" as *const u8 as *const std::ffi::c_char,
+            "javascript finshed called on non object",
         );
         return;
     }

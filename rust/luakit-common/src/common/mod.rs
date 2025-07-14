@@ -20,9 +20,10 @@ use mlua_sys::lua_State;
 pub struct common_t {
     pub L: *mut lua_State,
 }
-unsafe extern "C" {
-    pub static mut common: common_t;
-}
+
+pub static mut common: common_t = common_t {
+    L: std::ptr::null_mut(),
+};
 
 pub mod messages {
     pub const G_LOG_DOMAIN: std::ffi::c_int = 0;

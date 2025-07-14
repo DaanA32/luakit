@@ -19,7 +19,3 @@ pub struct globalconf_t {
     pub stylesheets: *mut GPtrArray,
     pub starttime: gdouble,
 }
-
-unsafe extern "C" {
-    pub static mut globalconf: globalconf_t;
-}

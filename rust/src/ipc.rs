@@ -1,3 +1,8 @@
+use std::{
+    ffi::CStr,
+    sync::{Arc, Condvar, Mutex},
+};
+
 pub use luakit_common::ipc as ipc_h;
 
 use crate::{
@@ -16,8 +21,8 @@ use crate::{
 use glib_sys::{
     G_FILE_TEST_EXISTS, GCond, GFunc, GIOChannel, GMutex, GPtrArray, GQueue, GVariant,
     g_build_filename, g_cond_signal, g_cond_wait, g_file_test, g_free, g_get_current_dir,
-    g_get_tmp_dir, g_mutex_lock, g_mutex_unlock, g_ptr_array_foreach, g_random_int_range,
-    g_strdup_printf, g_thread_new, g_unlink, g_variant_new, gboolean, gpointer,
+    g_get_tmp_dir, g_mutex_init, g_mutex_lock, g_mutex_unlock, g_ptr_array_foreach,
+    g_random_int_range, g_strdup_printf, g_thread_new, g_unlink, g_variant_new, gboolean, gpointer,
 };
 use gobject_sys::{G_CONNECT_DEFAULT, GCallback, GObject, g_signal_connect_data};
 use libc::{
@@ -45,12 +50,10 @@ unsafe extern "C" {
     pub fn webview_scroll_recv(d: *mut std::ffi::c_void, ipc: *const ipc_scroll_t);
     pub fn run_javascript_finished(msg: *const guint8, length: guint);
 }
-static mut socket_path: *mut std::ffi::c_char =
-    0 as *const std::ffi::c_char as *mut std::ffi::c_char;
 #[unsafe(no_mangle)]
-pub static mut socket_path_lock: *mut GMutex = std::ptr::null_mut();
+pub static mut socket_path_lock: Mutex<*mut std::ffi::c_char> = Mutex::new(std::ptr::null_mut());
 #[unsafe(no_mangle)]
-pub static mut socket_path_cond: *mut GCond = std::ptr::null_mut();
+pub static mut socket_path_cond: Condvar = Condvar::new();
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ipc_recv_lua_require_module(
     mut ipc: *mut ipc_endpoint_t,
@@ -60,10 +63,11 @@ pub unsafe extern "C" fn ipc_recv_lua_require_module(
     _log(
         LOG_LEVEL_fatal,
         b"ipc.c\0" as *const u8 as *const std::ffi::c_char,
-        b"process '%s': should never receive message of type %s\0" as *const u8
-            as *const std::ffi::c_char,
-        (*ipc).name,
-        b"lua_require_module\0" as *const u8 as *const std::ffi::c_char,
+        &format!(
+            "process '{}': should never receive message of type {}",
+            CStr::from_ptr((*ipc).name).to_string_lossy(),
+            "lua_require_module"
+        ),
     );
 }
 #[unsafe(no_mangle)]
@@ -75,10 +79,11 @@ pub unsafe extern "C" fn ipc_recv_web_extension_loaded(
     _log(
         LOG_LEVEL_fatal,
         b"ipc.c\0" as *const u8 as *const std::ffi::c_char,
-        b"process '%s': should never receive message of type %s\0" as *const u8
-            as *const std::ffi::c_char,
-        (*ipc).name,
-        b"web_extension_loaded\0" as *const u8 as *const std::ffi::c_char,
+        &format!(
+            "process '{}': should never receive message of type {}",
+            CStr::from_ptr((*ipc).name).to_string_lossy(),
+            "web_extension_loaded",
+        ),
     );
 }
 #[unsafe(no_mangle)]
@@ -90,10 +95,11 @@ pub unsafe extern "C" fn ipc_recv_crash(
     _log(
         LOG_LEVEL_fatal,
         b"ipc.c\0" as *const u8 as *const std::ffi::c_char,
-        b"process '%s': should never receive message of type %s\0" as *const u8
-            as *const std::ffi::c_char,
-        (*ipc).name,
-        b"crash\0" as *const u8 as *const std::ffi::c_char,
+        &format!(
+            "process '{}': should never receive message of type {}",
+            CStr::from_ptr((*ipc).name).to_string_lossy(),
+            "crash",
+        ),
     );
 }
 #[unsafe(no_mangle)]
@@ -220,8 +226,10 @@ unsafe extern "C" fn web_extension_connect_thread(mut UNUSED_data: gpointer) -> 
         _log(
             LOG_LEVEL_fatal,
             b"ipc.c\0" as *const u8 as *const std::ffi::c_char,
-            b"Error calling socket(): %s\0" as *const u8 as *const std::ffi::c_char,
-            strerror(*__errno_location()),
+            &format!(
+                "Error calling socket(): {}",
+                CStr::from_ptr(strerror(*__errno_location())).to_string_lossy(),
+            ),
         );
     }
     let mut local: sockaddr_un = sockaddr_un {
@@ -248,29 +256,34 @@ unsafe extern "C" fn web_extension_connect_thread(mut UNUSED_data: gpointer) -> 
         _log(
             LOG_LEVEL_fatal,
             b"ipc.c\0" as *const u8 as *const std::ffi::c_char,
-            b"Error calling bind() on socket %s: %s\0" as *const u8 as *const std::ffi::c_char,
-            path,
-            strerror(*__errno_location()),
+            &format!(
+                "Error calling bind() on socket {}: {}",
+                CStr::from_ptr(path).to_string_lossy(),
+                CStr::from_ptr(strerror(*__errno_location())).to_string_lossy(),
+            ),
         );
     }
     if listen(sock, 5 as std::ffi::c_int) == -(1 as std::ffi::c_int) {
         _log(
             LOG_LEVEL_fatal,
             b"ipc.c\0" as *const u8 as *const std::ffi::c_char,
-            b"Error calling listen() on socket %s: %s\0" as *const u8 as *const std::ffi::c_char,
-            path,
-            strerror(*__errno_location()),
+            &format!(
+                "Error calling listen() on socket {}: {}",
+                CStr::from_ptr(path).to_string_lossy(),
+                CStr::from_ptr(strerror(*__errno_location())).to_string_lossy(),
+            ),
         );
     }
-    g_mutex_lock(socket_path_lock);
-    socket_path = path;
-    g_cond_signal(socket_path_cond);
-    g_mutex_unlock(socket_path_lock);
+    {
+        let mut g = socket_path_lock.lock().expect("Lock aquired");
+        *g = path;
+        socket_path_cond.notify_all();
+    }
     while 0 as std::ffi::c_int == 0 {
         _log(
             LOG_LEVEL_debug,
             b"ipc.c\0" as *const u8 as *const std::ffi::c_char,
-            b"Waiting for a connection...\0" as *const u8 as *const std::ffi::c_char,
+            "Waiting for a connection...",
         );
         let mut web_socket: std::ffi::c_int = 0;
         let mut remote: sockaddr_un = sockaddr_un {
@@ -288,8 +301,10 @@ unsafe extern "C" fn web_extension_connect_thread(mut UNUSED_data: gpointer) -> 
             _log(
                 LOG_LEVEL_fatal,
                 b"ipc.c\0" as *const u8 as *const std::ffi::c_char,
-                b"Error calling accept(): %s\0" as *const u8 as *const std::ffi::c_char,
-                strerror(*__errno_location()),
+                &format!(
+                    "Error calling accept(): {}",
+                    CStr::from_ptr(strerror(*__errno_location())).to_string_lossy(),
+                ),
             );
         }
         let mut ipc: *mut ipc_endpoint_t =
@@ -321,8 +336,10 @@ unsafe extern "C" fn initialize_web_extensions_cb(
         _log(
             LOG_LEVEL_verbose,
             b"ipc.c\0" as *const u8 as *const std::ffi::c_char,
-            b"checking for luakit extension at '%s'\0" as *const u8 as *const std::ffi::c_char,
-            dirs[i as usize],
+            &format!(
+                "checking for luakit extension at '{}'",
+                CStr::from_ptr(dirs[i as usize]).to_string_lossy(),
+            ),
         );
         if access(extension_file, 4 as std::ffi::c_int) == 0 {
             dir = dirs[i as usize];
@@ -335,23 +352,25 @@ unsafe extern "C" fn initialize_web_extensions_cb(
         _log(
             LOG_LEVEL_verbose,
             b"ipc.c\0" as *const u8 as *const std::ffi::c_char,
-            b"found luakit extension at '%s'\0" as *const u8 as *const std::ffi::c_char,
-            dir,
+            &format!(
+                "found luakit extension at '{}'",
+                CStr::from_ptr(dir).to_string_lossy(),
+            ),
         );
     } else {
         _log(
             LOG_LEVEL_fatal,
             b"ipc.c\0" as *const u8 as *const std::ffi::c_char,
-            b"cannot find luakit extension 'luakit.so'\0" as *const u8 as *const std::ffi::c_char,
+            "cannot find luakit extension 'luakit.so'",
         );
     }
     let mut path: *const std::ffi::c_char = 0 as *const std::ffi::c_char;
-    g_mutex_lock(socket_path_lock);
-    while socket_path.is_null() {
-        g_cond_wait(socket_path_cond, socket_path_lock);
+    {
+        let mut started = socket_path_lock.lock().expect("Lock aquired");
+        while (*started).is_null() {
+            started = socket_path_cond.wait(started).unwrap();
+        }
     }
-    path = socket_path;
-    g_mutex_unlock(socket_path_lock);
     lua_getfield(
         common.L,
         -(10002 as std::ffi::c_int),
@@ -385,11 +404,10 @@ unsafe extern "C" fn initialize_web_extensions_cb(
 #[unsafe(no_mangle)]
 pub extern "C" fn ipc_remove_socket_file() -> () {
     unsafe {
-        g_mutex_lock(socket_path_lock);
-        g_unlink(socket_path);
-        g_free(socket_path as gpointer);
-        socket_path = 0 as *mut std::ffi::c_char;
-        g_mutex_unlock(socket_path_lock);
+        let mut socket_path = socket_path_lock.lock().expect("Lock aquired");
+        g_unlink(*socket_path);
+        g_free(*socket_path as gpointer);
+        *socket_path = 0 as *mut std::ffi::c_char;
     }
 }
 #[unsafe(no_mangle)]

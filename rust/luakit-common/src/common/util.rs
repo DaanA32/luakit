@@ -1,4 +1,4 @@
-use std::mem::MaybeUninit;
+use std::{ffi::CStr, mem::MaybeUninit};
 
 use ::libc;
 use glib_sys::{
@@ -50,8 +50,11 @@ pub unsafe extern "C-unwind" fn luaH_panic(mut L: *mut lua_State) -> std::ffi::c
     _log(
         LOG_LEVEL_error,
         b"common/util.c\0" as *const u8 as *const std::ffi::c_char,
-        b"unprotected error in call to Lua API (%s)\0" as *const u8 as *const std::ffi::c_char,
-        lua_tolstring(L, -(1 as std::ffi::c_int), 0 as *mut usize),
+        &format!(
+            "unprotected error in call to Lua API ({})",
+            CStr::from_ptr(lua_tolstring(L, -(1 as std::ffi::c_int), 0 as *mut usize))
+                .to_string_lossy()
+        ),
     );
     return 0 as std::ffi::c_int;
 }

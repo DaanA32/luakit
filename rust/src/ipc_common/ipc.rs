@@ -11,6 +11,7 @@ use glib_sys::{
     g_slice_free1, g_source_remove, g_thread_new, gboolean, gpointer,
 };
 use libc::{c_void, memcpy, size_t, ssize_t, strcmp};
+use std::ffi::CStr;
 
 use crate::common::luaclass::luaH_typename;
 use crate::common::luaserialize::lua_serialize_range;
@@ -49,10 +50,11 @@ unsafe extern "C-unwind" fn ipc_dispatch(
         _log(
             LOG_LEVEL_debug,
             b"common/ipc.c\0" as *const u8 as *const std::ffi::c_char,
-            b"Process '%s': recv \x1B[34m%s\x1B[0m message\0" as *const u8
-                as *const std::ffi::c_char,
-            (*ipc).name,
-            ipc_type_name(header.type_0),
+            &format!(
+                "Process '{}': recv \x1B[34m{}\x1B[0m message",
+                CStr::from_ptr((*ipc).name).to_string_lossy(),
+                CStr::from_ptr(ipc_type_name(header.type_0)).to_string_lossy(),
+            ),
         );
     }
     match header.type_0 as std::ffi::c_uint {
@@ -84,9 +86,10 @@ unsafe extern "C-unwind" fn ipc_dispatch(
             _log(
                 LOG_LEVEL_fatal,
                 b"common/ipc.c\0" as *const u8 as *const std::ffi::c_char,
-                b"Received message with invalid type 0x%x\0" as *const u8
-                    as *const std::ffi::c_char,
-                header.type_0 as std::ffi::c_uint,
+                &format!(
+                    "Received message with invalid type 0x{:x}",
+                    header.type_0 as std::ffi::c_uint,
+                ),
             );
         }
     };
@@ -130,8 +133,7 @@ unsafe extern "C" fn ipc_send_thread(mut UNUSED_user_data: gpointer) -> gpointer
             _log(
                 LOG_LEVEL_error,
                 b"common/ipc.c\0" as *const u8 as *const std::ffi::c_char,
-                b"Trying to send an ipc message, but the endpoint went away.\0" as *const u8
-                    as *const std::ffi::c_char,
+                "Trying to send an ipc message, but the endpoint went away.",
             );
         }
         g_free(out as gpointer);
@@ -159,10 +161,11 @@ pub unsafe extern "C-unwind" fn ipc_send(
         _log(
             LOG_LEVEL_debug,
             b"common/ipc.c\0" as *const u8 as *const std::ffi::c_char,
-            b"Process '%s': send \x1B[34m%s\x1B[0m message\0" as *const u8
-                as *const std::ffi::c_char,
-            (*ipc).name,
-            ipc_type_name((*header).type_0),
+            &format!(
+                "Process '{}': send \x1B[34m{}\x1B[0m message",
+                CStr::from_ptr((*ipc).name).to_string_lossy(),
+                CStr::from_ptr(ipc_type_name((*header).type_0),).to_string_lossy()
+            ),
         );
     }
     if ((*header).length == 0 as std::ffi::c_int as guint) as std::ffi::c_int
@@ -234,8 +237,7 @@ unsafe extern "C-unwind" fn ipc_recv_and_dispatch_or_enqueue(mut ipc: *mut ipc_e
             _log(
                 LOG_LEVEL_verbose,
                 b"common/ipc.c\0" as *const u8 as *const std::ffi::c_char,
-                b"g_io_channel_read_chars(): End Of File received\0" as *const u8
-                    as *const std::ffi::c_char,
+                "g_io_channel_read_chars(): End Of File received",
             );
             if 0 as std::ffi::c_int != 0 {
                 (*ipc).refcount;
@@ -262,8 +264,10 @@ unsafe extern "C-unwind" fn ipc_recv_and_dispatch_or_enqueue(mut ipc: *mut ipc_e
                     _log(
                         LOG_LEVEL_error,
                         b"common/ipc.c\0" as *const u8 as *const std::ffi::c_char,
-                        b"g_io_channel_read_chars(): %s\0" as *const u8 as *const std::ffi::c_char,
-                        (*error).message,
+                        &format!(
+                            "g_io_channel_read_chars(): {}",
+                            CStr::from_ptr((*error).message).to_string_lossy(),
+                        ),
                     );
                 }
             }
