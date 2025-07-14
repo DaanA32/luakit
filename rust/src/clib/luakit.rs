@@ -15,7 +15,7 @@ use std::ffi::CStr;
 use gdk_sys::*;
 use glib_sys::*;
 use libc::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 
 use crate::common::clib::luakit::*;
 use crate::common::common;
@@ -39,7 +39,7 @@ use gio_sys::*;
 use glib_sys::*;
 use gobject_sys::*;
 use libc::getenv;
-use mlua_sys::*;
+use mlua::ffi::*;
 use webkit2gtk_sys::*;
 
 use crate::clib::msg::*;
@@ -63,7 +63,7 @@ use gio_sys::{GAsyncReadyCallback, GAsyncResult, GCancellable, GFile};
 use glib_sys::*;
 use gtk_sys::*;
 use libc::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 
 use crate::{
     common::{
@@ -529,7 +529,7 @@ unsafe extern "C-unwind" fn luaH_parse_website_data_types_table(
     if !(lua_type(L, idx) == 5 as std::ffi::c_int) {
         luaL_argerror(L, idx, b"table\0" as *const u8 as *const std::ffi::c_char);
     }
-    let mut len: size_t = lua_objlen(L, idx);
+    let mut len: size_t = lua_rawlen(L, idx);
     let mut i: size_t = 1 as std::ffi::c_int as size_t;
     while i <= len {
         lua_rawgeti(L, idx, i as i64);
@@ -1614,7 +1614,7 @@ pub unsafe extern "C-unwind" fn luaH_class_newindex_miss_property(
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn luakit_lib_setup(mut L: *mut lua_State) {
-    static mut luakit_lib: [luaL_Reg; 20] = unsafe {
+    let luakit_lib = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -1756,21 +1756,23 @@ pub unsafe extern "C-unwind" fn luakit_lib_setup(mut L: *mut lua_State) {
                 };
                 init
             },
-            // {
-            //     let mut init = luaL_Reg {
-            //         name: 0 as *const std::ffi::c_char,
-            //         func: None,
-            //     };
-            //     init
-            // },
+            {
+                let mut init = luaL_Reg {
+                    name: 0 as *const std::ffi::c_char,
+                    func: core::mem::transmute::<libc::intptr_t, lua_CFunction>(
+                        0 as libc::intptr_t,
+                    ),
+                };
+                init
+            },
         ]
     };
     luakit_class.signals = signal_new();
     luaH_openlib(
         L,
         b"luakit\0" as *const u8 as *const std::ffi::c_char,
-        luakit_lib.as_ptr(),
-        luakit_lib.as_ptr(),
+        &luakit_lib,
+        &luakit_lib,
     );
 }
 #[unsafe(no_mangle)]

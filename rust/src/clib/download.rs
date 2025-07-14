@@ -3,7 +3,7 @@ use std::ffi::CStr;
 use gdk_sys::*;
 use glib_sys::*;
 use libc::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 
 use crate::clib::luakit::*;
 use crate::common::clib::luakit::*;
@@ -629,7 +629,7 @@ unsafe extern "C-unwind" fn luaH_download_cancel(mut L: *mut lua_State) -> gint 
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn download_class_setup(mut L: *mut lua_State) {
-    static mut download_methods: [luaL_Reg; 4] = unsafe {
+    let download_methods = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -668,7 +668,7 @@ pub unsafe extern "C-unwind" fn download_class_setup(mut L: *mut lua_State) {
             // },
         ]
     };
-    static mut download_meta: [luaL_Reg; 10] = unsafe {
+    let download_meta = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -747,6 +747,15 @@ pub unsafe extern "C-unwind" fn download_class_setup(mut L: *mut lua_State) {
             //     };
             //     init
             // },
+            {
+                let mut init = luaL_Reg {
+                    name: 0 as *const std::ffi::c_char,
+                    func: core::mem::transmute::<libc::intptr_t, lua_CFunction>(
+                        0 as libc::intptr_t,
+                    ),
+                };
+                init
+            },
         ]
     };
     luaH_class_setup(

@@ -8,7 +8,7 @@ use glib_sys::*;
 use gobject_sys::*;
 use gtk_sys::*;
 use libc::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 
 use crate::clib::widget::*;
 use crate::common::common;

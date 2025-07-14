@@ -2,7 +2,7 @@ use glib_sys::{
     GError, g_assertion_message_expr, g_error_free, g_free, g_strdup, gboolean, gpointer,
 };
 use libc::{c_void, memset, size_t};
-use mlua_sys::{
+use mlua::ffi::{
     lua_State, lua_createtable, lua_gettop, lua_newuserdata, lua_pushboolean, lua_pushstring,
     lua_pushvalue, lua_setfenv, lua_setmetatable, lua_tolstring, lua_touserdata, luaL_Reg,
     luaL_checklstring, luaL_error,
@@ -273,7 +273,7 @@ unsafe extern "C-unwind" fn luaH_regex_set_pattern(
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn regex_class_setup(mut L: *mut lua_State) {
-    static mut regex_methods: [luaL_Reg; 4] = unsafe {
+    let regex_methods = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -312,7 +312,7 @@ pub unsafe extern "C-unwind" fn regex_class_setup(mut L: *mut lua_State) {
             // },
         ]
     };
-    static mut regex_meta: [luaL_Reg; 9] = unsafe {
+    let regex_meta = unsafe {
         [
             {
                 let mut init = luaL_Reg {

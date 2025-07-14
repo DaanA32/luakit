@@ -2,10 +2,10 @@ use std::ffi::CStr;
 
 use glib_sys::gboolean;
 use libc::getenv;
-use mlua_sys::{
-    lua_Integer, lua_State, lua_gettop, lua_insert, lua_next, lua_objlen, lua_pcall,
-    lua_pushcclosure, lua_pushnil, lua_pushvalue, lua_remove, lua_settop, lua_toboolean,
-    lua_tointeger, lua_tolstring, lua_tonumber, lua_topointer, lua_type, lua_typename,
+use mlua::ffi::{
+    lua_Integer, lua_State, lua_gettop, lua_insert, lua_next, lua_pcall, lua_pushcclosure,
+    lua_pushnil, lua_pushvalue, lua_remove, lua_settop, lua_toboolean, lua_tointeger,
+    lua_tolstring, lua_tonumber, lua_topointer, lua_type, lua_typename,
 };
 
 use crate::common::luaclass::luaH_typename;
@@ -15,7 +15,7 @@ use crate::gtypes::guint;
 pub mod lualib_h {
     #[inline]
     pub unsafe extern "C" fn luaH_dump_table_keys(mut L: *mut lua_State, mut idx: gint) {
-        let mut len: gint = lua_objlen(L, idx) as gint;
+        let mut len: gint = lua_rawlen(L, idx) as gint;
         let mut limit: guint = 5 as std::ffi::c_int as guint;
         let mut rem: guint = 0 as std::ffi::c_int as guint;
         eprintln!("  Keys: ");
@@ -56,12 +56,12 @@ pub mod lualib_h {
         };
     }
     use glib_sys::*;
-    use mlua_sys::*;
+    use mlua::ffi::*;
 
     use crate::gtypes::*;
 }
 use glib_sys::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 
 use crate::{
     gtypes::gint,
@@ -113,7 +113,7 @@ pub unsafe extern "C" fn luaH_dump_stack(mut L: *mut lua_State) {
                 eprintln!(
                     "{}: table\t#{:?}\t{:?}",
                     i,
-                    lua_objlen(L, i),
+                    lua_rawlen(L, i),
                     lua_topointer(L, i),
                 );
                 luaH_dump_table_keys(L, i);
@@ -123,7 +123,7 @@ pub unsafe extern "C" fn luaH_dump_stack(mut L: *mut lua_State) {
                     "{:?}: {:?}\t#{:?}\t{:?}",
                     i,
                     lua_typename(L, t),
-                    lua_objlen(L, i),
+                    lua_rawlen(L, i),
                     lua_topointer(L, i),
                 );
             }

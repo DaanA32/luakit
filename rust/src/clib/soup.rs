@@ -7,10 +7,13 @@ use glib_sys::{
     g_uri_get_user, g_uri_join_with_user, g_uri_parse, g_uri_unref, gpointer,
 };
 use libc::{FILE, chmod, fclose, fopen, mode_t, strcmp};
-use mlua_sys::{
-    LUA_MULTRET, LUA_TNIL, LUA_TTABLE, lua_State, lua_createtable, lua_gettop, lua_pushlstring,
-    lua_pushnumber, lua_pushstring, lua_rawget, lua_rawset, lua_settop, lua_tolstring,
-    lua_tonumber, lua_type, luaL_Reg, luaL_argerror, luaL_checklstring, luaL_error,
+use mlua::{
+    ffi::{
+        LUA_MULTRET, LUA_TNIL, LUA_TTABLE, lua_State, lua_createtable, lua_gettop, lua_pushlstring,
+        lua_pushnumber, lua_pushstring, lua_rawget, lua_rawset, lua_settop, lua_tolstring,
+        lua_tonumber, lua_type, luaL_Reg, luaL_argerror, luaL_checklstring, luaL_error,
+    },
+    lua_CFunction,
 };
 use webkit2gtk_sys::{
     WEBKIT_COOKIE_PERSISTENT_STORAGE_SQLITE, WEBKIT_COOKIE_POLICY_ACCEPT_ALWAYS,
@@ -29,7 +32,7 @@ pub const SOUP_HTTP_URI_FLAGS: std::ffi::c_int = G_URI_FLAGS_HAS_PASSWORD as std
     | G_URI_FLAGS_SCHEME_NORMALIZE as std::ffi::c_int;
 
 pub mod soup_h {
-    use mlua_sys::{LUA_MULTRET, lua_gettop, luaL_Reg, luaL_error};
+    use mlua::ffi::{LUA_MULTRET, lua_gettop, luaL_Reg, luaL_error};
     pub static mut scheme_reg: *mut GRegex = 0 as *const GRegex as *mut GRegex;
     pub unsafe extern "C-unwind" fn luaH_soup_uri_tostring(mut L: *mut lua_State) -> gint {
         let mut p = 0 as *const gchar;
@@ -336,7 +339,7 @@ pub mod soup_h {
         g_uri_get_query, g_uri_get_scheme, g_uri_get_user, g_uri_join_with_user, g_uri_parse,
         g_uri_unref, gpointer,
     };
-    use mlua_sys::{
+    use mlua::ffi::{
         LUA_TNIL, LUA_TTABLE, lua_State, lua_createtable, lua_pushlstring, lua_pushnumber,
         lua_pushstring, lua_rawget, lua_rawset, lua_settop, lua_tolstring, lua_tonumber, lua_type,
         luaL_argerror, luaL_checklstring,
@@ -577,7 +580,7 @@ unsafe extern "C-unwind" fn luaH_soup_newindex(mut L: *mut lua_State) -> gint {
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn soup_lib_setup(mut L: *mut lua_State) {
     soup_lib_setup_common();
-    static mut soup_lib: [luaL_Reg; 7] = unsafe {
+    let soup_lib = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -635,14 +638,23 @@ pub unsafe extern "C-unwind" fn soup_lib_setup(mut L: *mut lua_State) {
             //    };
             //    init
             //},
+            {
+                let mut init = luaL_Reg {
+                    name: 0 as *const std::ffi::c_char,
+                    func: core::mem::transmute::<libc::intptr_t, lua_CFunction>(
+                        0 as libc::intptr_t,
+                    ),
+                };
+                init
+            },
         ]
     };
     soup_class.signals = signal_new();
     luaH_openlib(
         L,
         b"soup\0" as *const u8 as *const std::ffi::c_char,
-        soup_lib.as_ptr(),
-        soup_lib.as_ptr(),
+        &soup_lib,
+        &soup_lib,
     );
     proxy_uri = g_strdup(b"default\0" as *const u8 as *const std::ffi::c_char);
     accept_policy = g_strdup(b"no_third_party\0" as *const u8 as *const std::ffi::c_char);

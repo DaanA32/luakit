@@ -2812,7 +2812,7 @@ unsafe extern "C" fn luaH_page_index(mut L: *mut lua_State) -> gint {
 #[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn page_class_setup(mut L: *mut lua_State) {
-    static mut page_methods: [luaL_Reg; 5] = unsafe {
+    let page_methods = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -2866,7 +2866,7 @@ pub unsafe extern "C" fn page_class_setup(mut L: *mut lua_State) {
             },
         ]
     };
-    static mut page_meta: [luaL_Reg; 8] = unsafe {
+    let page_meta = unsafe {
         [
             {
                 let mut init = luaL_Reg {

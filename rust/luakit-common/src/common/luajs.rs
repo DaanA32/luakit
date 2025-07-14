@@ -11,9 +11,9 @@ use javascriptcore_rs_sys::{
     jsc_value_to_double, jsc_value_to_string,
 };
 use libc::{c_void, free, size_t, strtol};
-use mlua_sys::{
-    lua_State, lua_createtable, lua_gettop, lua_next, lua_objlen, lua_pushboolean, lua_pushinteger,
-    lua_pushnil, lua_pushnumber, lua_pushstring, lua_rawset, lua_settop, lua_toboolean,
+use mlua::ffi::{
+    lua_State, lua_createtable, lua_gettop, lua_next, lua_pushboolean, lua_pushinteger,
+    lua_pushnil, lua_pushnumber, lua_pushstring, lua_rawlen, lua_rawset, lua_settop, lua_toboolean,
     lua_tolstring, lua_tonumber, lua_type,
 };
 
@@ -31,7 +31,7 @@ pub unsafe extern "C" fn luajs_tovalue(
         -1 => return jsc_value_new_undefined(ctx),
         4 => return jsc_value_new_string(ctx, lua_tolstring(L, idx, 0 as *mut size_t)),
         5 => {
-            let mut len: size_t = lua_objlen(L, idx);
+            let mut len: size_t = lua_rawlen(L, idx);
             let mut top: std::ffi::c_int = lua_gettop(L);
             let mut res: *mut JSCValue = 0 as *mut JSCValue;
             let mut val: *mut JSCValue = 0 as *mut JSCValue;

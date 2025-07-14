@@ -1047,7 +1047,7 @@ unsafe extern "C" fn luaH_soup_class_add_signal(mut L: *mut lua_State) -> gint {
 
 pub unsafe extern "C" fn soup_lib_setup(mut L: *mut lua_State) {
     soup_lib_setup_common();
-    static mut soup_lib: [luaL_Reg; 6] = unsafe {
+    let soup_lib = unsafe {
         [
             {
                 let mut init = luaL_Reg {

@@ -1,7 +1,7 @@
 use gdk_sys::*;
 use glib_sys::*;
 use libc::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 
 use crate::clib::luakit::*;
 use crate::common::clib::luakit::*;

@@ -1,7 +1,7 @@
 use gio_sys::{GFile, g_file_get_path, g_file_new_for_path};
 use glib_sys::*;
 use libc::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 use std::mem::MaybeUninit;
 
 use crate::{
@@ -321,7 +321,7 @@ pub unsafe extern "C" fn luaH_dofunction_from_registry(
 
 pub unsafe extern "C" fn luaH_checkboolean(mut L: *mut lua_State, mut n: gint) -> gboolean {
     if !(lua_type(L, n) == LUA_TBOOLEAN) {
-        luaL_typerror(L, n, b"boolean\0" as *const u8 as *const std::ffi::c_char);
+        luaL_argerror(L, n, b"boolean\0" as *const u8 as *const std::ffi::c_char);
     }
     return lua_toboolean(L, n);
 }

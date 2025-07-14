@@ -5762,7 +5762,7 @@ unsafe extern "C" fn luaH_dom_element_newindex(mut L: *mut lua_State) -> gint {
 #[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn dom_element_class_setup(mut L: *mut lua_State) {
-    static mut dom_element_methods: [luaL_Reg; 4] = unsafe {
+    let dom_element_methods = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -5806,7 +5806,7 @@ pub unsafe extern "C" fn dom_element_class_setup(mut L: *mut lua_State) {
             },
         ]
     };
-    static mut dom_element_meta: [luaL_Reg; 9] = unsafe {
+    let dom_element_meta = unsafe {
         [
             {
                 let mut init = luaL_Reg {

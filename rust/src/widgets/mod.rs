@@ -83,7 +83,7 @@ pub unsafe extern "C" fn luaH_checkwidget(mut L: *mut lua_State, mut udx: gint) 
 use glib_sys::{g_assertion_message_expr, gboolean, gpointer};
 use gobject_sys::{GTypeInstance, g_type_check_instance_is_a};
 use gtk_sys::{GtkCssProvider, GtkWidget, gtk_widget_get_type};
-use mlua_sys::{lua_State, luaL_error};
+use mlua::ffi::{lua_State, luaL_error};
 
 use crate::common::luaclass::luaH_checkudata;
 use crate::common::tokenize::*;

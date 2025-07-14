@@ -14,7 +14,7 @@ pub mod ipc;
 // pub mod tokenize;
 // pub mod util;
 //
-// use mlua_sys::lua_State;
+// use mlua::ffi::lua_State;
 //
 // #[derive(Copy, Clone)]
 // #[repr(C)]

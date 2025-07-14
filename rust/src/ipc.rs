@@ -30,7 +30,7 @@ use libc::{
     sa_family_t, size_t, sockaddr, sockaddr_un, socket, socklen_t, strcpy, strerror, strlen,
     unlink,
 };
-use mlua_sys::{lua_getfield, lua_settop, lua_tolstring};
+use mlua::ffi::{lua_getfield, lua_settop, lua_tolstring};
 use webkit2gtk_sys::{
     WebKitWebContext, webkit_web_context_set_web_extensions_directory,
     webkit_web_context_set_web_extensions_initialization_user_data,

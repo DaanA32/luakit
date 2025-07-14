@@ -1752,7 +1752,7 @@ unsafe extern "C" fn luaH_dom_document_index(mut L: *mut lua_State) -> gint {
 #[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn dom_document_class_setup(mut L: *mut lua_State) {
-    static mut dom_document_methods: [luaL_Reg; 4] = unsafe {
+    let dom_document_methods = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -1796,7 +1796,7 @@ pub unsafe extern "C" fn dom_document_class_setup(mut L: *mut lua_State) {
             },
         ]
     };
-    static mut dom_document_meta: [luaL_Reg; 8] = unsafe {
+    let dom_document_meta = unsafe {
         [
             {
                 let mut init = luaL_Reg {

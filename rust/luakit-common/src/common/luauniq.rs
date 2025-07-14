@@ -1,5 +1,5 @@
 use glib_sys::{g_assertion_message_expr, gpointer};
-use mlua_sys::{
+use mlua::ffi::{
     lua_State, lua_createtable, lua_pushlightuserdata, lua_pushnil, lua_pushstring, lua_pushvalue,
     lua_rawget, lua_rawset, lua_remove, lua_setmetatable, lua_settop, lua_type,
 };

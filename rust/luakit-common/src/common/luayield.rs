@@ -2,9 +2,10 @@ use std::ffi::CStr;
 
 use glib_sys::gboolean;
 use libc::{c_void, size_t, strlen};
-use mlua_sys::{
+use mlua::ffi::luaL_argerror;
+use mlua::ffi::{
     lua_State, lua_call, lua_getfield, lua_gettop, lua_insert, lua_pushcclosure, lua_resume,
-    lua_settop, lua_tolstring, lua_type, luaL_loadbuffer, luaL_typerror,
+    lua_settop, lua_tolstring, lua_type, luaL_loadbuffer,
 };
 
 use crate::common::luaclass::*;
@@ -57,7 +58,7 @@ pub unsafe extern "C" fn luaH_yield_setup(mut L: *mut lua_State) {
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn luaH_yield_wrap_function(mut L: *mut lua_State) {
     if !(lua_type(L, -(1 as std::ffi::c_int)) == 6 as std::ffi::c_int) {
-        luaL_typerror(
+        luaL_argerror(
             L,
             -(1 as std::ffi::c_int),
             b"function\0" as *const u8 as *const std::ffi::c_char,

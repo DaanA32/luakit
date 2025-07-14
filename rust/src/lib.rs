@@ -48,7 +48,7 @@ use globalconf::globalconf;
 use libc::{
     __errno_location, c_void, exit, fork, memset, pid_t, setlocale, setsid, strchr, strcmp, strlen,
 };
-use mlua_sys::lua_State;
+use mlua::ffi::lua_State;
 use webkit2gtk_sys::*;
 
 use crate::{

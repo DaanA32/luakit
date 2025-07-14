@@ -7,7 +7,7 @@ use glib_sys::*;
 use gobject_sys::*;
 use gtk_sys::*;
 use libc::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 use pango_sys::*;
 use std::ffi::CStr;
 use webkit2gtk_sys::*;
@@ -2411,12 +2411,12 @@ unsafe extern "C" fn context_menu_from_table(
     let mut ref_0 = 0 as *mut std::ffi::c_void;
     let mut label = 0 as *const gchar;
     let mut i: lua_Integer = 0;
-    let mut len = lua_objlen(L, -(1 as std::ffi::c_int)) as lua_Integer;
+    let mut len = lua_rawlen(L, -(1 as std::ffi::c_int)) as lua_Integer;
     i = 1;
     while i <= len {
         lua_rawgeti(L, -(1 as std::ffi::c_int), i);
         if lua_type(L, -(1 as std::ffi::c_int)) == LUA_TTABLE
-            && lua_objlen(L, -(1 as std::ffi::c_int)) >= 2 as std::ffi::c_int as size_t
+            && lua_rawlen(L, -(1 as std::ffi::c_int)) >= 2 as std::ffi::c_int as size_t
         {
             lua_rawgeti(L, -1, 1);
             label = lua_tolstring(L, -1, std::ptr::null_mut());

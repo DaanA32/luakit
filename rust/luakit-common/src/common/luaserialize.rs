@@ -5,7 +5,7 @@ use glib_sys::{
     g_byte_array_set_size, gpointer,
 };
 use libc::{c_int, c_void, memcpy, size_t};
-use mlua_sys::{
+use mlua::ffi::{
     lua_Debug, lua_Number, lua_Reader, lua_State, lua_createtable, lua_dump, lua_getinfo,
     lua_gettop, lua_getupvalue, lua_load, lua_next, lua_pushboolean, lua_pushlightuserdata,
     lua_pushlstring, lua_pushnil, lua_pushnumber, lua_pushvalue, lua_rawset, lua_settop,
@@ -288,6 +288,7 @@ unsafe extern "C" fn lua_deserialize_value(
                 )),
                 bytes as *mut std::ffi::c_void,
                 std::ptr::null_mut(),
+                //std::ptr::null_mut(),
             );
             if status != 0 as std::ffi::c_int {
                 return luaL_error(

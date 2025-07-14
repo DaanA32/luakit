@@ -3,7 +3,7 @@ use std::ffi::CStr;
 use gdk_sys::*;
 use glib_sys::*;
 use libc::getenv;
-use mlua_sys::*;
+use mlua::ffi::*;
 
 use crate::common::luaclass::luaH_typename;
 use crate::common::{common, lua_State};
@@ -113,22 +113,8 @@ pub unsafe extern "C-unwind" fn luaH_object_incref(
         return std::ptr::null_mut();
     }
     lua_pushlightuserdata(L, p);
-    lua_pushvalue(
-        L,
-        if oud < 0 as std::ffi::c_int {
-            oud - 1 as std::ffi::c_int
-        } else {
-            oud
-        },
-    );
-    lua_rawset(
-        L,
-        if tud < 0 as std::ffi::c_int {
-            tud - 2 as std::ffi::c_int
-        } else {
-            tud
-        },
-    );
+    lua_pushvalue(L, if oud < 0 { oud - 1 } else { oud });
+    lua_rawset(L, if tud < 0 { tud - 2 } else { tud });
     lua_getmetatable(L, tud);
     lua_pushlightuserdata(L, p);
     lua_rawget(L, -(2 as std::ffi::c_int));
@@ -212,9 +198,9 @@ pub unsafe extern "C-unwind" fn luaH_object_add_signal(
         LOG_LEVEL_debug,
         b"common/luaobject.c\0" as *const u8 as *const std::ffi::c_char,
         &format!(
-            "add \x1B[34m\"{}\"\x1B[0m on {} from \x1B[32m{}\x1B[0m\0",
+            "add \x1B[34m\"{}\"\x1B[0m on {:?} from \x1B[32m{}\x1B[0m\0",
             CStr::from_ptr(name).to_string_lossy(),
-            obj as usize,
+            *obj,
             CStr::from_ptr(origin).to_string_lossy()
         ),
     );
@@ -509,22 +495,12 @@ pub unsafe extern "C-unwind" fn luaH_object_property_signal(
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn luaH_object_add_signal_simple(mut L: *mut lua_State) -> gint {
-    luaH_object_add_signal(
-        L,
-        1 as std::ffi::c_int,
-        luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut()),
-        3 as std::ffi::c_int,
-    );
+    luaH_object_add_signal(L, 1, luaL_checklstring(L, 2, std::ptr::null_mut()), 3);
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn luaH_object_remove_signal_simple(mut L: *mut lua_State) -> gint {
-    luaH_object_remove_signal(
-        L,
-        1 as std::ffi::c_int,
-        luaL_checklstring(L, 2 as std::ffi::c_int, std::ptr::null_mut()),
-        3 as std::ffi::c_int,
-    );
+    luaH_object_remove_signal(L, 1, luaL_checklstring(L, 2, std::ptr::null_mut()), 3);
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]

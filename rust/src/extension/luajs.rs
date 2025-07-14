@@ -3,7 +3,7 @@ use glib_sys::*;
 use gobject_sys::*;
 use javascriptcore_rs_sys::*;
 use libc::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 use webkit2gtk_sys::*;
 
 use crate::clib::luakit::*;

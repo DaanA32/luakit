@@ -28,7 +28,7 @@ use crate::ipc::{
 use crate::log::{
     _log, LOG_LEVEL_debug, LOG_LEVEL_error, LOG_LEVEL_fatal, LOG_LEVEL_verbose, ipc_recv_log,
 };
-use mlua_sys::lua_State;
+use mlua::ffi::lua_State;
 
 static mut send_thread: *mut GThread = 0 as *const GThread as *mut GThread;
 static mut send_queue: *mut GAsyncQueue = 0 as *const GAsyncQueue as *mut GAsyncQueue;

@@ -18,7 +18,7 @@ path = "src/lib.rs"
 [dependencies]
 libc = "0.2.174"
 luakit-common = { path = "luakit-common" }
-mlua-sys = { version = "0.8.1", features = [ "lua51" ] }
+mlua = { version = "0.10.5", features = [ "lua51" ] }
 webkit2gtk-sys = { version = "2.0.1", features = [ "v2_16"] }
 gio-sys = "0.18.1"
 # glib = "0.18.1"
@@ -31,4 +31,3 @@ cairo-sys-rs = "0.18.1"
 gdk-pixbuf-sys = "0.18.0"
 pango-sys = "0.18.0"
 sqlite3-sys = "0.18.0"
-

@@ -14,7 +14,7 @@ use glib_sys::{
 use gobject_sys::{GObject, GTypeInstance, g_object_unref, g_type_check_instance_cast};
 use gtk_sys::{gtk_application_get_active_window, gtk_application_new, gtk_window_get_screen};
 use libc::{c_void, intptr_t, strcmp};
-use mlua_sys::{
+use mlua::ffi::{
     LUA_GLOBALSINDEX, LUA_MULTRET, lua_CFunction, lua_State, lua_createtable, lua_getfield,
     lua_gettable, lua_gettop, lua_pushboolean, lua_pushcclosure, lua_pushlightuserdata,
     lua_pushlstring, lua_pushstring, lua_pushvalue, lua_rawset, lua_setfield, lua_setmetatable,
@@ -388,7 +388,7 @@ unsafe extern "C-unwind" fn luaH_open_unique_proxy(mut L: *mut lua_State) {
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn unique_lib_setup(mut L: *mut lua_State) {
-    static mut unique_lib: [luaL_Reg; 6] = unsafe {
+    let unique_lib = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -439,6 +439,15 @@ pub unsafe extern "C-unwind" fn unique_lib_setup(mut L: *mut lua_State) {
             //     };
             //     init
             // },
+            {
+                let mut init = luaL_Reg {
+                    name: 0 as *const std::ffi::c_char,
+                    func: core::mem::transmute::<libc::intptr_t, lua_CFunction>(
+                        0 as libc::intptr_t,
+                    ),
+                };
+                init
+            },
         ]
     };
     unique_class.signals = signal_new();

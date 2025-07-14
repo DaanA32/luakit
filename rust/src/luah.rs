@@ -15,7 +15,7 @@ use libc::execvp;
 use libc::getenv;
 use libc::setenv;
 use libc::unsetenv;
-use mlua_sys::{
+use mlua::ffi::{
     lua_Integer, lua_State, lua_atpanic, lua_createtable, lua_pushstring, lua_rawseti,
     lua_setfield, lua_settop, lua_tolstring, luaL_loadfile, luaL_newstate, luaL_openlibs,
 };

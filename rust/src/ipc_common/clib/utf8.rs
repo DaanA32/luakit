@@ -3,7 +3,7 @@ use glib_sys::{
     g_utf8_validate,
 };
 use libc::{size_t, ssize_t};
-use mlua_sys::{
+use mlua::ffi::{
     lua_Integer, lua_State, lua_getfield, lua_pushinteger, lua_pushnil, lua_pushstring,
     lua_setfield, lua_settop, luaL_Reg, luaL_argerror, luaL_checkinteger, luaL_checklstring,
     luaL_error, luaL_optinteger,
@@ -132,7 +132,7 @@ unsafe extern "C-unwind" fn luaH_utf8_offset(mut L: *mut lua_State) -> gint {
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn utf8_lib_setup(mut L: *mut lua_State) {
-    static mut utf8_lib: [luaL_Reg; 2] = unsafe {
+    let utf8_lib = unsafe {
         [
             {
                 let mut init = luaL_Reg {

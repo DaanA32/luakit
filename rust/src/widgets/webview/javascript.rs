@@ -9,7 +9,7 @@ use libc::*;
 use luakit_common::common::lualib::luaH_dofunction;
 use luakit_common::common::util::luaH_callerinfo;
 use luakit_common::ipc::IPC_TYPE_eval_js;
-use mlua_sys::*;
+use mlua::ffi::*;
 use pango_sys::*;
 use webkit2gtk_sys::*;
 

@@ -1,5 +1,5 @@
 use libc::size_t;
-use mlua_sys::*;
+use mlua::ffi::*;
 
 pub mod msg_h {
     use std::{
@@ -9,7 +9,7 @@ pub mod msg_h {
 
     use glib_sys::*;
     use libc::size_t;
-    use mlua_sys::*;
+    use mlua::ffi::*;
 
     use crate::{common::luaobject::luaH_object_push, gtypes::*, log::*};
 
@@ -148,7 +148,7 @@ pub unsafe extern "C-unwind" fn msg_lib_get_msg_class() -> *mut lua_class_t {
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn msg_lib_setup(mut L: *mut lua_State) {
-    static mut msg_lib: [luaL_Reg; 9] = unsafe {
+    let msg_lib = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -225,8 +225,8 @@ pub unsafe extern "C-unwind" fn msg_lib_setup(mut L: *mut lua_State) {
     luaH_openlib(
         L,
         b"msg\0" as *const u8 as *const std::ffi::c_char,
-        msg_lib.as_ptr(),
-        msg_lib.as_ptr(),
+        &msg_lib,
+        &msg_lib,
     );
     msg_class.signals = signal_new();
     lua_getfield(

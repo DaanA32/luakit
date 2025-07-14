@@ -7,7 +7,7 @@ use glib_sys::{
     g_regex_replace_literal, g_strdup_printf, gboolean,
 };
 use libc::{access, ssize_t};
-use mlua_sys::{lua_Debug, lua_State, lua_getinfo, lua_getstack, lua_tolstring};
+use mlua::ffi::{lua_Debug, lua_State, lua_getinfo, lua_getstack, lua_tolstring};
 
 use crate::{
     gtypes::gchar,

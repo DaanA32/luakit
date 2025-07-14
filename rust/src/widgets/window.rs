@@ -2,7 +2,7 @@ use gdk_sys::*;
 use glib_sys::*;
 use gobject_sys::*;
 use gtk_sys::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 
 use crate::common::common;
 use crate::common::luaclass::*;

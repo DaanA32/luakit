@@ -1,7 +1,7 @@
 use glib_sys::{g_free, g_strdup, gboolean, gpointer};
 use libc::memset;
-use mlua_sys::*;
-use mlua_sys::{
+use mlua::ffi::*;
+use mlua::ffi::{
     LUA_MULTRET, lua_State, lua_createtable, lua_gettop, lua_newuserdata, lua_pushstring,
     lua_pushvalue, lua_setmetatable, luaL_Reg, luaL_checklstring,
 };
@@ -182,7 +182,7 @@ unsafe extern "C-unwind" fn luaH_stylesheet_get_source(
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn stylesheet_class_setup(mut L: *mut lua_State) {
-    static mut stylesheet_methods: [luaL_Reg; 4] = unsafe {
+    let stylesheet_methods = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -221,7 +221,7 @@ pub unsafe extern "C-unwind" fn stylesheet_class_setup(mut L: *mut lua_State) {
             // },
         ]
     };
-    static mut stylesheet_meta: [luaL_Reg; 8] = unsafe {
+    let stylesheet_meta = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -276,6 +276,15 @@ pub unsafe extern "C-unwind" fn stylesheet_class_setup(mut L: *mut lua_State) {
                 let mut init = luaL_Reg {
                     name: b"__gc\0" as *const u8 as *const std::ffi::c_char,
                     func: luaH_stylesheet_gc,
+                };
+                init
+            },
+            {
+                let mut init = luaL_Reg {
+                    name: 0 as *const std::ffi::c_char,
+                    func: core::mem::transmute::<libc::intptr_t, lua_CFunction>(
+                        0 as libc::intptr_t,
+                    ),
                 };
                 init
             },

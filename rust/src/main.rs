@@ -516,7 +516,7 @@ unsafe extern "C" fn parseopts(
             log_set_verbosity(
                 b"all\0" as *const u8 as *const std::ffi::c_char,
                 (if verbose != 0 {
-                    LOG_LEVEL_verbose as std::ffi::c_int
+                    LOG_LEVEL_debug as std::ffi::c_int
                 } else {
                     LOG_LEVEL_info as std::ffi::c_int
                 }) as log_level_t,

@@ -1,8 +1,8 @@
 use std::ffi::CStr;
 
-use ::libc;
+use libc;
 use libc::size_t;
-use mlua_sys::*;
+use mlua::{Lua, ffi::*};
 pub mod signal_h {
     pub type signal_t = GTree;
     pub type signal_array_t = GPtrArray;
@@ -103,7 +103,7 @@ pub mod signal_h {
 }
 pub type lua_class_propfunc_t =
     Option<unsafe extern "C-unwind" fn(*mut lua_State, *mut lua_object_t) -> gint>;
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct lua_object_t {
     pub signals: *mut signal_t,
@@ -137,7 +137,7 @@ use glib_sys::{
     g_hash_table_insert, g_hash_table_lookup, g_hash_table_new, g_malloc0_n, g_ptr_array_add,
     g_ptr_array_new, g_strdup_printf, gboolean, gconstpointer, gpointer,
 };
-use mlua_sys::lua_State;
+use mlua::ffi::lua_State;
 use signal_h::signal_t;
 
 #[derive(Copy, Clone)]
@@ -214,11 +214,11 @@ pub unsafe extern "C-unwind" fn luaH_typename(
     return lua_typename(L, type_0);
 }
 #[unsafe(no_mangle)]
-pub unsafe extern "C-unwind" fn luaH_openlib(
+pub unsafe fn luaH_openlib(
     mut L: *mut lua_State,
     mut name: *const gchar,
-    mut methods: *const luaL_Reg,
-    mut meta: *const luaL_Reg,
+    mut methods: &[luaL_Reg],
+    mut meta: &[luaL_Reg],
 ) {
     luaL_newmetatable(L, name);
     lua_pushvalue(L, -(1 as std::ffi::c_int));
@@ -227,8 +227,8 @@ pub unsafe extern "C-unwind" fn luaH_openlib(
         -(2 as std::ffi::c_int),
         b"__index\0" as *const u8 as *const std::ffi::c_char,
     );
-    lua_register(L, 0 as *const std::ffi::c_char, (*meta).func);
-    lua_register(L, name, (*methods).func);
+    luaL_register(L, 0 as *const std::ffi::c_char, (*meta).as_ptr());
+    luaL_register(L, name, (*methods).as_ptr());
     lua_pushvalue(L, -(1 as std::ffi::c_int));
     lua_setmetatable(L, -(2 as std::ffi::c_int));
     lua_settop(L, -(2 as std::ffi::c_int) - 1 as std::ffi::c_int);
@@ -287,9 +287,9 @@ pub unsafe extern "C-unwind" fn luaH_class_setup(
         -(2 as std::ffi::c_int),
         b"__index\0" as *const u8 as *const std::ffi::c_char,
     );
-    lua_register(L, 0 as *const std::ffi::c_char, (*meta).func);
+    luaL_register(L, 0 as *const std::ffi::c_char, meta);
     if !methods.is_null() {
-        lua_register(L, name, (*methods).func);
+        luaL_register(L, name, methods);
         lua_pushvalue(L, -(1 as std::ffi::c_int));
         lua_setmetatable(L, -(2 as std::ffi::c_int));
         lua_settop(L, -(2 as std::ffi::c_int) - 1 as std::ffi::c_int);

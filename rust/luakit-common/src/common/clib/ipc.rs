@@ -1,6 +1,6 @@
 use glib_sys::{g_free, g_strdup, gpointer};
 use libc::{c_void, memset, size_t};
-use mlua_sys::{
+use mlua::ffi::{
     lua_State, lua_createtable, lua_gettop, lua_newuserdata, lua_pushstring, lua_pushvalue,
     lua_rawset, lua_remove, lua_setfenv, lua_setmetatable, luaL_Reg, luaL_checklstring,
 };
@@ -129,7 +129,7 @@ unsafe extern "C-unwind" fn luaH_ipc_channel_gc(mut L: *mut lua_State) -> gint {
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn ipc_channel_class_setup(mut L: *mut lua_State) {
-    static mut ipc_channel_methods: [luaL_Reg; 4] = unsafe {
+    let ipc_channel_methods = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -168,7 +168,7 @@ pub unsafe extern "C-unwind" fn ipc_channel_class_setup(mut L: *mut lua_State) {
             // },
         ]
     };
-    static mut ipc_channel_meta: [luaL_Reg; 7] = unsafe {
+    let ipc_channel_meta = unsafe {
         [
             {
                 let mut init = luaL_Reg {

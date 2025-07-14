@@ -12,7 +12,7 @@ use glib_sys::*;
 use gobject_sys::*;
 use gtk_sys::*;
 use libc::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 
 use crate::clib::widget::*;
 use crate::common::common;
@@ -21,8 +21,8 @@ use crate::common::luah::*;
 use crate::common::luaobject::*;
 use crate::common::tokenize::*;
 use crate::widgets::{
-    GTypeInstance, GtkWidget, L_TK_END, L_TK_VBOX, gboolean, gchar, gint, gpointer,
-    gtk_widget_get_type, guint, l_tokenize, lua_State, luaH_checkwidget, luakit_token_t, widget_t,
+    gboolean, gchar, gint, gpointer, gtk_widget_get_type, guint, l_tokenize, luaH_checkwidget,
+    lua_State, luakit_token_t, widget_t, GTypeInstance, GtkWidget, L_TK_END, L_TK_VBOX,
 };
 
 unsafe extern "C-unwind" fn luaH_box_pack(mut L: *mut lua_State) -> gint {

@@ -9,11 +9,12 @@ use gtk_sys::{
     gtk_widget_get_type, gtk_widget_set_name,
 };
 use libc::{c_void, memset, strlen};
-use mlua_sys::{
+use mlua::ffi::{
     LUA_MULTRET, lua_State, lua_createtable, lua_gettop, lua_newuserdata, lua_pushboolean,
     lua_pushstring, lua_pushvalue, lua_setmetatable, lua_settop, lua_touserdata, luaL_Reg,
     luaL_checklstring, luaL_error,
 };
+use mlua::lua_CFunction;
 
 use crate::common::common;
 use crate::common::luaobject::luaH_object_ref_class;
@@ -566,7 +567,7 @@ unsafe extern "C-unwind" fn luaH_widget_get_type(
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn widget_class_setup(mut L: *mut lua_State) {
-    static mut widget_methods: [luaL_Reg; 4] = unsafe {
+    let widget_methods = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -596,6 +597,15 @@ pub unsafe extern "C-unwind" fn widget_class_setup(mut L: *mut lua_State) {
                 };
                 init
             },
+            {
+                let mut init = luaL_Reg {
+                    name: 0 as *const std::ffi::c_char,
+                    func: core::mem::transmute::<libc::intptr_t, lua_CFunction>(
+                        0 as libc::intptr_t,
+                    ),
+                };
+                init
+            },
             // {
             //     let mut init = luaL_Reg {
             //         name: std::ptr::null(),
@@ -605,7 +615,7 @@ pub unsafe extern "C-unwind" fn widget_class_setup(mut L: *mut lua_State) {
             // },
         ]
     };
-    static mut widget_meta: [luaL_Reg; 8] = unsafe {
+    let widget_meta = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -660,6 +670,15 @@ pub unsafe extern "C-unwind" fn widget_class_setup(mut L: *mut lua_State) {
                 let mut init = luaL_Reg {
                     name: b"__gc\0" as *const u8 as *const std::ffi::c_char,
                     func: luaH_widget_gc,
+                };
+                init
+            },
+            {
+                let mut init = luaL_Reg {
+                    name: 0 as *const std::ffi::c_char,
+                    func: core::mem::transmute::<libc::intptr_t, lua_CFunction>(
+                        0 as libc::intptr_t,
+                    ),
                 };
                 init
             },

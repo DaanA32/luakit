@@ -3,7 +3,7 @@ use glib_sys::{
     gboolean, gpointer,
 };
 use libc::{gettimeofday, size_t, timeval, timezone};
-use mlua_sys::{
+use mlua::ffi::{
     lua_State, lua_gettop, lua_pushboolean, lua_pushnumber, lua_pushstring, lua_settop,
     lua_toboolean, lua_topointer, lua_type, luaL_argerror, luaL_checklstring,
 };

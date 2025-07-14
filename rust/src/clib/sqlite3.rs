@@ -2,13 +2,14 @@ use std::ffi::CStr;
 
 use glib_sys::{g_free, g_strdup, gpointer};
 use libc::{c_void, intptr_t, memset};
-use mlua_sys::{
+use mlua::ffi::{
     LUA_MULTRET, LUA_TBOOLEAN, LUA_TNUMBER, LUA_TSTRING, LUA_TTABLE, lua_Number, lua_State,
     lua_createtable, lua_error, lua_gettop, lua_newuserdata, lua_next, lua_pushfstring,
     lua_pushlstring, lua_pushnil, lua_pushnumber, lua_pushstring, lua_pushvalue, lua_rawset,
     lua_rawseti, lua_setmetatable, lua_settop, lua_toboolean, lua_tointeger, lua_tolstring,
     lua_tonumber, lua_type, lua_typename, luaL_Reg, luaL_argerror, luaL_checklstring,
 };
+use mlua::lua_CFunction;
 use sqlite3_sys::*;
 
 use crate::common::luaclass::signal_h::{signal_new, signal_t};
@@ -489,7 +490,7 @@ unsafe extern "C-unwind" fn luaH_sqlite3_new(mut L: *mut lua_State) -> gint {
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn sqlite3_class_setup(mut L: *mut lua_State) {
-    static mut sqlite3_methods: [luaL_Reg; 4] = unsafe {
+    let sqlite3_methods = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -528,7 +529,7 @@ pub unsafe extern "C-unwind" fn sqlite3_class_setup(mut L: *mut lua_State) {
             // },
         ]
     };
-    static mut sqlite3_meta: [luaL_Reg; 12] = unsafe {
+    let sqlite3_meta = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -657,7 +658,7 @@ pub unsafe extern "C-unwind" fn sqlite3_class_setup(mut L: *mut lua_State) {
         )),
         None,
     );
-    static mut sqlite3_stmt_meta: [luaL_Reg; 2] = unsafe {
+    let sqlite3_stmt_meta = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -680,6 +681,15 @@ pub unsafe extern "C-unwind" fn sqlite3_class_setup(mut L: *mut lua_State) {
             //     };
             //     init
             // },
+            {
+                let mut init = luaL_Reg {
+                    name: 0 as *const std::ffi::c_char,
+                    func: core::mem::transmute::<libc::intptr_t, lua_CFunction>(
+                        0 as libc::intptr_t,
+                    ),
+                };
+                init
+            },
         ]
     };
     luaH_class_setup(

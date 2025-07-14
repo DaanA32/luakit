@@ -1918,7 +1918,7 @@ unsafe extern "C" fn luaH_luakit_register_function(mut L: *mut lua_State) -> gin
 #[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn luakit_lib_setup(mut L: *mut lua_State) {
-    static mut luakit_lib: [luaL_Reg; 12] = unsafe {
+    let luakit_lib = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -2044,8 +2044,8 @@ pub unsafe extern "C" fn luakit_lib_setup(mut L: *mut lua_State) {
     luaH_openlib(
         L,
         b"luakit\0" as *const u8 as *const std::ffi::c_char,
-        luakit_lib.as_ptr(),
-        luakit_lib.as_ptr(),
+        luakit_lib,
+        luakit_lib,
     );
     queued_emissions = g_ptr_array_sized_new(1 as std::ffi::c_int as guint);
     g_signal_connect_data(

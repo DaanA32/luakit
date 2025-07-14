@@ -1,5 +1,5 @@
 use glib_sys::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 use webkit2gtk_sys::*;
 
 use crate::common::common;

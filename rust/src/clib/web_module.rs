@@ -1,6 +1,7 @@
 use glib_sys::{GPtrArray, g_ptr_array_add, g_ptr_array_new, g_strdup, gpointer};
 use libc::{c_void, strlen};
-use mlua_sys::{lua_State, luaL_Reg, luaL_checklstring};
+use mlua::ffi::{lua_State, luaL_Reg, luaL_checklstring};
+use mlua::lua_CFunction;
 
 use crate::common::common;
 use crate::common::luaclass::luaH_openlib;
@@ -33,12 +34,21 @@ pub unsafe extern "C-unwind" fn web_module_load_modules_on_endpoint(mut ipc: *mu
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn web_module_lib_setup(mut L: *mut lua_State) {
-    static mut web_module_methods: [luaL_Reg; 1] = unsafe {
+    let web_module_methods = unsafe {
         [
             {
                 let mut init = luaL_Reg {
                     name: b"__call\0" as *const u8 as *const std::ffi::c_char,
                     func: luaH_require_web_module,
+                };
+                init
+            },
+            {
+                let mut init = luaL_Reg {
+                    name: 0 as *const std::ffi::c_char,
+                    func: core::mem::transmute::<libc::intptr_t, lua_CFunction>(
+                        0 as libc::intptr_t,
+                    ),
                 };
                 init
             },
@@ -54,8 +64,8 @@ pub unsafe extern "C-unwind" fn web_module_lib_setup(mut L: *mut lua_State) {
     luaH_openlib(
         L,
         b"require_web_module\0" as *const u8 as *const std::ffi::c_char,
-        web_module_methods.as_ptr(),
-        web_module_methods.as_ptr(),
+        &web_module_methods,
+        &web_module_methods,
     );
     required_web_modules = g_ptr_array_new();
 }

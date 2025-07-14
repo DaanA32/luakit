@@ -3,7 +3,7 @@ use gio_sys::*;
 use glib_sys::*;
 use gobject_sys::*;
 use libc::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 
 use crate::clib::luakit::*;
 use crate::common::clib::luakit::*;
@@ -197,7 +197,7 @@ unsafe extern "C-unwind" fn luaH_request_get_finished(
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn request_class_setup(mut L: *mut lua_State) {
-    static mut request_methods: [luaL_Reg; 3] = unsafe {
+    let request_methods = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -229,7 +229,7 @@ pub unsafe extern "C-unwind" fn request_class_setup(mut L: *mut lua_State) {
             // },
         ]
     };
-    static mut request_meta: [luaL_Reg; 8] = unsafe {
+    let request_meta = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -284,6 +284,15 @@ pub unsafe extern "C-unwind" fn request_class_setup(mut L: *mut lua_State) {
                 let mut init = luaL_Reg {
                     name: b"finish\0" as *const u8 as *const std::ffi::c_char,
                     func: luaH_request_finish,
+                };
+                init
+            },
+            {
+                let mut init = luaL_Reg {
+                    name: 0 as *const std::ffi::c_char,
+                    func: core::mem::transmute::<libc::intptr_t, lua_CFunction>(
+                        0 as libc::intptr_t,
+                    ),
                 };
                 init
             },

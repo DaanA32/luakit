@@ -9,7 +9,7 @@ use gobject_sys::*;
 use gtk_sys::*;
 use libc::*;
 use luakit_common::common::luaobject::luaH_object_property_signal;
-use mlua_sys::*;
+use mlua::ffi::*;
 use webkit2gtk_sys::*;
 
 use crate::common::luaclass::*;

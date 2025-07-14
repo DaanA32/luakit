@@ -32,7 +32,7 @@ use gtk_sys::*;
 use libc::*;
 use luakit_common::common::luaobject::luaH_object_emit_signal;
 use luakit_common::common::luaobject::luaH_object_ref;
-use mlua_sys::*;
+use mlua::ffi::*;
 
 use crate::common::common;
 use crate::common::luaclass::*;

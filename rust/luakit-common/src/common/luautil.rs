@@ -1,7 +1,7 @@
 use gdk_sys::*;
 use glib_sys::*;
 use libc::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 use std::mem::MaybeUninit;
 
 use crate::common::luaclass::*;
@@ -493,7 +493,7 @@ pub unsafe extern "C-unwind" fn luaH_checkstrv(
     mut idx: gint,
 ) -> *mut *const gchar {
     if !(lua_type(L, idx) == 5 as std::ffi::c_int) {
-        luaL_typerror(L, idx, b"table\0" as *const u8 as *const std::ffi::c_char);
+        luaL_argerror(L, idx, b"table\0" as *const u8 as *const std::ffi::c_char);
     }
     let mut len: gint = lua_rawlen(L, idx) as gint;
     let mut langs: *mut GPtrArray = g_ptr_array_new();

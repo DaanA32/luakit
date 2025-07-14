@@ -2,7 +2,7 @@ use gdk_sys::*;
 use glib_sys::*;
 use gtk_sys::*;
 use libc::*;
-use mlua_sys::*;
+use mlua::ffi::*;
 
 use crate::clib::luakit::*;
 use crate::common::clib::luakit::*;
@@ -114,8 +114,12 @@ unsafe extern "C-unwind" fn luaH_xdg_index(mut L: *mut lua_State) -> gint {
     return 0 as std::ffi::c_int;
 }
 #[unsafe(no_mangle)]
+pub unsafe extern "C-unwind" fn test(mut L: *mut lua_State) -> i32 {
+    0
+}
+#[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn xdg_lib_setup(mut L: *mut lua_State) {
-    static mut xdg_lib: [luaL_Reg; 1] = unsafe {
+    let xdg_lib = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -133,12 +137,21 @@ pub unsafe extern "C-unwind" fn xdg_lib_setup(mut L: *mut lua_State) {
             //     };
             //     init
             // },
+            {
+                let mut init = luaL_Reg {
+                    name: 0 as *const std::ffi::c_char,
+                    func: core::mem::transmute::<libc::intptr_t, lua_CFunction>(
+                        0 as libc::intptr_t,
+                    ),
+                };
+                init
+            },
         ]
     };
     luaH_openlib(
         L,
         b"xdg\0" as *const u8 as *const std::ffi::c_char,
-        xdg_lib.as_ptr(),
-        xdg_lib.as_ptr(),
+        &xdg_lib,
+        &xdg_lib,
     );
 }

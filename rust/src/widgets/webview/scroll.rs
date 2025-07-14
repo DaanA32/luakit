@@ -7,7 +7,7 @@ use gobject_sys::*;
 use gtk_sys::*;
 use libc::*;
 use luakit_common::ipc::IPC_TYPE_scroll;
-use mlua_sys::*;
+use mlua::ffi::*;
 use pango_sys::*;
 use webkit2gtk_sys::*;
 

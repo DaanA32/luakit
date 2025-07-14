@@ -7,9 +7,7 @@ pub mod __stddef_size_t_h {
 
 pub mod lua_h {
 
-    pub type lua_CFunction = Option::<
-        unsafe extern "C" fn(*mut lua_State) -> std::ffi::c_int,
-    >;
+    pub type lua_CFunction = Option<unsafe extern "C" fn(*mut lua_State) -> std::ffi::c_int>;
     #[derive(Copy, Clone)]
     #[repr(C)]
 
@@ -59,11 +57,7 @@ pub mod lua_h {
 
         pub fn lua_pushlightuserdata(L: *mut lua_State, p: *mut std::ffi::c_void);
 
-        pub fn lua_getfield(
-            L: *mut lua_State,
-            idx: std::ffi::c_int,
-            k: *const std::ffi::c_char,
-        );
+        pub fn lua_getfield(L: *mut lua_State, idx: std::ffi::c_int, k: *const std::ffi::c_char);
 
         pub fn lua_rawget(L: *mut lua_State, idx: std::ffi::c_int);
 
@@ -139,9 +133,9 @@ pub mod log_h {
 }
 
 pub mod luaclass_h {
-    use super::lua_h::lua_State;
     use super::gtypes_h::gchar;
     use super::lauxlib_h::luaL_Reg;
+    use super::lua_h::lua_State;
     unsafe extern "C" {
 
         pub fn luaH_openlib(
@@ -161,45 +155,41 @@ pub mod luaobject_h {
             L,
             b"luakit.object.registry\0" as *const u8 as *const std::ffi::c_char,
             (::core::mem::size_of::<[std::ffi::c_char; 23]>() as std::ffi::c_ulong)
-                .wrapping_div(
-                    ::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong,
-                )
+                .wrapping_div(::core::mem::size_of::<std::ffi::c_char>() as std::ffi::c_ulong)
                 .wrapping_sub(1 as std::ffi::c_int as std::ffi::c_ulong),
         );
         lua_rawget(L, LUA_REGISTRYINDEX);
     }
     #[inline]
 
-    pub unsafe extern "C" fn luaH_object_ref(
-        mut L: *mut lua_State,
-        mut oud: gint,
-    ) -> gpointer {
+    pub unsafe extern "C" fn luaH_object_ref(mut L: *mut lua_State, mut oud: gint) -> gpointer {
         luaH_object_registry_push(L);
         let mut p = luaH_object_incref(
             L,
             -(1 as std::ffi::c_int),
-            if oud < 0 as std::ffi::c_int { oud - 1 as std::ffi::c_int } else { oud },
+            if oud < 0 as std::ffi::c_int {
+                oud - 1 as std::ffi::c_int
+            } else {
+                oud
+            },
         );
         lua_settop(L, -(1 as std::ffi::c_int) - 1 as std::ffi::c_int);
         return p;
     }
     #[inline]
 
-    pub unsafe extern "C" fn luaH_object_push(
-        mut L: *mut lua_State,
-        mut p: gpointer,
-    ) -> gint {
+    pub unsafe extern "C" fn luaH_object_push(mut L: *mut lua_State, mut p: gpointer) -> gint {
         luaH_object_registry_push(L);
         lua_pushlightuserdata(L, p);
         lua_rawget(L, -(2 as std::ffi::c_int));
         lua_remove(L, -(2 as std::ffi::c_int));
         return 1 as std::ffi::c_int;
     }
-    use super::lua_h::{
-        lua_State, lua_pushlstring, lua_rawget, LUA_REGISTRYINDEX, lua_settop,
-        lua_pushlightuserdata, lua_remove,
-    };
     use super::gtypes_h::{gint, gpointer};
+    use super::lua_h::{
+        LUA_REGISTRYINDEX, lua_State, lua_pushlightuserdata, lua_pushlstring, lua_rawget,
+        lua_remove, lua_settop,
+    };
     unsafe extern "C" {
 
         pub fn luaH_object_incref(L: *mut lua_State, tud: gint, oud: gint) -> gpointer;
@@ -208,15 +198,12 @@ pub mod luaobject_h {
 
 pub mod msg_h {
 
-    pub static mut string_format_ref: gpointer = 0 as *const std::ffi::c_void
-        as *mut std::ffi::c_void;
+    pub static mut string_format_ref: gpointer =
+        0 as *const std::ffi::c_void as *mut std::ffi::c_void;
 
-    pub static mut tostring_ref: gpointer = 0 as *const std::ffi::c_void
-        as *mut std::ffi::c_void;
+    pub static mut tostring_ref: gpointer = 0 as *const std::ffi::c_void as *mut std::ffi::c_void;
 
-    pub unsafe extern "C" fn luaH_msg_string_from_args(
-        mut L: *mut lua_State,
-    ) -> *const gchar {
+    pub unsafe extern "C" fn luaH_msg_string_from_args(mut L: *mut lua_State) -> *const gchar {
         let mut nargs = lua_gettop(L);
         let mut i = 1 as std::ffi::c_int;
         while i <= nargs {
@@ -240,18 +227,14 @@ pub mod msg_h {
         if lua_pcall(L, nargs, 1 as std::ffi::c_int, 0 as std::ffi::c_int) != 0 {
             luaL_error(
                 L,
-                b"failed to format message: %s\0" as *const u8
-                    as *const std::ffi::c_char,
+                b"failed to format message: %s\0" as *const u8 as *const std::ffi::c_char,
                 lua_tolstring(L, -(1 as std::ffi::c_int), NULL as *mut size_t),
             );
         }
         return lua_tolstring(L, -(1 as std::ffi::c_int), NULL as *mut size_t);
     }
 
-    pub unsafe extern "C" fn luaH_msg(
-        mut L: *mut lua_State,
-        mut lvl: log_level_t,
-    ) -> gint {
+    pub unsafe extern "C" fn luaH_msg(mut L: *mut lua_State, mut lvl: log_level_t) -> gint {
         let mut ar = lua_Debug {
             event: 0,
             name: 0 as *const std::ffi::c_char,
@@ -267,8 +250,8 @@ pub mod msg_h {
         };
         lua_getstack(L, 1 as std::ffi::c_int, &mut ar);
         lua_getinfo(L, b"Sln\0" as *const u8 as *const std::ffi::c_char, &mut ar);
-        let mut src = if *(ar.source).offset(0 as std::ffi::c_int as isize)
-            as std::ffi::c_int == '@' as i32
+        let mut src = if *(ar.source).offset(0 as std::ffi::c_int as isize) as std::ffi::c_int
+            == '@' as i32
         {
             (ar.source).offset(1 as std::ffi::c_int as isize)
         } else {
@@ -306,113 +289,100 @@ pub mod msg_h {
     pub unsafe extern "C" fn luaH_msg_fatal(mut L: *mut lua_State) -> gint {
         return luaH_msg(L, LOG_LEVEL_fatal);
     }
-    use super::gtypes_h::{gpointer, gchar, gint};
-    use super::lua_h::{
-        lua_State, lua_gettop, lua_type, LUA_TNUMBER, lua_pushvalue, lua_pcall,
-        lua_remove, lua_insert, lua_tolstring, lua_Debug, lua_getstack, lua_getinfo,
-    };
-    use super::luaobject_h::luaH_object_push;
-    use super::lauxlib_h::luaL_error;
     use super::__stddef_null_h::NULL;
     use super::__stddef_size_t_h::size_t;
+    use super::gtypes_h::{gchar, gint, gpointer};
+    use super::lauxlib_h::luaL_error;
     use super::log_h::{
-        log_level_t, _log, LOG_LEVEL_debug, LOG_LEVEL_verbose, LOG_LEVEL_info,
-        LOG_LEVEL_warn, LOG_LEVEL_error, LOG_LEVEL_fatal,
+        _log, LOG_LEVEL_debug, LOG_LEVEL_error, LOG_LEVEL_fatal, LOG_LEVEL_info, LOG_LEVEL_verbose,
+        LOG_LEVEL_warn, log_level_t,
     };
+    use super::lua_h::{
+        LUA_TNUMBER, lua_Debug, lua_State, lua_getinfo, lua_getstack, lua_gettop, lua_insert,
+        lua_pcall, lua_pushvalue, lua_remove, lua_tolstring, lua_type,
+    };
+    use super::luaobject_h::luaH_object_push;
 }
 
 pub mod __stddef_null_h {
 
     pub const NULL: std::ffi::c_int = 0 as std::ffi::c_int;
 }
+pub use self::__stddef_null_h::NULL;
 pub use self::__stddef_size_t_h::size_t;
-pub use self::lua_h::{
-    lua_CFunction, lua_Debug, LUA_REGISTRYINDEX, LUA_GLOBALSINDEX, LUA_TNUMBER,
-    lua_State, lua_gettop, lua_settop, lua_pushvalue, lua_remove, lua_insert, lua_type,
-    lua_tolstring, lua_pushlstring, lua_pushlightuserdata, lua_getfield, lua_rawget,
-    lua_pcall, lua_getstack, lua_getinfo,
-};
-pub use self::gtypes_h::{gpointer, gint, gchar};
+pub use self::gtypes_h::{gchar, gint, gpointer};
 pub use self::lauxlib_h::{luaL_Reg, luaL_error};
 pub use self::log_h::{
-    log_level_t, LOG_LEVEL_debug, LOG_LEVEL_verbose, LOG_LEVEL_info, LOG_LEVEL_warn,
-    LOG_LEVEL_error, LOG_LEVEL_fatal, _log,
+    _log, LOG_LEVEL_debug, LOG_LEVEL_error, LOG_LEVEL_fatal, LOG_LEVEL_info, LOG_LEVEL_verbose,
+    LOG_LEVEL_warn, log_level_t,
+};
+pub use self::lua_h::{
+    LUA_GLOBALSINDEX, LUA_REGISTRYINDEX, LUA_TNUMBER, lua_CFunction, lua_Debug, lua_State,
+    lua_getfield, lua_getinfo, lua_getstack, lua_gettop, lua_insert, lua_pcall,
+    lua_pushlightuserdata, lua_pushlstring, lua_pushvalue, lua_rawget, lua_remove, lua_settop,
+    lua_tolstring, lua_type,
 };
 use self::luaclass_h::luaH_openlib;
 pub use self::luaobject_h::{
-    luaH_object_registry_push, luaH_object_ref, luaH_object_push, luaH_object_incref,
+    luaH_object_incref, luaH_object_push, luaH_object_ref, luaH_object_registry_push,
 };
 pub use self::msg_h::{
-    string_format_ref, tostring_ref, luaH_msg_string_from_args, luaH_msg, luaH_msg_debug,
-    luaH_msg_verbose, luaH_msg_info, luaH_msg_warn, luaH_msg_error, luaH_msg_fatal,
+    luaH_msg, luaH_msg_debug, luaH_msg_error, luaH_msg_fatal, luaH_msg_info,
+    luaH_msg_string_from_args, luaH_msg_verbose, luaH_msg_warn, string_format_ref, tostring_ref,
 };
-pub use self::__stddef_null_h::NULL;
 #[unsafe(no_mangle)]
 
 pub unsafe extern "C" fn msg_lib_setup(mut L: *mut lua_State) {
-    static mut msg_lib: [luaL_Reg; 7] = unsafe {
+    let msg_lib = unsafe {
         [
             {
                 let mut init = luaL_Reg {
                     name: b"fatal\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_msg_fatal as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: Some(luaH_msg_fatal as unsafe extern "C" fn(*mut lua_State) -> gint),
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"error\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_msg_error as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: Some(luaH_msg_error as unsafe extern "C" fn(*mut lua_State) -> gint),
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"warn\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_msg_warn as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: Some(luaH_msg_warn as unsafe extern "C" fn(*mut lua_State) -> gint),
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"info\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_msg_info as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: Some(luaH_msg_info as unsafe extern "C" fn(*mut lua_State) -> gint),
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"verbose\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_msg_verbose as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: Some(luaH_msg_verbose as unsafe extern "C" fn(*mut lua_State) -> gint),
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: b"debug\0" as *const u8 as *const std::ffi::c_char,
-                    func: Some(
-                        luaH_msg_debug as unsafe extern "C" fn(*mut lua_State) -> gint,
-                    ),
+                    func: Some(luaH_msg_debug as unsafe extern "C" fn(*mut lua_State) -> gint),
                 };
                 init
             },
             {
                 let mut init = luaL_Reg {
                     name: NULL as *const std::ffi::c_char,
-                    func: ::core::mem::transmute::<
-                        libc::intptr_t,
-                        lua_CFunction,
-                    >(NULL as libc::intptr_t),
+                    func: ::core::mem::transmute::<libc::intptr_t, lua_CFunction>(
+                        NULL as libc::intptr_t,
+                    ),
                 };
                 init
             },
@@ -421,8 +391,8 @@ pub unsafe extern "C" fn msg_lib_setup(mut L: *mut lua_State) {
     luaH_openlib(
         L,
         b"msg\0" as *const u8 as *const std::ffi::c_char,
-        msg_lib.as_ptr(),
-        msg_lib.as_ptr(),
+        msg_lib,
+        msg_lib,
     );
     lua_getfield(
         L,

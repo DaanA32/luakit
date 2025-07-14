@@ -3,7 +3,7 @@ use std::ffi::CStr;
 use glib_sys::*;
 use gobject_sys::*;
 use libc::size_t;
-use mlua_sys::*;
+use mlua::ffi::*;
 use webkit2gtk_sys::*;
 
 pub mod property_h {

@@ -3,10 +3,10 @@ use glib_sys::{
     gboolean, gpointer,
 };
 use libc::{c_void, memset, size_t};
-use mlua_sys::{
+use mlua::ffi::{
     lua_Integer, lua_State, lua_createtable, lua_gettop, lua_newuserdata, lua_pushboolean,
-    lua_pushinteger, lua_pushvalue, lua_setfenv, lua_setmetatable, lua_settop, lua_tolstring,
-    luaL_Reg, luaL_checkinteger, luaL_checklstring, luaL_error,
+    lua_pushinteger, lua_pushvalue, lua_setmetatable, lua_settop, lua_tolstring, luaL_Reg,
+    luaL_checkinteger, luaL_checklstring, luaL_error,
 };
 
 use crate::common::common;
@@ -57,7 +57,7 @@ unsafe extern "C-unwind" fn timer_new(mut L: *mut lua_State) -> *mut ltimer_t {
     lua_createtable(L, 0 as std::ffi::c_int, 0 as std::ffi::c_int);
     lua_createtable(L, 0 as std::ffi::c_int, 0 as std::ffi::c_int);
     lua_setmetatable(L, -(2 as std::ffi::c_int));
-    lua_setfenv(L, -(2 as std::ffi::c_int));
+    // lua_setfenv(L, -(2 as std::ffi::c_int));
     lua_pushvalue(L, -(1 as std::ffi::c_int));
     luaH_class_emit_signal(
         L,
@@ -207,7 +207,7 @@ pub unsafe extern "C-unwind" fn luaH_timer_newindex_miss_property(
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C-unwind" fn timer_class_setup(mut L: *mut lua_State) {
-    static mut timer_methods: [luaL_Reg; 4] = unsafe {
+    let timer_methods = unsafe {
         [
             {
                 let mut init = luaL_Reg {
@@ -246,7 +246,7 @@ pub unsafe extern "C-unwind" fn timer_class_setup(mut L: *mut lua_State) {
             // },
         ]
     };
-    static mut timer_meta: [luaL_Reg; 10] = unsafe {
+    let timer_meta = unsafe {
         [
             {
                 let mut init = luaL_Reg {
